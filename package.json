@@ -72,8 +72,6 @@
     "vitest": "^4.0.18"
   },
   "lint-staged": {
-    "*": {
-      "{ts,tsx}": "eslint --fix"
-    }
+    "**/*.{ts,tsx}": "eslint --fix"
   }
 }
