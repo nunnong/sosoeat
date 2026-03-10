@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -14,7 +13,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             staleTime: 60 * 1000,
           },
         },
-      }),
+      })
   );
 
   return (
