@@ -201,32 +201,39 @@ import { LocalUtils } from './utils';
 
 ## ⚓ Git Hooks & 자동화 (Automation)
 
-본 프로젝트는 **Husky**와 **lint-staged**를 사용하여 코드 품질을 자동으로 검증합니다.
+본 프로젝트는 **Husky**와 **lint-staged**를 사용하여 코드 품질을 자동으로 검증합니다. 모든 커밋과 푸시 전 단계에서 최소한의 코드 품질을 보장합니다.
 
-### Pre-commit 실행 순서
+### 1. 커밋 전 검증 (Pre-commit Hook)
 
-1. **Type Check**: `tsc --noEmit` 전체 타입 검사
-2. **Lint-staged**: 스테이징된 파일에 대해 Prettier(포맷팅), ESLint(컨벤션), Jest(연관 테스트) 실행
+커밋 시 다음 과정이 자동으로 실행되며, 실패 시 커밋이 중단됩니다.
 
-### Commit-msg 실행
+1.  **Type Check**: `npm run type-check`를 통해 전체 프로젝트의 타입 안정성을 검사합니다.
+2.  **Lint-staged**: 스테이징된(변경된) 파일에 대해서만 다음 작업을 수행합니다.
+    - `ts, tsx`: Prettier 포맷팅 → ESLint 자동 수정 → Jest 관련 단위 테스트 실행
+    - `js, jsx, json, md, css`: Prettier 포맷팅
 
-- **Commitlint**: 커밋 메시지 규칙 준수 여부 검사
+### 2. 커밋 메시지 규칙 (Commit-msg Hook)
+
+- **Commitlint**: 설정된 커밋 컨벤션(Angular 스타일) 준수 여부를 검사합니다. (예: `feat:`, `fix:`, `chore:` 등)
 
 ---
 
 ## 🧪 CI/CD 파이프라인 (CI/CD Pipeline)
 
-GitHub Actions를 사용하여 자동화된 검증 및 배포 프로세스를 운영합니다.
+GitHub Actions와 Vercel CLI를 결합하여 견고한 배포 파이프라인을 운영합니다. Vercel의 기본 자동 배포 대신 GitHub Actions에서 빌드와 테스트를 직접 제어합니다.
 
-### 1. CI (Continuous Integration): 코드 검증
+### 1. Preview 배포 (Pull Request)
 
-모든 PR에 대해 다음 작업이 **병렬(Parallel)**로 실행됩니다:
+`main` 또는 `develop` 브랜치로 PR이 생성될 때 실행됩니다.
 
-- **Lint & Type Check**: 코드 컨벤션 및 타입 안정성 검사
-- **Unit Tests**: `jest` 단위 테스트 실행
-- **Build & E2E Tests**: 빌드 성공 여부 및 `playwright` 시나리오 테스트
+- **검증**: `npm ci` 후 단위 테스트(`npm test`)를 수행합니다.
+- **빌드**: Vercel CLI를 사용하여 Preview 환경용 빌드를 수행합니다.
+- **배포**: 성공 시 고유한 **Preview URL**을 생성하고 PR에 댓글로 링크를 제공합니다.
 
-### 2. CD (Continuous Deployment): 자동 배포
+### 2. Production 배포 (Main Push/Merge)
 
-- **트리거**: `main` 브랜치로 병합 시 발생
-- **절차**: 모든 CI 작업 성공 후 Vercel을 통해 자동 배포됩니다.
+`main` 브랜치에 코드가 푸시되거나 PR이 병합될 때 실행됩니다.
+
+- **검증**: 프로덕션 빌드 가능 여부를 최종 확인합니다. (`npm run build`)
+- **배포**: Vercel CLI를 통해 **Production 환경**으로 즉시 배포합니다. (`vercel deploy --prod`)
+
