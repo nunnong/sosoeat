@@ -65,4 +65,6 @@ export const LoggedInWithProfileImage: Story = {
   ],
 };
 
-// TODO: 알림 읽음/읽지 않음 스토리는 React Query 연결 후 추가 예정
+// TODO: 아래 스토리는 React Query 연결 후 추가 예정
+// - 알림 읽음/읽지 않음 (unreadCount)
+// - 찜한 모임 배지 표시 (wishlistCount)

@@ -11,9 +11,9 @@ import { Bell, ChevronDown, Plus, X } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
 const NAV_ITEMS = [
-  { href: '/meetings', label: '전체 모임' },
-  { href: '/together', label: '함께 먹기' },
-  { href: '/group-buy', label: '공동구매' },
+  { href: '/meetings', label: '모임찾기' },
+  { href: '/wishlist', label: '찜한 모임', showBadge: true },
+  { href: '/sosotalk', label: '소소토크' },
 ] as const;
 
 export function NavigationBar() {
@@ -24,6 +24,10 @@ export function NavigationBar() {
   // TODO: 알림 기능 구현 시 React Query로 교체 예정
   // ex) const { data: unreadCount = 0 } = useUnreadNotificationCount();
   const unreadCount = 0;
+
+  // TODO: 찜 기능 구현 시 React Query로 교체 예정
+  // ex) const { data: wishlistCount = 0 } = useWishlistCount();
+  const [wishlistCount] = useState(0);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -67,13 +71,18 @@ export function NavigationBar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                     isActive
                       ? 'text-sosoeat-orange-600 bg-orange-50'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {item.label}
+                  {'showBadge' in item && (
+                    <span className="bg-sosoeat-orange-600 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white">
+                      {wishlistCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
