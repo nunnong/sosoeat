@@ -64,7 +64,7 @@ describe('NavigationBar', () => {
 
     it('알림 버튼이 표시된다', () => {
       render(<NavigationBar />);
-      expect(screen.getByRole('button', { name: '알림' })).toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: '알림' }).length).toBeGreaterThan(0);
     });
 
     it('프로필 메뉴가 표시된다', () => {

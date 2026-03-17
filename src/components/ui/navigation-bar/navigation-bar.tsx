@@ -33,17 +33,12 @@ export function NavigationBar() {
   const [wishlistCount] = useState(0);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsDropdownOpen(false);
-      }
-      if (notificationRef.current && !notificationRef.current.contains(e.target as Node)) {
-        setIsNotificationOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -94,24 +89,45 @@ export function NavigationBar() {
           {/* 로그인 상태 */}
           {user ? (
             <>
-              {/* 알림 버튼 */}
-              <div ref={notificationRef} className="relative">
-                <button
-                  className="relative p-1"
-                  onClick={() => setIsNotificationOpen((prev) => !prev)}
-                  aria-label="알림"
-                >
-                  <Bell className="text-sosoeat-orange-600 h-5 w-5" />
-                  {unreadCount > 0 && (
-                    <span className="bg-sosoeat-orange-600 absolute top-0 right-0 h-2 w-2 rounded-full" />
-                  )}
-                </button>
+              {/* 알림 버튼 — Mobile: Sheet / PC·Tablet: Dropdown */}
 
-                {/* 알림 패널 — 패널 연결하면서 주석 해제하시면 됩니다! */}
-                {/* {isNotificationOpen && (
-                  <NotificationPanel onClose={() => setIsNotificationOpen(false)} />
-                )} */}
-              </div>
+              {/* Mobile 알림 (md 미만) */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="relative p-1 md:hidden" aria-label="알림">
+                    <Bell className="text-sosoeat-orange-600 h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="bg-sosoeat-orange-600 absolute top-0 right-0 h-2 w-2 rounded-full" />
+                    )}
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-64 p-0 pt-12">
+                  <SheetTitle className="sr-only">알림</SheetTitle>
+                  {/* TODO: 알림 패널 연결 시 주석 해제
+                  <NotificationPanel /> */}
+                </SheetContent>
+              </Sheet>
+
+              {/* PC·Tablet 알림 (md 이상) — Dropdown 연결 시 주석 해제 */}
+              {/* <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="relative hidden p-1 md:block" aria-label="알림">
+                    <Bell className="text-sosoeat-orange-600 h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="bg-sosoeat-orange-600 absolute top-0 right-0 h-2 w-2 rounded-full" />
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <NotificationPanel />
+                </DropdownMenuContent>
+              </DropdownMenu> */}
+              <button className="relative hidden p-1 md:block" aria-label="알림">
+                <Bell className="text-sosoeat-orange-600 h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="bg-sosoeat-orange-600 absolute top-0 right-0 h-2 w-2 rounded-full" />
+                )}
+              </button>
 
               {/* 모임 만들기 — lg 이상 */}
               <button
