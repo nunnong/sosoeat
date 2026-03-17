@@ -21,6 +21,8 @@ export function NavigationBar() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
 
+  const visibleNavItems = NAV_ITEMS.filter((item) => !('showBadge' in item) || !!user);
+
   // TODO: 알림 기능 구현 시 React Query로 교체 예정
   // ex) const { data: unreadCount = 0 } = useUnreadNotificationCount();
   const unreadCount = 0;
@@ -65,7 +67,7 @@ export function NavigationBar() {
 
           {/* 메뉴 링크 — 태블릿 이상 */}
           <nav className="hidden items-center gap-1 md:flex">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -205,7 +207,7 @@ export function NavigationBar() {
               </button>
             </div>
             <nav className="flex flex-col gap-1 px-4">
-              {NAV_ITEMS.map((item) => {
+              {visibleNavItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <Link

@@ -35,15 +35,8 @@ describe('NavigationBar', () => {
     it('카테고리 메뉴 링크가 렌더링된다', () => {
       render(<NavigationBar />);
       expect(screen.getAllByRole('link', { name: '모임찾기' }).length).toBeGreaterThan(0);
-      expect(screen.getAllByRole('link', { name: /찜한 모임/ }).length).toBeGreaterThan(0);
+      expect(screen.queryByRole('link', { name: /찜한 모임/ })).not.toBeInTheDocument();
       expect(screen.getAllByRole('link', { name: '소소토크' }).length).toBeGreaterThan(0);
-    });
-
-    it('찜한 모임 배지가 항상 표시된다', () => {
-      render(<NavigationBar />);
-      // 데스크톱 + 모바일 메뉴 두 곳에 렌더링됨
-      const badges = screen.getAllByText('0');
-      expect(badges.length).toBeGreaterThan(0);
     });
   });
 
@@ -82,6 +75,12 @@ describe('NavigationBar', () => {
     it('로그인 버튼이 표시되지 않는다', () => {
       render(<NavigationBar />);
       expect(screen.queryByRole('link', { name: '로그인' })).not.toBeInTheDocument();
+    });
+
+    it('찜한 모임 메뉴와 배지가 표시된다', () => {
+      render(<NavigationBar />);
+      expect(screen.getAllByRole('link', { name: /찜한 모임/ }).length).toBeGreaterThan(0);
+      expect(screen.getAllByText('0').length).toBeGreaterThan(0);
     });
   });
 
