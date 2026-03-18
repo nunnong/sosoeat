@@ -4,6 +4,5 @@ export interface BestSoeatCardProps {
   meetingAt: string;
   thumbnailUrl?: string;
   thumbnailAlt?: string;
-  className?: string;
   onClick?: () => void;
 }

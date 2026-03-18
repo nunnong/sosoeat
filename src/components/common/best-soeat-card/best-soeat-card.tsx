@@ -13,15 +13,13 @@ export function BestSoeatCard({
   meetingAt,
   thumbnailUrl,
   thumbnailAlt = '모임 이미지',
-  className,
   onClick,
 }: BestSoeatCardProps) {
   return (
     <Card
       className={cn(
         'border-sosoeat-gray-400 h-[200px] w-[220px] gap-0 border py-0 ring-0',
-        onClick && 'cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]',
-        className
+        onClick && 'cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]'
       )}
       onClick={onClick}
     >
