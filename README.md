@@ -191,13 +191,15 @@ const meta = {
 
 ### 2. 네이밍 컨벤션
 
-| 대상            | 규칙       | 예시                        |
-| :-------------- | :--------- | :-------------------------- |
-| 폴더명          | kebab-case | `button/`, `user-auth/`     |
-| 파일명          | kebab-case | `button.tsx`, `use-auth.ts` |
-| 컴포넌트        | PascalCase | `Button`, `DatePicker`      |
-| 훅              | camelCase  | `useAuth`, `useToggle`      |
-| 타입/인터페이스 | PascalCase | `ButtonProps`, `UserData`   |
+| 타입별 명명      | 규칙       | 예시                        |
+| :--------------- | :--------- | :-------------------------- |
+| 폴더명           | kebab-case | `button/`, `user-auth/`     |
+| 파일명           | kebab-case | `button.tsx`, `use-auth.ts` |
+| 컴포넌트         | PascalCase | `Button`, `DatePicker`      |
+| 훅               | camelCase  | `useAuth`, `useToggle`      |
+| 타입 선언 (필수) | PascalCase | `interface ButtonProps {}`  |
+
+> 💡 **타입 선언 규칙**: 본 프로젝트에서는 객체의 타입을 정의할 때 `type` 키워드 대신 확장성이 좋은 **`interface` 구문만을 사용**하도록 강제합니다. (예: `type User = {}` 지양, `interface User {}` 권장)
 
 ### 3. Import 순서 정렬 (자동화)
 
