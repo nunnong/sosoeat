@@ -1,17 +1,20 @@
 import { cva } from 'class-variance-authority';
+import clsx from 'clsx';
 import { User, Users } from 'lucide-react';
+import { twMerge } from 'tailwind-merge';
 
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Progress } from '@/components/ui/progress-bar/progress';
-import { ProgressProps } from '@/components/ui/progress-bar/progress.type';
+import type { GroupTypeProps } from '@/types/group-type.type';
 
-type ProgressWithLabelProps = {
+interface ProgressWithLabelProps {
   current: number;
   max: number;
-  variant: ProgressProps['variant'];
-};
+  variant: GroupTypeProps['variant'];
+  className?: string;
+}
 
-export function ProgressWithLabel({ current, max, variant }: ProgressWithLabelProps) {
+export function ProgressWithLabel({ current, max, variant, className }: ProgressWithLabelProps) {
   const clampedCurrent = Math.min(Math.max(0, current), max);
   const progress = (clampedCurrent / max) * 100;
 
@@ -27,9 +30,11 @@ export function ProgressWithLabel({ current, max, variant }: ProgressWithLabelPr
   return (
     <Field className="w-full max-w-sm">
       <FieldLabel htmlFor="progress-upload">
-        <span className="m-0 flex items-end justify-center gap-1">{<Users />}</span>
+        <span className="m-0 flex items-end justify-center gap-1">
+          {<Users className="size-3" />}
+        </span>
         <span className="text-bold -ml-1">{`${clampedCurrent}/${max} 참여중`}</span>
-        <span className={progressStateClasses({ variant })}>
+        <span className={twMerge(clsx(progressStateClasses({ variant, className })))}>
           {clampedCurrent === max ? '마감' : ``}
         </span>
       </FieldLabel>

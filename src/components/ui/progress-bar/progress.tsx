@@ -4,21 +4,11 @@ import * as React from 'react';
 
 import { Progress as ProgressPrimitive } from 'radix-ui';
 
-import { ProgressProps } from '@/components/ui/progress-bar/progress.type';
 import { cn } from '@/lib/utils';
+import type { GroupTypeProps } from '@/types/group-type.type';
+import { variantStyles,variantStylesFull } from '@/types/group-type.type';
 
-const variantStyles = {
-  groupBuy: 'bg-sosoeat-blue-500',
-  groupEat: 'bg-sosoeat-orange-500',
-  error: 'bg-red-600',
-};
-const variantStylesFull = {
-  groupBuy: 'bg-sosoeat-blue-700',
-  groupEat: 'bg-sosoeat-orange-700',
-  error: 'bg-red-600',
-};
-
-function Progress({ className, value, variant, ...props }: ProgressProps) {
+function Progress({ className, value, variant, ...props }: GroupTypeProps) {
   const isFull = (value ?? 0) >= 100;
   return (
     <ProgressPrimitive.Root
