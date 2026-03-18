@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 
+import { Providers } from '@/app/providers';
 import { Toaster } from '@/components/ui/sonner';
 
-import { Providers } from './providers';
-
-import './globals.css';
+import '@/app/globals.css';
 
 export const metadata: Metadata = {
   title: '소소잇 | 일상과 만남을 잇다',

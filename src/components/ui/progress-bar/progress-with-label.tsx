@@ -2,9 +2,8 @@ import { cva } from 'class-variance-authority';
 import { User, Users } from 'lucide-react';
 
 import { Field, FieldLabel } from '@/components/ui/field';
-
-import { Progress } from './progress';
-import { ProgressProps } from './progress.type';
+import { Progress } from '@/components/ui/progress-bar/progress';
+import { ProgressProps } from '@/components/ui/progress-bar/progress.type';
 
 type ProgressWithLabelProps = {
   current: number;

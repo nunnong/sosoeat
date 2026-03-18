@@ -1,8 +1,7 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/nextjs-vite';
 
+import { NavigationBar } from '@/components/ui/navigation-bar/navigation-bar';
 import { useAuthStore } from '@/store/authStore';
-
-import { NavigationBar } from './navigation-bar';
 
 const meta: Meta<typeof NavigationBar> = {
   title: 'Common/NavigationBar',

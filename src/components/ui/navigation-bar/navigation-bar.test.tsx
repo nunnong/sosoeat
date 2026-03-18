@@ -3,9 +3,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { NavigationBar } from '@/components/ui/navigation-bar/navigation-bar';
 import { useAuthStore } from '@/store/authStore';
-
-import { NavigationBar } from './navigation-bar';
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(),
