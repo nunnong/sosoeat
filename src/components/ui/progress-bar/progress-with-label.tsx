@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority';
 import clsx from 'clsx';
-import { Users } from 'lucide-react';
+import { User, Users } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
 import { Field, FieldLabel } from '@/components/ui/field';
@@ -29,10 +29,9 @@ export function ProgressWithLabel({ current, max, variant }: ProgressWithLabelPr
   return (
     <Field className="w-full max-w-sm">
       <FieldLabel htmlFor="progress-upload">
-        <span className="flex items-center justify-center gap-1">{'참여 인원'}</span>
-        <span className={progressStateClasses({ variant })}>
-          {current === max ? '마감' : `${current}/${max}명`}
-        </span>
+        <span className="m-0 flex items-end justify-center gap-1">{<Users />}</span>
+        <span className="text-bold -ml-1">{`${current}/${max} 참여중`}</span>
+        <span className={progressStateClasses({ variant })}>{current === max ? '마감' : ``}</span>
       </FieldLabel>
       <Progress value={progress} variant={variant} id="progress-upload" />
     </Field>
