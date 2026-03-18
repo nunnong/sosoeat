@@ -25,8 +25,8 @@ export function NavigationBar() {
   const visibleNavItems = NAV_ITEMS.filter((item) => !('showBadge' in item) || !!user);
 
   // TODO: 알림 기능 구현 시 React Query로 교체 예정
-  // ex) const { data: unreadCount = 0 } = useUnreadNotificationCount();
-  const unreadCount = 0;
+  // ex) const { data: hasUnread = false } = useHasUnreadNotification();
+  const hasUnread = false;
 
   // TODO: 찜 기능 구현 시 React Query로 교체 예정
   // ex) const { data: wishlistCount = 0 } = useWishlistCount();
@@ -96,7 +96,7 @@ export function NavigationBar() {
                 <SheetTrigger asChild>
                   <button className="relative p-1 md:hidden" aria-label="알림">
                     <Bell className="text-sosoeat-orange-600 h-5 w-5" />
-                    {unreadCount > 0 && (
+                    {hasUnread && (
                       <span className="bg-sosoeat-orange-600 absolute top-0 right-0 h-2 w-2 rounded-full" />
                     )}
                   </button>
@@ -113,7 +113,7 @@ export function NavigationBar() {
                 <DropdownMenuTrigger asChild>
                   <button className="relative hidden p-1 md:block" aria-label="알림">
                     <Bell className="text-sosoeat-orange-600 h-5 w-5" />
-                    {unreadCount > 0 && (
+                    {hasUnread && (
                       <span className="bg-sosoeat-orange-600 absolute top-0 right-0 h-2 w-2 rounded-full" />
                     )}
                   </button>
@@ -124,7 +124,7 @@ export function NavigationBar() {
               </DropdownMenu> */}
               <button className="relative hidden p-1 md:block" aria-label="알림">
                 <Bell className="text-sosoeat-orange-600 h-5 w-5" />
-                {unreadCount > 0 && (
+                {hasUnread && (
                   <span className="bg-sosoeat-orange-600 absolute top-0 right-0 h-2 w-2 rounded-full" />
                 )}
               </button>
