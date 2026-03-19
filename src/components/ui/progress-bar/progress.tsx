@@ -4,9 +4,9 @@ import * as React from 'react';
 
 import { Progress as ProgressPrimitive } from 'radix-ui';
 
+import type { GroupTypeProps } from '@/components/ui/progress-bar/progress.type';
+import { variantStyles, variantStylesFull } from '@/components/ui/progress-bar/progress.type';
 import { cn } from '@/lib/utils';
-import type { GroupTypeProps } from '@/types/group-type.type';
-import { variantStyles,variantStylesFull } from '@/types/group-type.type';
 
 function Progress({ className, value, variant, ...props }: GroupTypeProps) {
   const isFull = (value ?? 0) >= 100;

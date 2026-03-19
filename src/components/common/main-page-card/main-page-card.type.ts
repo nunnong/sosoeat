@@ -1,4 +1,4 @@
-import type { GroupTypeProps } from '@/types/group-type.type';
+import type { GroupTypeProps } from '@/components/ui/progress-bar';
 
 export interface MeetingHost {
   id: number;

@@ -4,8 +4,8 @@ import { Users } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
 import { Field, FieldLabel } from '@/components/ui/field';
+import type { GroupTypeProps } from '@/components/ui/progress-bar';
 import { Progress } from '@/components/ui/progress-bar/progress';
-import type { GroupTypeProps } from '@/types/group-type.type';
 
 interface ProgressWithLabelProps {
   current: number;
