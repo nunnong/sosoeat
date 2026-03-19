@@ -80,10 +80,16 @@ export function MainPageCard(meeting: Meeting) {
             <motion.div
               animate={{ scale: 1 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              whileTap={{ scale: [0.5, 1.15, 0.8] }}
+              whileTap={{ scale: [0.1, 1.15, 0.8], transition: { duration: 1, ease: 'easeOut' } }}
               className="flex items-center justify-center"
             >
-              <Image src="/icons/main-page-heart.svg" alt="좋아요" width={36} height={33} />
+              <Image
+                src="/icons/main-page-heart.svg"
+                alt="좋아요"
+                width={36}
+                height={33}
+                className=""
+              />
             </motion.div>
           </Button>
         </CardAction>
@@ -98,7 +104,7 @@ export function MainPageCard(meeting: Meeting) {
           </span>
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="text-[#6B7280]">
         <div
           className={cn('mb-4 -ml-1 flex items-center gap-1', variantTagStyles[meeting.variant])}
         >
@@ -141,7 +147,16 @@ export function MainPageCard(meeting: Meeting) {
           variant={meeting.variant}
           className="text-xs font-semibold"
         />
-        <span className="mt-2 block">{meeting.host.name}</span>
+        <div className="mt-1 flex items-center">
+          <Image
+            src={meeting.host.image}
+            alt="frofile-img"
+            width={32}
+            height={32}
+            className="rounded-full ring-2 ring-gray-300"
+          />
+          <span className="ml-1 block text-base font-semibold">{meeting.host.name}</span>
+        </div>
       </CardContent>
     </Card>
   );
