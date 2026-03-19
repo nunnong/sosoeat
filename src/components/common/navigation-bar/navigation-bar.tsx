@@ -47,7 +47,7 @@ export function NavigationBar() {
 
   return (
     <header className="bg-background min-w-[343px] md:min-w-[670px]">
-      <div className="flex h-12 items-center justify-between px-4 md:h-16 md:px-[30px]">
+      <div className="mx-auto flex h-12 w-full max-w-[343px] items-center justify-between px-4 md:h-16 md:max-w-[670px] md:px-[30px] lg:max-w-[1140px] lg:px-0">
         {/* 로고 */}
         <Link href="/" className="shrink-0">
           <Image src="/images/logo.svg" alt="sosoeat" width={72} height={22.64} priority />
