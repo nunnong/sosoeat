@@ -17,7 +17,6 @@ import {
   CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -32,6 +31,7 @@ const variantTagStyles = {
 };
 export function MainPageCard(meeting: Meeting) {
   const [showAlt, setShowAlt] = useState(false);
+  const [now, setNow] = useState(() => new Date());
 
   const startDate = new TZDate(new Date(), 'Asia/Seoul');
   const endDate = new TZDate(meeting.registrationEnd, 'Asia/Seoul');
@@ -46,6 +46,9 @@ export function MainPageCard(meeting: Meeting) {
   const isEnded = hoursUntilEnd <= 0;
   //곧 끝나는지
   const isClosingSoon = !isEnded && hoursUntilEnd < 24;
+  const isToday = format(endDate, 'yyyy-MM-dd') === format(startDate, 'yyyy-MM-dd');
+  const dateLabel = isToday ? '오늘' : '내일';
+  // "오늘 14:00 마감" 또는 "내일 14:00 마감"
 
   const countdownText = `${(duration.months ?? 0) > 0 ? `${duration.months}개월` : ''} ${Math.max(0, duration.days ?? 0)}일 ${Math.max(0, duration.hours ?? 0)}시간 ${Math.max(0, duration.minutes ?? 0)}분 남음`;
 
@@ -54,6 +57,11 @@ export function MainPageCard(meeting: Meeting) {
     const id = setInterval(() => setShowAlt((prev) => !prev), 2500);
     return () => clearInterval(id);
   }, [isClosingSoon]);
+  useEffect(() => {
+    if (!isClosingSoon && !isEnded) return;
+    const id = setInterval(() => setNow(new Date()), 60000); // 1분마다
+    return () => clearInterval(id);
+  }, [isClosingSoon, isEnded]);
 
   //시작 시간
   const formatted = format(parseISO(meeting.dateTime), 'M/d(E) HH:mm', { locale: ko });
@@ -134,7 +142,7 @@ export function MainPageCard(meeting: Meeting) {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
                   >
-                    오늘 {registrationEndFormatted} 마감
+                    {dateLabel} {registrationEndFormatted} 마감
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -152,7 +160,7 @@ export function MainPageCard(meeting: Meeting) {
         <div className="mt-1 flex items-center">
           <Image
             src={meeting.host.image}
-            alt="frofile-img"
+            alt="profile-img"
             width={32}
             height={32}
             className="rounded-full ring-2 ring-gray-300"
