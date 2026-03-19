@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown';
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth-store';
 
 const NAV_ITEMS = [
@@ -46,8 +47,14 @@ export function NavigationBar() {
   }
 
   return (
-    <header className="bg-background mx-auto w-full max-w-[1920px]">
-      <div className="flex h-[33px] items-center justify-between px-4 md:h-[40px] md:px-[37px] xl:h-16 xl:px-[390px]">
+    <header className="bg-background w-full">
+      <div
+        className={cn(
+          'mx-auto flex w-full items-center justify-between',
+          'h-[50px] max-w-[1140px] px-4',
+          'md:h-16 md:px-[37px]'
+        )}
+      >
         {/* 로고 */}
         <Link href="/" className="shrink-0">
           <Image src="/images/logo.svg" alt="sosoeat" width={72} height={22.64} priority />
