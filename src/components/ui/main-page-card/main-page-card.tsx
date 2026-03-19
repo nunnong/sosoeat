@@ -32,7 +32,6 @@ const variantTagStyles = {
     'rounded-lg bg-sosoeat-orange-100 px-2 py-1 font-semibold text-sosoeat-orange-600 [&_svg]:stroke-sosoeat-orange-600',
 };
 export function MainPageCard(meeting: Meeting) {
-  const [isTap, setIsTap] = useState(false);
   const [showAlt, setShowAlt] = useState(false);
 
   const startDate = new TZDate(new Date(), 'Asia/Seoul');
@@ -46,7 +45,7 @@ export function MainPageCard(meeting: Meeting) {
   //곧 끝나는지
   const isClosingSoon = !isEnded && hoursUntilEnd < 24;
 
-  const countdownText = `${Math.max(0, duration.days ?? 0)}일 ${Math.max(0, duration.hours ?? 0)}시간 ${Math.max(0, duration.minutes ?? 0)}분 남음`;
+  const countdownText = `${(duration.months ?? 0) > 0 ? `${duration.months}개월` : ''} ${Math.max(0, duration.days ?? 0)}일 ${Math.max(0, duration.hours ?? 0)}시간 ${Math.max(0, duration.minutes ?? 0)}분 남음`;
 
   useEffect(() => {
     if (!isClosingSoon) return;
