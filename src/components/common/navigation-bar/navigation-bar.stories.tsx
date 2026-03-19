@@ -1,11 +1,11 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/auth-store';
 
 import { NavigationBar } from './navigation-bar';
 
 const meta: Meta<typeof NavigationBar> = {
-  title: 'Common/NavigationBar',
+  title: 'components/common/navigation-bar',
   component: NavigationBar,
   parameters: {
     layout: 'fullscreen',

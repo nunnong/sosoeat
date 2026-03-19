@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown';
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/auth-store';
 
 const NAV_ITEMS = [
   { href: '/meetings', label: '모임찾기' },

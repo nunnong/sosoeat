@@ -3,7 +3,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/auth-store';
 
 import { NavigationBar } from './navigation-bar';
 
