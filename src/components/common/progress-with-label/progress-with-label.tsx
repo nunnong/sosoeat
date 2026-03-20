@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority';
-import { User, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 import { Field, FieldLabel } from '@/components/ui/field/field';
 import type { ProgressProps } from '@/components/ui/progress-bar/index';

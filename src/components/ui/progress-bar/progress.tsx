@@ -10,22 +10,22 @@ import { cn } from '@/lib/utils';
 const variantStyles = {
   groupBuy: 'bg-sosoeat-blue-500',
   groupEat: 'bg-sosoeat-orange-500',
-  error: 'bg-red-600',
 };
+
 const variantStylesFull = {
   groupBuy: 'bg-sosoeat-blue-700',
   groupEat: 'bg-sosoeat-orange-700',
-  error: 'bg-red-600',
 };
 
-function Progress({ className, value, variant, ...props }: ProgressProps) {
+const Progress = ({ className, value, variant, ...props }: ProgressProps) => {
   const isFull = (value ?? 0) >= 100;
+
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
       value={value}
       className={cn(
-        'bg-muted relative flex h-2 w-[328px] items-center overflow-x-hidden rounded-full',
+        'bg-muted relative flex h-2 w-full items-center overflow-x-hidden rounded-full',
         className
       )}
       {...props}
@@ -40,6 +40,6 @@ function Progress({ className, value, variant, ...props }: ProgressProps) {
       />
     </ProgressPrimitive.Root>
   );
-}
+};
 
 export { Progress };
