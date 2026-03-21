@@ -1,2 +1,2 @@
-export { GoogleIcon } from './google-icon';
-export { KakaoIcon } from './kakao-icon';
+export * from './google-icon';
+export * from './kakao-icon';

@@ -4,7 +4,7 @@ export interface LoginFormValues {
 }
 
 export interface LoginFormProps {
-  onSubmit: (data: LoginFormValues) => Promise<void>;
+  onSubmit?: (data: LoginFormValues) => Promise<void>;
   isLoading?: boolean;
   defaultValues?: Partial<LoginFormValues>;
 }
