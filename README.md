@@ -15,7 +15,7 @@
 
 ### 테스트 및 개발 도구 (Testing & Tooling)
 
-- **단위 테스트**: Jest, Vitest, React Testing Library
+- **단위 테스트**: Jest, React Testing Library
 - **E2E 테스트**: Playwright
 - **컴포넌트 문서화**: Storybook
 - **코드 품질 관리**: ESLint 9 (Flat Config), Prettier
@@ -152,115 +152,13 @@ tests/e2e               # Playwright E2E 테스트 시나리오
 .github/workflows/      # CI/CD (GitHub Actions)
 ```
 
-### 💡 컴포넌트 관리 규칙
-
-- **Colocation**: 특정 페이지에서만 쓰이는 컴포넌트는 해당 라우트의 `_components/` 폴더에 위치시킵니다.
-- **Atomic & Composed**: 순수 UI 조각은 `ui/`, 이를 조합한 재사용 패턴은 `common/`에서 관리합니다.
-- **Barrel Pattern**: 각 컴포넌트 폴더에는 `index.ts`를 두어 외부에서 깔끔하게 임포트할 수 있도록 re-export합니다.
-- **Testing & Stories**: 컴포넌트 파일(`.tsx`), 테스트(`.test.tsx`), 스토리북(`.stories.tsx`)은 반드시 **동일한 폴더**에 함께 둡니다.
-
-### 🎨 스토리북 구조 (Storybook Structure)
-
-Storybook 내에서의 컴포넌트 계층 구조(`title`)는 컴포넌트의 역할과 실제 폴더 위치에 따라 다음과 같은 명명 규칙을 따릅니다:
-
-1. **페이지 종속 컴포넌트 (`pages/`)**
-   - 특정 라우트(페이지)의 `_components/` 내에서만 사용되는 컴포넌트는 실제 라우트 URL 경로와 동일하게 작성합니다.
-   - 포맷: `pages/[라우트경로]/[컴포넌트명]`
-   - 예: `pages/auth/signup/SignupForm`
-
-2. **공용 컴포넌트 (`ui/`, `common/`)**
-   - **ui**: 원자(Atomic) 단위의 순수 UI 조각 (예: `ui/Button`, `ui/Input`)
-   - **common**: 공용으로 재사용되는 조합형 패턴 (예: `common/Funnel`, `common/ProgressWithLabel`)
-
-`.stories.tsx` 파일 작성 시 상단 `meta`의 `title` 속성을 아래와 같이 설정해 주세요:
-
-```typescript
-// 1. 페이지 컴포넌트 예시
-const meta: Meta<typeof SignupForm> = {
-  title: 'pages/auth/signup/signupForm',
-  component: SignupForm,
-};
-
-// 2. 공용 컴포넌트 예시
-const meta: Meta<typeof Button> = {
-  title: 'ui/Button', // 또는 'common/Funnel'
-  component: Button,
-};
-```
-
 ---
 
-## 📏 개발 규칙 및 컨벤션 (Conventions)
+## 📏 컨벤션 및 가이드 (Conventions)
 
-### 1. 브랜치 전략 (Branch Strategy)
+상세한 폴더 구조 관리 규칙, 스토리북 작성법, 코딩 컨벤션 및 테스트 작성 규칙은 별도의 문서에서 관리합니다.
 
-본 프로젝트는 **Git Flow** 전략을 기반으로 협업합니다.
-
-- **main**: 프로덕션 환경에 배포되는 최상위 브랜치입니다.
-- **develop**: 다음 출시 버전을 개발하는 통합 브랜치입니다.
-- **feature**: 새로운 기능을 개발하는 브랜치입니다. `develop`에서 생성하며, 완료 후 `develop`으로 PR을 보냅니다.
-
-**브랜치 네이밍 규칙**: `type/#issuenumber-description` (예: `feat/#12-login-page`)
-
-### 2. 네이밍 컨벤션
-
-| 타입별 명명      | 규칙       | 예시                        |
-| :--------------- | :--------- | :-------------------------- |
-| 폴더명           | kebab-case | `button/`, `user-auth/`     |
-| 파일명           | kebab-case | `button.tsx`, `use-auth.ts` |
-| 컴포넌트         | PascalCase | `Button`, `DatePicker`      |
-| 훅               | camelCase  | `useAuth`, `useToggle`      |
-| 타입 선언 (필수) | PascalCase | `interface ButtonProps {}`  |
-
-> 💡 **타입 선언 규칙**: 본 프로젝트에서는 객체의 타입을 정의할 때 `type` 키워드 대신 확장성이 좋은 **`interface` 구문만을 사용**하도록 강제합니다. (예: `type User = {}` 지양, `interface User {}` 권장)
-
-### 3. Import 순서 정렬 (자동화)
-
-```typescript
-// 1. React 관련 -> 2. Next.js 관련 -> 3. 외부 라이브러리 -> 4. 프로젝트 내부 (@/*) -> 5. 상대 경로
-import React from 'react';
-import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { LocalUtils } from './utils';
-```
-
-### 4. 커밋 메시지 규칙 (Commitlint)
-
-`type: description` 형식을 엄격히 준수해야 커밋이 가능합니다.
-
-- `feat`: 새로운 기능 추가
-- `fix`: 버그 수정
-- `docs`: 문서 수정
-- `style`: 코드 포맷팅 (로직 변경 없음)
-- `refactor`: 코드 리팩토링
-- `test`: 테스트 코드 추가 및 수정
-- `chore`: 빌드 업무, 패키지 설정 변경
-- `design`: UI 디자인 스타일만 수정 (CSS 등)
-- `perf`: 성능 개선 작업
-
-### 5. 지향 및 지양해야 할 코드 패턴 (Do's & Don'ts)
-
-코드 가독성, 테스트 용이성, 그리고 유지보수성을 위해 **단일 책임 원칙(SRP)**을 바탕으로 다음 패턴들을 엄격히 준수합니다.
-
-#### 🟢 지향해야 할 패턴 (Do's)
-
-- **화살표 함수 사용**: 컴포넌트 내부 핸들러 함수나 일반 유틸리티 함수 정의 시, 특별한 이유가 없다면 **화살표 함수(`=>`)** 사용을 지향합니다.
-- **직접 Import 사용**: `React.useState`와 같은 프로퍼티 접근 방식보다 `import { useState } from 'react'` 같은 직접 Import 방식을 권장합니다.
-- **비즈니스 로직 훅 분리 (Custom Hooks)**: 컴포넌트 비대화를 막기 위해 단일 파일이 **200라인을 초과할 경우** 혹은 복잡한 상태 업데이트 로직이 있을 경우, 이를 `use[FeatureName]` 형태의 커스텀 훅으로 추출합니다.
-- **데이터 로직 분리**: 컴포넌트 내부에서 API를 직접 호출하지 않습니다. `services/` 폴더 내에 API fetch 로직과 TanStack Query 커스텀 훅을 하나의 동일한 파일 안에서 묶어 관리합니다.
-- **순수 유틸리티 함수 분리**: 특정 컴포넌트에 종속되지 않는 로직(date-fns 등을 활용한 날짜 포맷팅 등)은 과감히 `utils/` 폴더로 분리하여 재사용성을 높입니다.
-
-#### 🔴 지양해야 할 패턴 (Don'ts)
-
-- **`any` 타입 사용 지양**: TypeScript 기능을 무력화하는 `any` 패턴 사용을 금지하며, 컴파일 에러가 나지 않도록 항상 엄격하고 구체적인 타입을 정의합니다.
-- **`type` 키워드 사용 지양 (객체 시)**: 확장이 제한적인 `type` 구문 대신 `interface` 구문만을 주력으로 사용합니다.
-
-### 6. 테스트 작성 규칙 (Testing Conventions)
-
-- **한글 설명 원칙**: 유즈케이스와 의도를 정확히 전달하기 위해 테스트 코드의 `description` 작성 시 **한글 사용을 원칙**으로 합니다.
-- **구조화 패턴**: `describe` 블록 안에 `test` 함수를 넣는 방식으로 구조화하며, `it` 구문의 사용은 가급적 지양합니다.
-- **콜백 컨벤션**: 테스트 블록 콜백이나 일반 내부 함수 작성 시 화살표 함수(`=>`)를 통일하여 사용합니다.
+👉 **[프로젝트 컨벤션 가이드 바로가기](./docs/CONVENTION.md)**
 
 ---
 
