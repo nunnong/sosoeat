@@ -1,15 +1,10 @@
 import { useState } from 'react';
 
-import {
-  EmailValues,
-  NicknameValues,
-  PasswordValues,
-  SignupFormValues,
-  SignupStep,
-} from '../signup-form.types';
+import { EmailValues, NicknameValues, PasswordValues } from '../signup-form.schema';
+import { SignupApiPayload, SignupFormValues, SignupStep } from '../signup-form.types';
 
 interface UseSignupFormProps {
-  onSubmit: (data: SignupFormValues) => Promise<void>;
+  onSubmit: (data: SignupApiPayload) => Promise<void>;
   defaultStep?: SignupStep;
 }
 
@@ -37,29 +32,29 @@ export const useSignupForm = ({ onSubmit, defaultStep = 'email' }: UseSignupForm
     setStep('nickname');
   };
 
-  // [3단계] 닉네임 작성 완료 ➔ 전체 취합된 데이터(finalData)로 최종 가입(onSubmit) 제출 처리
+  // [3단계] 닉네임 작성 완료 ➔ 전체 취합된 데이터(apiPayload)로 최종 가입(onSubmit) 제출 처리
   const handleNicknameNext = async (data: NicknameValues) => {
-    // 이전 단계 데이터가 모두 있는지 타입 세이프하게 체크
-    if (!formData.email || !formData.password || !formData.passwordConfirm) {
+    // API payload에 필요한 필드가 모두 있는지 타입 세이프하게 체크
+    if (!formData.email || !formData.password) {
       console.error('필수 회원가입 데이터가 누락되었습니다.');
       setStep('email');
       return;
     }
 
-    const finalData: SignupFormValues = {
+    // passwordConfirm은 클라이언트 검증 전용 필드이므로 API payload에서 제외합니다.
+    const apiPayload: SignupApiPayload = {
       email: formData.email,
       password: formData.password,
-      passwordConfirm: formData.passwordConfirm,
       nickname: data.nickname,
     };
 
-    await onSubmit(finalData);
+    await onSubmit(apiPayload);
   };
 
   // 이전 버튼 동작: 현재 스텝을 확인하여 직전 뷰로 단계 변경
   const handlePrev = () => {
     if (step === 'password') setStep('email');
-    if (step === 'nickname') setStep('password');
+    else if (step === 'nickname') setStep('password');
   };
 
   return {

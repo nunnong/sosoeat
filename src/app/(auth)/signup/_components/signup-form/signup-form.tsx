@@ -14,10 +14,10 @@ import {
 } from './_components';
 import { useSignupForm } from './hooks';
 import { STEP_TO_NUMBER } from './signup-form.constants';
-import { SignupFormValues, SignupStep } from './signup-form.types';
+import { SignupApiPayload, SignupStep } from './signup-form.types';
 
 interface SignupFormProps {
-  onSubmit: (data: SignupFormValues) => Promise<void>;
+  onSubmit: (data: SignupApiPayload) => Promise<void>;
   isLoading?: boolean;
   defaultStep?: SignupStep;
 }
@@ -59,7 +59,7 @@ export const SignupForm = ({ onSubmit, isLoading, defaultStep = 'email' }: Signu
               <NicknameStep
                 onNext={handleNicknameNext}
                 onPrev={handlePrev}
-                isLoading={isLoading}
+                isLoading={isLoading} // 최종 제출이 발생하는 단계이므로 isLoading 전달
                 defaultValues={{ nickname: formData.nickname }}
               />
             </Step>
