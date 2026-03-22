@@ -1,21 +1,20 @@
 'use client';
 
-import * as React from 'react';
-
 import { Progress as ProgressPrimitive } from 'radix-ui';
 
-import type { GroupTypeProps } from '@/components/ui/progress-bar/progress.type';
-import { variantStyles, variantStylesFull } from '@/components/ui/progress-bar/progress.type';
 import { cn } from '@/lib/utils';
 
-function Progress({ className, value, variant, ...props }: GroupTypeProps) {
+import { variantStyles, variantStylesFull } from './progress.constants';
+import type { ProgressProps } from './progress.types';
+
+export const Progress = ({ className, value, variant, ...props }: ProgressProps) => {
   const isFull = (value ?? 0) >= 100;
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
       value={value}
       className={cn(
-        'bg-muted relative flex h-2 w-[328px] items-center overflow-x-hidden rounded-full',
+        'bg-muted relative flex h-2 w-82 items-center overflow-x-hidden rounded-full',
         className
       )}
       {...props}
@@ -30,6 +29,4 @@ function Progress({ className, value, variant, ...props }: GroupTypeProps) {
       />
     </ProgressPrimitive.Root>
   );
-}
-
-export { Progress };
+};

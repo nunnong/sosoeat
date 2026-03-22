@@ -1,4 +1,4 @@
-import type { GroupTypeProps } from '@/components/ui/progress-bar';
+import type { ProgressProps } from '@/components/ui/progress-bar';
 
 export interface MeetingHost {
   id: number;
@@ -22,5 +22,5 @@ export interface Meeting {
   createdAt: string;
   updatedAt: string;
   host: MeetingHost;
-  variant: GroupTypeProps['variant'];
+  variant: ProgressProps['variant'];
 }
