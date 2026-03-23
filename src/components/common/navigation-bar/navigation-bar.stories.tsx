@@ -41,6 +41,14 @@ export const NotLoggedInActiveMenu: Story = {
   },
 };
 
+export const NotLoggedInWishList: Story = {
+  name: '비로그인 / 찜한 모임 클릭 → 로그인 이동',
+  decorators: [withAuthState({ user: null })],
+  parameters: {
+    nextjs: { navigation: { pathname: '/mypage?tab=liked' } },
+  },
+};
+
 // ── 로그인 ────────────────────────────────────────────
 
 export const LoggedIn: Story = {

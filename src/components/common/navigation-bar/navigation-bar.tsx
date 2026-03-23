@@ -29,7 +29,7 @@ export function NavigationBar() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
 
-  const visibleNavItems = NAV_ITEMS.filter((item) => !('showBadge' in item) || !!user);
+  const visibleNavItems = NAV_ITEMS;
 
   // TODO: 알림 기능 구현 시 React Query로 교체 예정
   // ex) const { data: hasUnread = false } = useHasUnreadNotification();
@@ -65,7 +65,7 @@ export function NavigationBar() {
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={'showBadge' in item && !user ? '/login' : item.href}
                 className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
                   isActive
                     ? 'text-sosoeat-orange-600 bg-sosoeat-orange-100'
@@ -74,7 +74,7 @@ export function NavigationBar() {
               >
                 {item.label}
                 {/* TODO: 찜 컴포넌트 분리 시 <WishGroupBadge />로 교체 */}
-                {'showBadge' in item && (
+                {'showBadge' in item && !!user && (
                   <span className="bg-sosoeat-orange-600 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white">
                     {wishGroupCount}
                   </span>

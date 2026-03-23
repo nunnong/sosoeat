@@ -35,7 +35,7 @@ describe('NavigationBar', () => {
     it('카테고리 메뉴 링크가 렌더링된다', () => {
       render(<NavigationBar />);
       expect(screen.getAllByRole('link', { name: '모임찾기' }).length).toBeGreaterThan(0);
-      expect(screen.queryByRole('link', { name: /찜한 모임/ })).not.toBeInTheDocument();
+      expect(screen.getAllByRole('link', { name: /찜한 모임/ }).length).toBeGreaterThan(0);
       expect(screen.getAllByRole('link', { name: '소소토크' }).length).toBeGreaterThan(0);
     });
   });
@@ -44,6 +44,19 @@ describe('NavigationBar', () => {
     it('로그인 버튼이 표시된다', () => {
       render(<NavigationBar />);
       expect(screen.getAllByRole('link', { name: '로그인' }).length).toBeGreaterThan(0);
+    });
+
+    it('찜한 모임 메뉴가 표시되며 클릭 시 /login으로 이동한다', () => {
+      render(<NavigationBar />);
+      const links = screen.getAllByRole('link', { name: /찜한 모임/ });
+      links.forEach((link) => {
+        expect(link).toHaveAttribute('href', '/login');
+      });
+    });
+
+    it('찜한 모임 배지가 표시되지 않는다', () => {
+      render(<NavigationBar />);
+      expect(screen.queryByText('0')).not.toBeInTheDocument();
     });
 
     it('알림 버튼이 표시되지 않는다', () => {
@@ -77,9 +90,13 @@ describe('NavigationBar', () => {
       expect(screen.queryByRole('link', { name: '로그인' })).not.toBeInTheDocument();
     });
 
-    it('찜한 모임 메뉴와 배지가 표시된다', () => {
+    it('찜한 모임 메뉴와 배지가 표시되며 /mypage?tab=liked로 이동한다', () => {
       render(<NavigationBar />);
-      expect(screen.getAllByRole('link', { name: /찜한 모임/ }).length).toBeGreaterThan(0);
+      const links = screen.getAllByRole('link', { name: /찜한 모임/ });
+      expect(links.length).toBeGreaterThan(0);
+      links.forEach((link) => {
+        expect(link).toHaveAttribute('href', '/mypage?tab=liked');
+      });
       expect(screen.getAllByText('0').length).toBeGreaterThan(0);
     });
 
