@@ -6,7 +6,7 @@ interface CountingBadgeProps {
 }
 
 const badgeVariants = cva(
-  'bg-sosoeat-orange-600 flex items-center justify-center rounded-full font-bold text-white',
+  'bg-sosoeat-orange-600 flex items-center justify-center rounded-full font-semibold text-white',
   {
     variants: {
       size: {
