@@ -15,7 +15,7 @@ export const SosoTalkBanner = ({
           className,
         )}
       >
-        <img src={imageUrl} alt={alt} className="h-full w-full object-cover" />
+        <image src={imageUrl} alt={alt} className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/50" />
       </div>
     </section>
