@@ -1,2 +1,2 @@
-export { MainPageCard } from './main-page-card';
-export type { Meeting, MeetingHost } from './main-page-card.type';
+export * from './main-page-card';
+export * from './main-page-card.types';

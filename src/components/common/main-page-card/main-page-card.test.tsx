@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { MainPageCard } from '@/components/common/main-page-card/main-page-card';
-import type { Meeting } from '@/components/common/main-page-card/main-page-card.type';
+import type { Meeting } from '@/components/common/main-page-card/main-page-card.types';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -132,6 +132,22 @@ describe('MainPageCard', () => {
     });
   });
 
+  describe('개설 상태', () => {
+    it('confirmedAt이 없으면 개설대기가 표시된다', () => {
+      const meeting = createMockMeeting({ confirmedAt: null });
+      render(<MainPageCard {...meeting} />);
+
+      expect(screen.getByText('개설대기')).toBeInTheDocument();
+    });
+
+    it('confirmedAt이 있으면 개설완료가 표시된다', () => {
+      const meeting = createMockMeeting({ confirmedAt: '2025-03-22T12:00:00' });
+      render(<MainPageCard {...meeting} />);
+
+      expect(screen.getByText('개설완료')).toBeInTheDocument();
+    });
+  });
+
   describe('마감 상태', () => {
     it('마감된 모임일 때 마감 종료가 표시된다', () => {
       const pastDate = new Date('2025-03-19T09:00:00+09:00'); // 1시간 전
@@ -146,7 +162,7 @@ describe('MainPageCard', () => {
       const meeting = createMockMeeting({ registrationEnd: futureDate.toISOString() });
       render(<MainPageCard {...meeting} />);
 
-      expect(screen.getByText(/남음/)).toBeInTheDocument();
+      expect(screen.getByText(/남았어요|남음/)).toBeInTheDocument();
     });
   });
 });

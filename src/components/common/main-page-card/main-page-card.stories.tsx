@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { addDays, addMonths, format } from 'date-fns';
 
 import { MainPageCard } from '@/components/common/main-page-card/main-page-card';
-import type { Meeting } from '@/components/common/main-page-card/main-page-card.type';
+import type { Meeting } from '@/components/common/main-page-card/main-page-card.types';
 
 const meta = {
   title: 'components/common/main-page-card',
@@ -62,5 +62,21 @@ export const AlmostFull: Story = {
     participantCount: 5,
     capacity: 6,
     name: '마감 임박! 6명 중 5명 모집 완료',
+  },
+};
+
+export const EstablishedGroupEat: Story = {
+  args: {
+    ...MOCK_MEETING,
+    confirmedAt: '2025-03-22T12:00:00',
+  },
+};
+
+export const EstablishedGroupBuy: Story = {
+  args: {
+    ...MOCK_MEETING,
+    type: '공동구매_그룹',
+    variant: 'groupBuy',
+    confirmedAt: '2025-03-22T12:00:00',
   },
 };

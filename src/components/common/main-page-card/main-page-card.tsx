@@ -1,17 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import Image from 'next/image';
 
-import { TZDate } from '@date-fns/tz';
-import { differenceInHours, format, intervalToDuration, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Clock, MapPin, Tag, Users } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
+import { Clock, MapPin, Users } from 'lucide-react';
 
-import type { Meeting } from '@/components/common/main-page-card/main-page-card.type';
-import { Button } from '@/components/ui/button';
+import { DeadlineBadge } from '@/components/common/deadline-badge';
+import { EstablishmentStatusBadge } from '@/components/common/establishment-status-badge';
+import { HeartButton } from '@/components/common/heart-button';
+import type { Meeting } from '@/components/common/main-page-card/main-page-card.types';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress-bar';
 import { cn } from '@/lib/utils';
 
@@ -20,180 +19,122 @@ const VARIANT_LABEL = {
   groupEat: '함께먹기',
 } as const;
 
-const variantTagStyles = {
-  groupBuy:
-    'bg-sosoeat-blue-200 pl-3 pr-3 py-1.5 rounded-[14px] font-bold text-xs text-sosoeat-blue-600 [&_svg]:stroke-sosoeat-blue-600',
-  groupEat:
-    'bg-sosoeat-orange-200 pl-3 pr-3 py-1.5 rounded-[14px] font-bold text-xs text-sosoeat-orange-600 [&_svg]:stroke-sosoeat-orange-600',
-};
-
 const variantImageBadgeStyles = {
   groupBuy: 'bg-sosoeat-blue-600/90 text-white',
   groupEat: 'bg-sosoeat-orange-600/90 text-white',
 };
 
+const variantImageBadgeIcon = {
+  groupEat: '/icons/main-page-fork.svg',
+  groupBuy: '/icons/main-page-buy.svg',
+} as const;
+
 export function MainPageCard(meeting: Meeting) {
-  const [showAlt, setShowAlt] = useState(false);
-  const [now, setNow] = useState(() => new Date());
-
-  const startDate = new TZDate(new Date(), 'Asia/Seoul');
-  const endDate = new TZDate(meeting.registrationEnd, 'Asia/Seoul');
-
-  const registrationEndFormatted = format(endDate, 'HH:mm', { locale: ko });
-  const duration = intervalToDuration({ start: startDate, end: endDate });
-  const hoursUntilEnd = differenceInHours(endDate, startDate);
-  const isEnded = hoursUntilEnd <= 0;
-  const isClosingSoon = !isEnded && hoursUntilEnd < 24;
-  const isToday = format(endDate, 'yyyy-MM-dd') === format(startDate, 'yyyy-MM-dd');
-  const dateLabel = isToday ? '오늘' : '내일';
-
-  const countdownText = `${(duration.months ?? 0) > 0 ? `${duration.months}개월` : ''} ${Math.max(0, duration.days ?? 0)}일 ${Math.max(0, duration.hours ?? 0)}시간 ${Math.max(0, duration.minutes ?? 0)}분 남음`;
-
-  useEffect(() => {
-    if (!isClosingSoon) return;
-    const id = setInterval(() => setShowAlt((prev) => !prev), 2500);
-    return () => clearInterval(id);
-  }, [isClosingSoon]);
-  useEffect(() => {
-    if (!isClosingSoon && !isEnded) return;
-    const id = setInterval(() => setNow(new Date()), 60000);
-    return () => clearInterval(id);
-  }, [isClosingSoon, isEnded]);
-
   const formatted = format(parseISO(meeting.dateTime), 'M/d(E) HH:mm', { locale: ko });
   const progress = (meeting.participantCount / meeting.capacity) * 100;
 
   return (
-    <div className="flex w-[362px] flex-col overflow-hidden rounded-2xl bg-white font-medium">
-      {/* 이미지 영역 */}
-      <div className="relative h-[180px] w-full shrink-0 overflow-hidden">
+    <Card
+      className={cn(
+        'h-105 w-90 gap-0 overflow-hidden rounded-2xl border border-[#F3F4F6] bg-white py-0 font-medium shadow-none ring-0'
+      )}
+    >
+      <div className="relative h-[180px] w-full shrink-0 overflow-hidden rounded-2xl">
         <Image
           src={meeting.image}
           fill
-          sizes="362px"
+          sizes="360px"
           alt="main-page-card-image"
           className="object-cover"
         />
-        {/* 하단 그라데이션 오버레이 */}
         <div
           className="absolute inset-0 z-10"
           style={{
             background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.3) 100%)',
           }}
         />
-        {/* 이미지 상단 배지: 함께먹기 / 공동구매 */}
         <span
           className={cn(
-            'absolute top-3 left-3 z-20 rounded-full px-3 py-1 text-xs font-bold',
+            'absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-full px-3 py-1 text-sm leading-5 font-bold',
             variantImageBadgeStyles[meeting.variant]
           )}
         >
+          <Image
+            src={variantImageBadgeIcon[meeting.variant]}
+            alt=""
+            width={11}
+            height={11}
+            className="shrink-0"
+          />
+
           {VARIANT_LABEL[meeting.variant]}
         </span>
-        {/* 좋아요 버튼 */}
       </div>
 
-      {/* 본문 영역 */}
-      <div className="flex flex-col px-4 pt-4 pb-4">
-        {/* 제목 + 좋아요 */}
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sosoeat-gray-900 min-w-0 flex-1 text-base leading-6 font-bold">
-            {meeting.name}
-          </h3>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="border-sosoeat-gray-300 h-[50px] w-[50px] cursor-pointer rounded-full border bg-white/90 hover:bg-white/90"
-          >
-            <motion.div
-              animate={{ scale: 0.8 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              whileTap={{
-                scale: [0.1, 1.15, 0.8],
-                transition: { duration: 1, ease: 'easeOut' },
-              }}
-              className="flex items-center justify-center"
-            >
-              <Image src="/icons/main-page-heart.svg" alt="좋아요" width={40} height={40} />
-            </motion.div>
-          </Button>
-        </div>
+      <CardHeader className="relative gap-0 space-y-0 rounded-none px-4 pt-0 pb-0">
+        <h3
+          data-slot="card-title"
+          className="min-w-0 pt-4 pr-14.5 text-base leading-6 font-bold text-[#101828]"
+        >
+          {meeting.name}
+        </h3>
+        <HeartButton />
+      </CardHeader>
 
-        {/* 지역, 일시 */}
-        <div className="mt-2 flex flex-col gap-1.5">
-          <span className="text-sosoeat-gray-700 flex items-center gap-1.5 text-xs font-medium">
-            <MapPin className="stroke-sosoeat-gray-700 size-3 shrink-0" />
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto px-4 pt-0 pb-0">
+        {/* Figma: Heading ~16px top, 지역 블록 top 44px → 제목 아래 ~4.2px */}
+        <div className="mt-[4.19px] flex flex-col gap-[5.98px]">
+          <span className="text-sosoeat-gray-600 flex items-center gap-[5.98px] text-sm leading-5 font-medium">
+            <MapPin className="size-4 shrink-0 stroke-[#8E8E8E]" strokeWidth={1} />
             {meeting.region}
           </span>
-          <span className="text-sosoeat-gray-700 flex items-center gap-1.5 text-xs font-medium">
-            <Clock className="stroke-sosoeat-gray-700 size-3 shrink-0" />
+          <span className="text-sosoeat-gray-600 flex items-center gap-[5.98px] text-sm leading-5 font-medium">
+            <Image
+              src="/icons/deadline-calendar.svg"
+              alt=""
+              width={14}
+              height={14}
+              className="size-3.5 shrink-0"
+            />
             {formatted}
           </span>
         </div>
-
-        {/* 마감 카운트다운 배지 */}
-        <div className={cn('mt-4 flex items-center gap-1.5', variantTagStyles[meeting.variant])}>
-          <Tag className="size-3 shrink-0" />
-          <div className="relative min-h-[1.25em] overflow-hidden">
-            {isEnded ? (
-              <span>마감 종료</span>
-            ) : isClosingSoon ? (
-              <AnimatePresence mode="wait">
-                {showAlt ? (
-                  <motion.span
-                    key="countdown"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    {countdownText}
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="closing-soon"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    {dateLabel} {registrationEndFormatted} 마감
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            ) : (
-              <span>{countdownText}</span>
-            )}
-          </div>
+        <div className="mt-3.5 flex items-center justify-between gap-2">
+          <DeadlineBadge
+            registrationEnd={meeting.registrationEnd}
+            variant={meeting.variant}
+            className="mt-0 min-w-0 flex-1"
+          />
+          <EstablishmentStatusBadge confirmedAt={meeting.confirmedAt} variant={meeting.variant} />
         </div>
 
-        {/* 참여 진행률 */}
-        <div className="mt-4 flex flex-col gap-1">
-          <div className="flex items-center gap-1.5">
-            <Users className="stroke-sosoeat-gray-700 size-3 shrink-0" />
-            <span className="text-sosoeat-gray-700 text-xs font-medium">
+        <div className="mt-3 flex flex-col gap-1">
+          <div className="flex items-center gap-1">
+            <Users className="size-3 shrink-0 stroke-[#6B7280]" strokeWidth={1} />
+            <span className="text-xs leading-4 font-medium text-[#6B7280]">
               {meeting.participantCount}/{meeting.capacity}명 참여중
             </span>
           </div>
           <Progress
             value={progress}
             variant={meeting.variant}
-            className="bg-sosoeat-gray-200 h-1.5 w-full max-w-[328px]"
+            className="h-2 w-full max-w-82 bg-[#F3F4F6]"
           />
         </div>
+      </CardContent>
 
-        {/* 호스트 */}
-        <div className="border-sosoeat-gray-100 mt-4 flex items-center gap-2 border-t pt-4">
-          <Image
-            src={meeting.host.image}
-            alt={meeting.host.name}
-            width={32}
-            height={32}
-            className="border-sosoeat-gray-300 rounded-full border object-cover"
-          />
-          <span className="text-sosoeat-gray-600 text-xs font-medium">{meeting.host.name}</span>
-        </div>
-      </div>
-    </div>
+      <CardFooter className="gap-1.5 rounded-none border-t border-[#F9FAFB] bg-transparent px-4 pt-1.5 pb-4 shadow-none ring-0">
+        <Image
+          src={meeting.host.image}
+          alt={meeting.host.name}
+          width={32}
+          height={32}
+          className="border-sosoeat-gray-300 rounded-full border object-cover"
+        />
+        <span className="text-base leading-6 font-semibold text-[#6B7280]">
+          {meeting.host.name}
+        </span>
+      </CardFooter>
+    </Card>
   );
 }

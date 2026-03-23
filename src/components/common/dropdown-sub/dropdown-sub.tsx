@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown/index';
 
-import type { DropdownSubProp } from './dropdown-sub.type';
+import type { DropdownSubProp } from './dropdown-sub.types';
 
 export function DropdownSub({
   data,

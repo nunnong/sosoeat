@@ -5,7 +5,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown/index';
 
-import type { DropdownSimpleProp } from './dropdown-simple.type';
+import type { DropdownSimpleProp } from './dropdown-simple.types';
 
 export function DropdownSimple({
   options,
