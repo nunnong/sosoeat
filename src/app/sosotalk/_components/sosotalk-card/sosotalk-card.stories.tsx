@@ -17,7 +17,7 @@ export const Default: Story = {
     title: '유기농 채소 주기적으로 공구 하실 분!',
     content: '유기농 채소 주기적으로 공구 하실 분들을 찾습니다.',
     imageUrl:
-      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=1200&auto=format&fit=crop',
+      'https://c.files.bbci.co.uk/DCE1/production/_104454565_mary-mcgowan_caught-in-the-act_00001294.jpg',
     authorName: '홍길동',
     authorImageUrl:
       'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=400&auto=format&fit=crop',

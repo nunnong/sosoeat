@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar/avatar';
 
 import { SosoTalkCardProps } from './sosotalk-card.types';
@@ -15,8 +17,8 @@ export function SosoTalkCard({
   return (
     <article className="border-border bg-card flex h-[352px] w-[302px] flex-col overflow-hidden rounded-[14px] border">
       {/* 상단 대표 이미지 */}
-      <div className="h-[170px] w-full">
-        <img src={imageUrl} alt="대표 이미지" className="h-full w-full object-cover" />
+      <div className="relative h-[170px] w-full">
+        <Image src={imageUrl} alt="대표 이미지" fill className="object-cover object-center" />
       </div>
 
       {/* 제목 + 내용 */}
@@ -44,7 +46,7 @@ export function SosoTalkCard({
               <span>{likeCount}</span>
             </span>
             <span className="flex items-center gap-[2px]">
-              <span>🗨️</span>
+              <span>💬</span>
               <span>{commentCount}</span>
             </span>
           </div>
