@@ -32,10 +32,10 @@ export const PasswordStep = ({
     handleSubmit,
     control,
     trigger,
-    formState: { errors, isValid, touchedFields, isSubmitted },
+    formState: { errors, isValid },
   } = useForm<PasswordValues>({
     resolver: zodResolver(passwordSchema),
-    mode: 'all',
+    mode: 'onTouched',
     delayError: 1000,
     defaultValues,
   });
@@ -61,20 +61,10 @@ export const PasswordStep = ({
   }, [passwordValue, passwordConfirmValue, trigger]);
 
   // 공통 헬퍼 함수를 사용하여 에러 노출 여부 결정
-  const passwordError = getAuthFieldError(
-    errors.password,
-    touchedFields.password,
-    isSubmitted,
-    passwordValue
-  );
+  const passwordError = getAuthFieldError(errors.password, passwordValue);
   const hasPasswordError = !!passwordError;
 
-  const confirmError = getAuthFieldError(
-    errors.passwordConfirm,
-    touchedFields.passwordConfirm,
-    isSubmitted,
-    passwordConfirmValue
-  );
+  const confirmError = getAuthFieldError(errors.passwordConfirm, passwordConfirmValue);
   const hasConfirmError = !!confirmError;
 
   const onSubmit = (data: PasswordValues) => {

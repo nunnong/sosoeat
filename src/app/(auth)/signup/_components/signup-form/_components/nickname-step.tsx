@@ -28,10 +28,10 @@ export const NicknameStep = ({
     register,
     handleSubmit,
     control,
-    formState: { errors, isValid, touchedFields, isSubmitted },
+    formState: { errors, isValid },
   } = useForm<NicknameValues>({
     resolver: zodResolver(nicknameSchema),
-    mode: 'all',
+    mode: 'onTouched',
     delayError: 1000,
     defaultValues,
   });
@@ -42,12 +42,7 @@ export const NicknameStep = ({
   });
 
   // 공통 헬퍼 함수를 사용하여 에러 노출 여부 결정
-  const nicknameError = getAuthFieldError(
-    errors.nickname,
-    touchedFields.nickname,
-    isSubmitted,
-    nicknameValue
-  );
+  const nicknameError = getAuthFieldError(errors.nickname, nicknameValue);
   const hasError = !!nicknameError;
 
   const onSubmit = (data: NicknameValues) => {

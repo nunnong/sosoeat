@@ -21,10 +21,10 @@ export const EmailStep = ({ onNext, defaultValues }: FirstStepProps<EmailValues>
     register,
     handleSubmit,
     control,
-    formState: { errors, isValid, touchedFields, isSubmitted },
+    formState: { errors, isValid },
   } = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
-    mode: 'all',
+    mode: 'onTouched',
     delayError: 1000,
     defaultValues,
   });
@@ -35,7 +35,7 @@ export const EmailStep = ({ onNext, defaultValues }: FirstStepProps<EmailValues>
   });
 
   // 공통 헬퍼 함수를 사용하여 에러 노출 여부 결정
-  const emailError = getAuthFieldError(errors.email, touchedFields.email, isSubmitted, emailValue);
+  const emailError = getAuthFieldError(errors.email, emailValue);
   const hasError = !!emailError;
 
   /**
