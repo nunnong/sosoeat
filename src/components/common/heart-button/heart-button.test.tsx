@@ -10,7 +10,7 @@ jest.mock('next/image', () => ({
   ),
 }));
 
-jest.mock('motion/react', () => ({
+jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className }: { children?: React.ReactNode; className?: string }) => (
       <div className={className}>{children}</div>

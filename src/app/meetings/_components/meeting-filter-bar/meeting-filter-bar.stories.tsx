@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import type { DateRange } from 'react-day-picker';
 
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { MeetingFilterBar } from './meeting-filter-bar';
+import type { RegionSelection } from './meeting-filter-bar.types';
 
 const meta = {
   title: 'app/meetings/meeting-filter-bar',
@@ -20,11 +20,11 @@ export const Default: Story = {
   name: '기본',
   args: {
     date: null,
-    regionCommitted: {},
+    regionCommitted: null,
   },
   render: function MeetingFilterBarStory() {
-    const [date, setDate] = useState<DateRange | null>(null);
-    const [regionCommitted, setRegionCommitted] = useState<Record<string, string>>({});
+    const [date, setDate] = useState<Date | null>(null);
+    const [regionCommitted, setRegionCommitted] = useState<RegionSelection>(null);
 
     return (
       <div className="w-[1140px]">

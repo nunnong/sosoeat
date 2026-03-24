@@ -1,2 +1,7 @@
 export * from './region-select-modal';
-export type { KoreaRegionRegion, RegionSelectModalProps } from './region-select-modal.type';
+export type {
+  KoreaRegionRegion,
+  RegionModalDropdownSub,
+  RegionSelection,
+  RegionSelectModalProps,
+} from './region-select-modal.type';

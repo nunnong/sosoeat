@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export const MeetingFilterBarButton = ({
@@ -15,19 +14,18 @@ export const MeetingFilterBarButton = ({
   selected?: boolean;
 }) => {
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
       onClick={() => onClick(filterType)}
       className={cn(
-        'h-10 shrink-0 rounded-[14px] border-0 px-4 py-2 text-base tracking-[-0.02em] shadow-none',
+        'focus-visible:ring-sosoeat-gray-400 h-10 shrink-0 rounded-[14px] border-0 px-4 py-2 text-base leading-6 tracking-[-0.02em] shadow-none transition-none [-webkit-tap-highlight-color:transparent] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
         selected
-          ? 'bg-[#4A4A4A] font-semibold text-white hover:bg-[#4A4A4A] hover:text-white'
-          : 'bg-[#EDEFF1] font-medium text-[#333333] hover:bg-[#E5E8EB] hover:text-[#333333]',
+          ? 'bg-sosoeat-gray-800 hover:bg-sosoeat-gray-800 active:bg-sosoeat-gray-800 font-semibold text-white'
+          : 'bg-sosoeat-gray-300 text-sosoeat-gray-800 hover:bg-sosoeat-gray-300 active:bg-sosoeat-gray-300 font-medium',
         className
       )}
     >
-      <span>{label}</span>
-    </Button>
+      {label}
+    </button>
   );
 };

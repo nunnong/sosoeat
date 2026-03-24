@@ -12,15 +12,28 @@ const config: StorybookConfig = {
   framework: '@storybook/nextjs-vite',
   staticDirs: ['../public'],
   async viteFinal(config) {
+    const prevNoExternal = config.ssr?.noExternal;
+    const noExternal =
+      prevNoExternal === true
+        ? true
+        : [
+            ...(Array.isArray(prevNoExternal)
+              ? prevNoExternal
+              : prevNoExternal != null
+                ? [prevNoExternal]
+                : []),
+            'framer-motion',
+          ];
+
     return {
       ...config,
       optimizeDeps: {
         ...config.optimizeDeps,
-        include: [...(config.optimizeDeps?.include ?? []), 'motion', 'motion/react'],
+        include: [...(config.optimizeDeps?.include ?? []), 'framer-motion'],
       },
       ssr: {
         ...config.ssr,
-        noExternal: [...(config.ssr?.noExternal ?? []), 'motion'],
+        noExternal,
       },
     };
   },

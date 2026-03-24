@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { CardAction } from '@/components/ui/card';

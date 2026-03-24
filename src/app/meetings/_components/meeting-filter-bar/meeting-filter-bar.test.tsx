@@ -6,7 +6,7 @@ import type { MeetingFilterBarProps } from './meeting-filter-bar.types';
 
 const defaultProps: Pick<MeetingFilterBarProps, 'date' | 'regionCommitted'> = {
   date: null,
-  regionCommitted: {},
+  regionCommitted: null,
 };
 
 describe('MeetingFilterBar', () => {

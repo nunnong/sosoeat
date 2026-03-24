@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { XIcon } from 'lucide-react';
 
-import { DropdownSub } from '@/components/common/dropdown-sub';
+import { DropdownSub, type DropdownSubProp } from '@/components/common/dropdown-sub';
 import { Button } from '@/components/ui/button/button';
 import {
   Dialog,
@@ -18,7 +18,29 @@ import {
 import { cn } from '@/lib/utils';
 
 import { RegionCascadeSelect } from './region-cascade-select';
-import type { RegionSelectModalProps } from './region-select-modal.type';
+import type {
+  RegionModalDropdownSub,
+  RegionSelection,
+  RegionSelectModalProps,
+} from './region-select-modal.type';
+
+function selectionToRecord(s: RegionSelection): Record<string, string> {
+  if (s == null) return {};
+  return { [s.province]: s.district };
+}
+
+function recordToSelection(r: Record<string, string>): RegionSelection {
+  const keys = Object.keys(r).sort();
+  if (keys.length === 0) return null;
+  return { province: keys[0], district: r[keys[0]]! };
+}
+
+function omitRegionModalValueOnChange(
+  sub: RegionModalDropdownSub
+): Omit<DropdownSubProp, 'value' | 'onChange'> {
+  const { value: _v, onChange: _o, ...rest } = sub;
+  return rest;
+}
 
 /**
  * 피그마 Region Select modal — shell 544×724, padding 48, gap 48, radius 40,
@@ -72,7 +94,7 @@ export const RegionSelectModal = ({
   const draftControlled = draftValueProp !== undefined && onDraftChange !== undefined;
 
   const [open, setOpen] = React.useState(false);
-  const [internalDraft, setInternalDraft] = React.useState<Record<string, string>>({});
+  const [internalDraft, setInternalDraft] = React.useState<RegionSelection>(null);
 
   const draftValue = draftControlled ? draftValueProp : internalDraft;
 
@@ -81,16 +103,17 @@ export const RegionSelectModal = ({
       setOpen(next);
       if (!next) return;
       if (dropdownSub != null) {
-        const seed = { ...dropdownSub.value };
+        const v = dropdownSub.value;
+        const seed = v == null ? null : { province: v.province, district: v.district };
         if (draftControlled) {
           onDraftChange(seed);
         } else {
           setInternalDraft(seed);
         }
       } else if (draftControlled) {
-        onDraftChange({});
+        onDraftChange(null);
       } else {
-        setInternalDraft({});
+        setInternalDraft(null);
       }
     },
     [dropdownSub, draftControlled, onDraftChange]
@@ -144,9 +167,16 @@ export const RegionSelectModal = ({
             ) : null}
             {!showCascade && dropdownSub != null ? (
               <DropdownSub
-                {...dropdownSub}
-                value={draftValue}
-                onChange={draftControlled ? onDraftChange : setInternalDraft}
+                {...omitRegionModalValueOnChange(dropdownSub)}
+                value={selectionToRecord(draftValue)}
+                onChange={(rec) => {
+                  const next = recordToSelection(rec);
+                  if (draftControlled) {
+                    onDraftChange(next);
+                  } else {
+                    setInternalDraft(next);
+                  }
+                }}
                 triggerClassName={cn(
                   regionSelectDropdownTriggerClass,
                   dropdownSub.triggerClassName

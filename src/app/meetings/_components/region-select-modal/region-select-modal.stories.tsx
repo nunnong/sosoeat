@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import { RegionSelectModal } from '@/app/meetings/_components/region-select-modal';
+import type { RegionSelection } from '@/app/meetings/_components/region-select-modal/region-select-modal.type';
 import { Button } from '@/components/ui/button/button';
 import regionData from '@/data/korea-regions-districts.json';
 
@@ -57,7 +58,7 @@ export const WithDropdownSubConfirm: Story = {
     description: '구를 고른 뒤 확인을 누르면 아래 값이 갱신됩니다. 취소·X는 반영하지 않습니다.',
   },
   render: (args) => {
-    const [committed, setCommitted] = useState<Record<string, string>>({});
+    const [committed, setCommitted] = useState<RegionSelection>(null);
     const first = regionData.regions[0];
 
     return (
@@ -86,7 +87,7 @@ export const WithRegionCascade: Story = {
     description: '시·도를 고른 뒤 구·군을 선택하세요.',
   },
   render: (args) => {
-    const [committed, setCommitted] = useState<Record<string, string>>({});
+    const [committed, setCommitted] = useState<RegionSelection>(null);
 
     return (
       <div className="flex flex-col items-center gap-4">
@@ -116,8 +117,8 @@ export const WithExternalDraft: Story = {
       'draft는 아래 첫 번째 JSON에 실시간 반영되고, 확인 시에만 두 번째(확정)가 바뀝니다.',
   },
   render: (args) => {
-    const [committed, setCommitted] = useState<Record<string, string>>({});
-    const [draft, setDraft] = useState<Record<string, string>>({});
+    const [committed, setCommitted] = useState<RegionSelection>(null);
+    const [draft, setDraft] = useState<RegionSelection>(null);
     const first = regionData.regions[0];
 
     return (

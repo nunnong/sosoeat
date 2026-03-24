@@ -1,6 +1,8 @@
 'use client';
 
-import { ChevronDownIcon } from 'lucide-react';
+import Image from 'next/image';
+
+import { Check, Triangle } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -11,21 +13,21 @@ import {
 } from '@/components/ui/dropdown/index';
 import { cn } from '@/lib/utils';
 
-import type { KoreaRegionRegion } from './region-select-modal.type';
+import type { KoreaRegionRegion, RegionSelection } from './region-select-modal.type';
 
 /** 피그마 Input 행 — h 48, p 12, bg gray/50 #F9FAFB, 본문 slate/800 #333333, radius 12 */
 const triggerClass =
-  'focus-visible:ring-sosoeat-orange-600/35 inline-flex h-12 w-full min-w-0 items-center justify-between gap-2 ' +
+  'focus-visible:ring-sosoeat-gray-600/35 inline-flex h-12 w-full min-w-0 items-center justify-between gap-2 ' +
   'rounded-xl bg-[#F9FAFB] px-3 py-3 text-left text-base font-normal tracking-[-0.02em] text-[#333333] outline-none ' +
   'transition-colors hover:bg-neutral-100 focus-visible:ring-2 data-[state=open]:bg-neutral-100';
 
 const triggerSelectedClass =
-  'bg-sosoeat-orange-50 ring-2 ring-sosoeat-orange-500 hover:bg-sosoeat-orange-50';
+  'bg-sosoeat-gray-50 ring-2 ring-inset ring-sosoeat-gray-500 hover:bg-sosoeat-gray-100';
 
 export interface RegionCascadeSelectProps {
   regions: KoreaRegionRegion[];
-  value: Record<string, string>;
-  onChange: (next: Record<string, string>) => void;
+  value: RegionSelection;
+  onChange: (next: RegionSelection) => void;
   className?: string;
 }
 
@@ -42,7 +44,7 @@ export function RegionCascadeSelect({
       aria-label="시·도 목록"
     >
       {regions.map((r) => {
-        const hasSelection = Boolean(value[r.name]);
+        const hasSelection = value != null && value.province === r.name;
         return (
           <li key={r.id}>
             <DropdownMenu>
@@ -50,10 +52,22 @@ export function RegionCascadeSelect({
                 className={cn(triggerClass, hasSelection && triggerSelectedClass)}
               >
                 <span className="min-w-0 flex-1 truncate">{r.name}</span>
-                <ChevronDownIcon
-                  className="pointer-events-none size-6 shrink-0 text-[#333333]"
-                  aria-hidden
-                />
+                {hasSelection ? (
+                  <Check
+                    className="text-sosoeat-orange-600 pointer-events-none size-6 shrink-0"
+                    strokeWidth={2.25}
+                    aria-hidden
+                  />
+                ) : (
+                  <Image
+                    src="/icons/arrow-down.svg"
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="shrink-0"
+                    aria-hidden
+                  />
+                )}
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
@@ -64,17 +78,18 @@ export function RegionCascadeSelect({
                   {r.districts.map((district) => (
                     <DropdownMenuCheckboxItem
                       key={district}
-                      checked={value[r.name] === district}
-                      onSelect={(e) => e.preventDefault()}
+                      checked={
+                        value != null && value.province === r.name && value.district === district
+                      }
                       onCheckedChange={(checked) => {
                         if (checked) {
-                          onChange({ [r.name]: district });
-                        } else {
-                          const next = { ...value };
-                          if (next[r.name] === district) {
-                            delete next[r.name];
-                          }
-                          onChange(next);
+                          onChange({ province: r.name, district });
+                        } else if (
+                          value != null &&
+                          value.province === r.name &&
+                          value.district === district
+                        ) {
+                          onChange(null);
                         }
                       }}
                     >

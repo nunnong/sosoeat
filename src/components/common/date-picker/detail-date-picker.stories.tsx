@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import type { DateRange } from 'react-day-picker';
 
 import { Meta, StoryObj } from '@storybook/nextjs-vite';
 
@@ -15,7 +14,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   render: function Template(args) {
-    const [value, setValue] = useState<DateRange | null>(null);
+    const [value, setValue] = useState<Date | null>(null);
     return <DetailDatePicker {...args} value={value} onChange={setValue} />;
   },
   args: {
@@ -27,7 +26,7 @@ export const Primary: Story = {
 
 export const GroupEat: Story = {
   render: function Template(args) {
-    const [value, setValue] = useState<DateRange | null>(null);
+    const [value, setValue] = useState<Date | null>(null);
     return <DetailDatePicker {...args} value={value} onChange={setValue} />;
   },
   args: {

@@ -5,6 +5,8 @@ interface MeetingHost {
 }
 
 interface Meeting {
+  id: number;
+  isFavorited: boolean;
   teamId: string;
   name: string;
   type: string;

@@ -6,16 +6,16 @@ import { ChevronDown } from 'lucide-react';
 
 import { DetailDatePicker } from '@/components/common/date-picker';
 import regionData from '@/data/korea-regions-districts.json';
+import {
+  meetingFilterPillLabelClass,
+  meetingFilterPillTriggerClass,
+} from '@/lib/meeting-filter-pill';
 import { cn } from '@/lib/utils';
 
 import { RegionSelectModal } from '../region-select-modal';
 
 import { MeetingFilterBarButton } from './_components/meetig-filter-bar-button';
 import type { MeetingFilterBarProps } from './meeting-filter-bar.types';
-
-/** 피그마 Filter 행 — padding 4×8, h 32, slate/600 본문 */
-const filterPillClass =
-  'inline-flex h-8 cursor-pointer items-center justify-center gap-0.5 rounded-md border-0 bg-transparent px-2 py-1 text-base font-medium tracking-[-0.02em] text-[#737373] shadow-none hover:bg-black/[0.04] focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:outline-none';
 
 export const MeetingFilterBar = ({
   regionCommitted,
@@ -37,12 +37,12 @@ export const MeetingFilterBar = ({
   return (
     <div
       className={cn(
-        'flex h-10 w-full max-w-[1140px] flex-row flex-nowrap items-center gap-[584.93px] px-1',
+        'flex h-10 w-full max-w-[1140px] flex-row flex-nowrap items-center justify-between px-1',
         className
       )}
     >
-      {/* Frame 2610400 — 탭 그룹, gap 60 · 공동구매 ↔ 날짜 전체 간격 584.93 (피그마) */}
-      <div className="flex shrink-0 items-center gap-[24.5px]">
+      {/* Frame 2610400 — w 283, 탭 간 space-between (피그마 gap 60 대응) */}
+      <div className="flex h-10 w-[283px] max-w-[min(283px,100%)] shrink-0 items-center justify-between">
         <MeetingFilterBarButton
           filterType="all"
           label="전체"
@@ -63,14 +63,18 @@ export const MeetingFilterBar = ({
         />
       </div>
 
-      {/* Frame 2610402 — 우측 필터 */}
-      <div className="flex shrink-0 items-center justify-end gap-2">
+      {/* Frame 2610402 — h 32 필터 행 */}
+      <div className="flex h-8 shrink-0 items-center justify-end gap-2">
         <DetailDatePicker value={date} onChange={onDateChange} />
         <RegionSelectModal
           trigger={
-            <button type="button" className={cn(filterPillClass, 'min-w-[93px]')}>
-              <span>지역 전체</span>
-              <ChevronDown className="size-[17px] shrink-0 text-[#737373]" aria-hidden />
+            <button type="button" className={cn(meetingFilterPillTriggerClass, 'min-w-[93px]')}>
+              <span className={meetingFilterPillLabelClass(regionCommitted != null)}>
+                {regionCommitted == null
+                  ? '지역 전체'
+                  : `${regionCommitted.province} ${regionCommitted.district}`}
+              </span>
+              <ChevronDown className="text-sosoeat-gray-600 size-[17px] shrink-0" aria-hidden />
             </button>
           }
           title="지역"
@@ -82,8 +86,8 @@ export const MeetingFilterBar = ({
             onChange: onRegionChange,
           }}
         />
-        <button type="button" className={cn(filterPillClass, 'min-w-[71px]')}>
-          인기순
+        <button type="button" className={cn(meetingFilterPillTriggerClass, 'min-w-[71px]')}>
+          <span className={meetingFilterPillLabelClass(false)}>인기순</span>
         </button>
       </div>
     </div>

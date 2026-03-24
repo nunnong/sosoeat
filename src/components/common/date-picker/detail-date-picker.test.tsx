@@ -12,6 +12,13 @@ describe('DetailDatePicker', () => {
       expect(screen.getByRole('button', { name: /날짜 전체/ })).toBeInTheDocument();
     });
 
+    it('선택된 날짜가 있으면 트리거에 yyyy-MM-dd가 표시된다', () => {
+      const onChange = jest.fn();
+      render(<DetailDatePicker value={new Date(2026, 2, 15)} onChange={onChange} />);
+
+      expect(screen.getByRole('button', { name: /2026-03-15/ })).toBeInTheDocument();
+    });
+
     it("variant='groupEat'일 때 groupEat 스타일이 적용된다", async () => {
       const user = userEvent.setup();
       const onChange = jest.fn();

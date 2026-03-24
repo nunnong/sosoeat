@@ -2,11 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { RegionSelectModal } from '@/app/meetings/_components/region-select-modal';
+import type { RegionSelection } from '@/app/meetings/_components/region-select-modal/region-select-modal.type';
 import { Button } from '@/components/ui/button/button';
 
 const dropdownFixture = {
   data: { label: '서울', options: ['강남구', '서초구'] as string[] },
-  value: {} as Record<string, string>,
+  value: null as RegionSelection,
   onChange: jest.fn(),
 };
 
@@ -85,7 +86,7 @@ describe('RegionSelectModal', () => {
         title="지역 선택"
         dropdownSub={{
           ...dropdownFixture,
-          value: { 서울: '강남구' },
+          value: { province: '서울', district: '강남구' },
           onChange,
         }}
       />
@@ -97,7 +98,7 @@ describe('RegionSelectModal', () => {
     await user.click(screen.getByRole('button', { name: '확인' }));
 
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange).toHaveBeenCalledWith({ 서울: '강남구' });
+    expect(onChange).toHaveBeenCalledWith({ province: '서울', district: '강남구' });
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -114,7 +115,7 @@ describe('RegionSelectModal', () => {
         title="지역 선택"
         dropdownSub={{
           ...dropdownFixture,
-          value: { 서울: '강남구' },
+          value: { province: '서울', district: '강남구' },
           onChange,
         }}
       />
@@ -141,11 +142,11 @@ describe('RegionSelectModal', () => {
       <RegionSelectModal
         trigger={<Button type="button">열기</Button>}
         title="지역 선택"
-        draftValue={{}}
+        draftValue={null}
         onDraftChange={onDraftChange}
         dropdownSub={{
           ...dropdownFixture,
-          value: { 서울: '서초구' },
+          value: { province: '서울', district: '서초구' },
           onChange,
         }}
       />
@@ -154,7 +155,7 @@ describe('RegionSelectModal', () => {
     await user.click(screen.getByRole('button', { name: '열기' }));
     await screen.findByRole('dialog');
 
-    expect(onDraftChange).toHaveBeenCalledWith({ 서울: '서초구' });
+    expect(onDraftChange).toHaveBeenCalledWith({ province: '서울', district: '서초구' });
   });
 
   it('contentClassName이 Dialog 루트에 합쳐진다', async () => {
@@ -187,7 +188,7 @@ describe('RegionSelectModal', () => {
         regionCascade={{ regions: cascadeRegions }}
         dropdownSub={{
           data: { label: '_', options: [] },
-          value: {},
+          value: null,
           onChange: jest.fn(),
         }}
       />

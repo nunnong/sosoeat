@@ -23,7 +23,6 @@ export function DropdownSimple({
           <DropdownMenuCheckboxItem
             key={option}
             checked={value === option}
-            onSelect={(e) => e.preventDefault()}
             onCheckedChange={(checked) => {
               onChange(checked ? option : null);
             }}

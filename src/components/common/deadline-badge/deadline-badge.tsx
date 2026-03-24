@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import { TZDate } from '@date-fns/tz';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
