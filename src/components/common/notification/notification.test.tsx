@@ -25,7 +25,7 @@ jest.mock('next/image', () => ({
 
 const list = <NotificationList />;
 
-const MAX_WIDTH_QUERY = '(max-width: 743px)';
+const MAX_WIDTH_QUERY = '(max-width: 767px)';
 
 function mockMatchMedia(matchesNarrow: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -63,7 +63,7 @@ describe('Notification', () => {
     expect(screen.getByText('모임 초대')).toBeInTheDocument();
   });
 
-  describe('743px 이하 (Dialog)', () => {
+  describe('767px 이하 (Dialog)', () => {
     beforeEach(() => {
       mockMatchMedia(true);
     });

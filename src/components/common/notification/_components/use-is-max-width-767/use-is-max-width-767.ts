@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from 'react';
 
-const QUERY = '(max-width: 743px)';
+const QUERY = '(max-width: 767px)';
 
 function getSnapshot(): boolean {
   if (typeof window.matchMedia !== 'function') return false;
@@ -20,7 +20,7 @@ function getServerSnapshot(): boolean {
   return false;
 }
 
-/** 뷰포트 너비가 743px 이하인지 */
-export function useIsMaxWidth743(): boolean {
+/** 뷰포트 너비가 767px 이하인지 */
+export function useIsMaxWidth767(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

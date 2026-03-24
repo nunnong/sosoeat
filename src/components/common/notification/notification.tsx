@@ -2,11 +2,11 @@
 
 import { NotificationDialog } from './_components/notification-dialog';
 import { NotificationPopover } from './_components/notification-popover';
-import { useIsMaxWidth743 } from './_components/use-is-max-width-743';
+import { useIsMaxWidth767 } from './_components/use-is-max-width-767';
 import type { NotificationProps } from './notification.types';
 
 export const Notification = ({ triggerClassName, list }: NotificationProps) => {
-  const isNarrow = useIsMaxWidth743();
+  const isNarrow = useIsMaxWidth767();
 
   if (isNarrow) {
     return <NotificationDialog triggerClassName={triggerClassName} list={list} />;
