@@ -38,14 +38,14 @@ const comments = [
 ];
 
 const meta = {
-  title: 'SosoTalk/SosoTalkCommentSection',
+  title: 'pages/sosotalk/sosotalk-comment-section',
   component: SosoTalkCommentSection,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
   },
   decorators: [
-    Story => (
+    (Story) => (
       <div className="bg-sosoeat-gray-100 min-h-screen w-full px-4 py-8 md:px-8 md:py-10">
         <div className="mx-auto w-full max-w-[1280px]">
           <Story />
@@ -83,5 +83,5 @@ function InteractiveSection(args: ComponentProps<typeof SosoTalkCommentSection>)
 }
 
 export const Default: Story = {
-  render: args => <InteractiveSection {...args} />,
+  render: (args) => <InteractiveSection {...args} />,
 };
