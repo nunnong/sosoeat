@@ -1,24 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-interface CountCardProps {
-  count: number;
-  title: string;
-  className?: string;
-  countClassName?: string;
-}
+import { CountCardProps } from './count-card.types';
+import { cardVariants, countVariants } from './count-card.variants';
 
-export function CountCard({ count, title, className, countClassName }: CountCardProps) {
+export function CountCard({ count, title, variant, className }: CountCardProps) {
   return (
-    <Card className={cn('i flex h-20 w-90 flex-col gap-1 text-center ring-0', className)}>
+    <Card className={cn(cardVariants({ variant }), className)}>
       <CardHeader>
         <CardTitle>
-          <p className={cn('text-sm', countClassName)}>{count}</p>
+          <p className={cn(countVariants({ variant }))}>{count}</p>
         </CardTitle>
       </CardHeader>
       {title && (
         <CardContent>
-          <p className="text-sosoeat-gray-600 text-xs">{title}</p>
+          <p className="text-sosoeat-gray-600 text-[11px]">{title}</p>
         </CardContent>
       )}
     </Card>

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CountCard } from './count-card';
 
 const meta: Meta<typeof CountCard> = {
-  title: 'COMPONENTS/common/CardCount',
+  title: 'COMPONENTS/common/card-count',
   component: CountCard,
   tags: ['autodocs'],
   argTypes: {
@@ -24,25 +24,22 @@ export const Default: Story = {
 };
 export const MeetingCount: Story = {
   args: {
-    count: 0,
-    title: '참여 모임',
-    className: 'bg-sosoeat-orange-100',
-    countClassName: 'text-sosoeat-orange-600',
+    variant: 'meeting',
+    count: 12,
+    title: '모임 찾기',
   },
 };
 export const FavoriteCount: Story = {
   args: {
-    count: 0,
+    variant: 'favorite',
+    count: 5,
     title: '찜한 모임',
-    className: 'bg-[#FFF0F0]',
-    countClassName: 'text-[#EF4444]',
   },
 };
 export const PostCount: Story = {
   args: {
-    count: 0,
-    title: '작성 게시글',
-    className: 'bg-sosoeat-blue-50',
-    countClassName: 'text-sosoeat-blue-500',
+    variant: 'post',
+    count: 8,
+    title: '게시글 작성',
   },
 };
