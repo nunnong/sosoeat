@@ -4,18 +4,8 @@ import { Progress as ProgressPrimitive } from 'radix-ui';
 
 import { cn } from '@/lib/utils';
 
+import { variantStyles, variantStylesFull } from './progress.constants';
 import type { ProgressProps } from './progress.types';
-
-const variantStyles = {
-  groupBuy: 'bg-sosoeat-blue-500',
-  groupEat: 'bg-sosoeat-orange-500',
-  error: 'bg-red-600',
-};
-const variantStylesFull = {
-  groupBuy: 'bg-sosoeat-blue-700',
-  groupEat: 'bg-sosoeat-orange-700',
-  error: 'bg-red-600',
-};
 
 export const Progress = ({ className, value, variant, ...props }: ProgressProps) => {
   const isFull = (value ?? 0) >= 100;

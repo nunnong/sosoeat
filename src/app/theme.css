@@ -11,6 +11,7 @@
   --color-sosoeat-gray-800: var(--sosoeat-gray-800);
   --color-sosoeat-gray-900: var(--sosoeat-gray-900);
 
+  --color-sosoeat-orange-100: var(--sosoeat-orange-50);
   --color-sosoeat-orange-100: var(--sosoeat-orange-100);
   --color-sosoeat-orange-200: var(--sosoeat-orange-200);
   --color-sosoeat-orange-300: var(--sosoeat-orange-300);
@@ -125,7 +126,7 @@
   --sosoeat-gray-900: #1e1e1e;
 
   /* ── Orange ────────────────────────────────────── */
-  --sosoeat-orange-100: #ffe7cc;
+  --sosoeat-orange-100: #fff2ec;
   --sosoeat-orange-200: #ffe8db;
   --sosoeat-orange-300: #ffd5c0;
   --sosoeat-orange-400: #ffb999;
