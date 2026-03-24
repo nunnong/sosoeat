@@ -10,7 +10,7 @@ const meta = {
     layout: 'fullscreen',
   },
   decorators: [
-    Story => (
+    (Story) => (
       <div className="bg-sosoeat-gray-100 min-h-screen px-4 py-6 md:px-6 md:py-8">
         <div className="mx-auto w-full max-w-[1280px] md:max-w-[685px] lg:max-w-[1280px]">
           <Story />
