@@ -27,7 +27,7 @@ export const Default: Story = {
     const [regionCommitted, setRegionCommitted] = useState<RegionSelection>(null);
 
     return (
-      <div className="w-[1140px]">
+      <div className="w-full max-w-[1140px]">
         <MeetingFilterBar
           date={date}
           regionCommitted={regionCommitted}
