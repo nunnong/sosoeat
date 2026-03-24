@@ -21,7 +21,7 @@ export const useLoginForm = ({ onSubmit, isLoading, defaultValues }: LoginFormPr
     formState: { isSubmitted, isSubmitting, isValid },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    mode: 'all',
+    mode: 'onTouched',
     delayError: 1000,
     defaultValues,
   });
