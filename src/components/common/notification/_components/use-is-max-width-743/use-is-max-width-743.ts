@@ -2,9 +2,9 @@
 
 import { useSyncExternalStore } from 'react';
 
-import type { UseIsMaxWidth375Result } from './use-is-max-width-375.types';
+import type { UseIsMaxWidth743Result } from './use-is-max-width-743.types';
 
-const QUERY = '(max-width: 375px)';
+const QUERY = '(max-width: 743px)';
 
 function getSnapshot(): boolean {
   if (typeof window.matchMedia !== 'function') return false;
@@ -22,7 +22,7 @@ function getServerSnapshot(): boolean {
   return false;
 }
 
-/** 뷰포트 너비가 375px 이하인지 */
-export function useIsMaxWidth375(): UseIsMaxWidth375Result {
+/** 뷰포트 너비가 743px 이하인지 */
+export function useIsMaxWidth743(): UseIsMaxWidth743Result {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

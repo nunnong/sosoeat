@@ -25,12 +25,14 @@ jest.mock('next/image', () => ({
 
 const list = <NotificationList />;
 
-function mockMatchMedia(matches375: boolean) {
+const MAX_WIDTH_QUERY = '(max-width: 743px)';
+
+function mockMatchMedia(matchesNarrow: boolean) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     configurable: true,
     value: jest.fn().mockImplementation((query: string) => ({
-      matches: query === '(max-width: 375px)' ? matches375 : false,
+      matches: query === MAX_WIDTH_QUERY ? matchesNarrow : false,
       media: query,
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
@@ -61,7 +63,7 @@ describe('Notification', () => {
     expect(screen.getByText('모임 초대')).toBeInTheDocument();
   });
 
-  describe('375px 이하 (Dialog)', () => {
+  describe('743px 이하 (Dialog)', () => {
     beforeEach(() => {
       mockMatchMedia(true);
     });
