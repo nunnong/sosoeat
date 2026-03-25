@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import Image from 'next/image';
 
 import { motion } from 'framer-motion';
@@ -26,7 +28,18 @@ const ringSizeClass = {
 
 export function HeartButton({ className, size = 'lg', isFavorited }: HeartButtonProps) {
   const iconPx = sizeIcon[size];
-  const src = isFavorited ? '/icons/main-page-heart.svg' : '/icons/main-page-not-heart.svg';
+  const [isFavoritedState, setIsFavoritedState] = useState(() => isFavorited ?? false);
+  const [src, setSrc] = useState(() =>
+    isFavoritedState ? '/icons/main-page-heart.svg' : '/icons/main-page-not-heart.svg'
+  );
+
+  const handleClick = () => {
+    setIsFavoritedState((prev) => !prev);
+    setSrc(isFavoritedState ? '/icons/main-page-heart.svg' : '/icons/main-page-not-heart.svg');
+    // setInterval(() => {
+    //   //API 부분
+    // }, 1000);
+  };
 
   return (
     <CardAction className={cn('absolute top-4 right-[17px] z-10 m-0 shrink-0', className)}>
@@ -37,12 +50,13 @@ export function HeartButton({ className, size = 'lg', isFavorited }: HeartButton
           'border-sosoeat-gray-300 cursor-pointer rounded-full border bg-white/90 p-0 hover:bg-white/90',
           ringSizeClass[size]
         )}
+        onClick={handleClick}
       >
         <motion.div
           animate={{ scale: 1 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
           whileTap={{
-            scale: [0.1, 1.15, 0.6, 1],
+            scale: isFavoritedState ? [0.1, 1.15, 0.6, 1] : 1,
             transition: { duration: 1, ease: 'easeOut' },
           }}
           className="flex size-full items-center justify-center"
