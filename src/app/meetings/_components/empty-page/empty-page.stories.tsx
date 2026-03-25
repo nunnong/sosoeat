@@ -3,7 +3,7 @@ import { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { EmptyPage } from './index';
 
 const meta: Meta<typeof EmptyPage> = {
-  title: 'components/common/empty-page',
+  title: 'meetings/_components/empty-page',
   component: EmptyPage,
 } satisfies Meta<typeof EmptyPage>;
 

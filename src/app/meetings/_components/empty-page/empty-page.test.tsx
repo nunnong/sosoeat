@@ -24,20 +24,23 @@ describe('EmptyPage', () => {
     render(<EmptyPage />);
     const root = screen.getByTestId('empty-page-root');
 
-    expect(root).toHaveClass('mt-[200px]');
-    expect(root).toHaveClass('min-[375px]:mt-[145px]');
-    expect(root).toHaveClass('min-[744px]:mt-[180px]');
+    expect(root).toHaveClass('mt-[145px]');
+    expect(root).toHaveClass('md:mt-[180px]');
+    expect(root).toHaveClass('lg:mt-[200px]');
   });
 
   it('EMPTY_PAGE_MARGIN_CLASSES 상수가 기본·375·744 구간용 mt를 모두 담는다', () => {
-    expect(EMPTY_PAGE_MARGIN_CLASSES).toContain('mt-[200px]');
-    expect(EMPTY_PAGE_MARGIN_CLASSES).toContain('min-[375px]:mt-[145px]');
-    expect(EMPTY_PAGE_MARGIN_CLASSES).toContain('min-[744px]:mt-[180px]');
+    expect(EMPTY_PAGE_MARGIN_CLASSES).toContain('mt-[145px]');
+    expect(EMPTY_PAGE_MARGIN_CLASSES).toContain('md:mt-[180px]');
+    expect(EMPTY_PAGE_MARGIN_CLASSES).toContain('lg:mt-[200px]');
   });
 
   it('빈 페이지 일러스트가 렌더된다', () => {
     render(<EmptyPage />);
-    const img = screen.getByRole('img', { name: 'Empty Page' });
-    expect(img).toHaveAttribute('src', '/images/empty-page.svg');
+    const images = screen.getAllByRole('img', { name: 'Empty Page' });
+    expect(images).toHaveLength(2);
+    expect(images.map((el) => el.getAttribute('src'))).toEqual(
+      expect.arrayContaining(['/images/empty-page.svg', '/images/empty-page-small.svg'])
+    );
   });
 });
