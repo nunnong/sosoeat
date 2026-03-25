@@ -27,7 +27,7 @@ export function UserCard({ name, location, joinedAt, bio, className }: UserCardP
               <Pencil className="text-sosoeat-gray-600 size-3 shrink-0" />
             </div>
             {joinedAt && (
-              <span className="bg-sosoeat-orange-200 text-sosoeat-gray-600 flex items-center gap-1 rounded-2xl px-1 py-1.5 text-xs ring-0">
+              <span className="bg-sosoeat-orange-200 text-sosoeat-gray-600 flex items-center gap-1 rounded-2xl px-4 py-1.5 text-xs ring-0">
                 <Calendar className={cn('size-3')} /> {joinedAt} 가입
               </span>
             )}
@@ -35,7 +35,7 @@ export function UserCard({ name, location, joinedAt, bio, className }: UserCardP
         </div>
 
         <div className="hidden md:block">
-          <CardTitle className={cn('w-full text-base font-bold')}>{name}</CardTitle>
+          <CardTitle className="w-full text-base font-bold">{name}</CardTitle>
           <CardDescription>
             <span className="text-sosoeat-gray-600 flex gap-x-3 gap-y-1 text-xs">
               {location && (

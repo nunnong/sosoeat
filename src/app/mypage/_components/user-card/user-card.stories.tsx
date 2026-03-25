@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { UserCard } from './user-card';
 
 const meta: Meta<typeof UserCard> = {
-  title: 'COMPONENTS/common/user-card',
+  title: 'APP/mypage/user-card',
   component: UserCard,
   tags: ['autodocs'],
   argTypes: {
