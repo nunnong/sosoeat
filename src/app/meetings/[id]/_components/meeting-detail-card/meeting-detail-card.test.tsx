@@ -14,8 +14,8 @@ const mockMeeting: Meeting = {
   address: '서울 강남구 테헤란로 123',
   latitude: 37.5065,
   longitude: 127.0536,
-  dateTime: '2024/03/15(금) 18:30',
-  registrationEnd: '2024/03/14T23:59:59.000Z',
+  dateTime: '2024-03-15T09:30:00.000Z',
+  registrationEnd: '2024-03-14T23:59:59.000Z',
   participantCount: 3,
   capacity: 6,
   image: '',
@@ -41,11 +41,11 @@ describe('MeetingDetailCard', () => {
 
     // 제목은 모바일·태블릿 양쪽에 렌더링됨
     expect(screen.getAllByText('강남 맛집 탐방 함께해요!').length).toBeGreaterThanOrEqual(1);
-    // 날짜 전체 문자열은 태블릿 섹션에만 표시
-    expect(screen.getByText('2024/03/15(금) 18:30')).toBeInTheDocument();
-    // 지역명 단독은 태블릿 섹션에만 표시 (모바일은 "서울 강남구 · 같이먹기" 형태)
-    expect(screen.getByText('서울 강남구')).toBeInTheDocument();
-    expect(screen.getByText('서울 강남구 테헤란로 123')).toBeInTheDocument();
+    // fullDateLabel은 태블릿·PC 섹션에 표시 (KST 변환: 2024-03-15T09:30Z → 18:30 KST)
+    expect(screen.getAllByText('2024년 3월 15일 금요일 · 18:30').length).toBeGreaterThanOrEqual(1);
+    // 지역명은 태블릿·PC 섹션에 표시 (모바일은 "서울 강남구 · 같이먹기" 형태)
+    expect(screen.getAllByText('서울 강남구').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('서울 강남구 테헤란로 123').length).toBeGreaterThanOrEqual(1);
   });
 
   describe('더보기(...) 버튼', () => {

@@ -6,14 +6,14 @@ import { MeetingDetailCard } from './meeting-detail-card';
 
 const mockMeeting: Meeting = {
   id: '1',
-  name: '강남 맛집 탐방 함께해요! 분위기 좋은 이탈리안 레스토랑',
+  name: '강남 맛집 탐방 함께해요!',
   type: 'groupEat',
   region: '서울 강남구',
   address: '서울 강남구 테헤란로 123 1층',
   latitude: 37.5065,
   longitude: 127.0536,
-  dateTime: '2024/03/15(금) 18:30',
-  registrationEnd: '2024/03/14T23:59:59.000Z',
+  dateTime: '2024-03-15T09:30:00.000Z',
+  registrationEnd: '2027-03-14T23:59:59.000Z',
   participantCount: 3,
   capacity: 6,
   image: '',

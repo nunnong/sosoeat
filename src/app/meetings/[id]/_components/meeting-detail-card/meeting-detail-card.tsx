@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import {
   CalendarIcon,
   ChevronDownIcon,
@@ -11,6 +13,10 @@ import {
   UsersIcon,
 } from 'lucide-react';
 
+import {
+  DateBadge,
+  TimeBadge,
+} from '@/app/meetings/[id]/_components/meeting-detail-card/date-badge';
 import { DeadlineBadge } from '@/components/common/deadline-badge';
 import { HeartButton } from '@/components/common/heart-button';
 import { ProgressWithLabel } from '@/components/common/progress-with-label';
@@ -25,36 +31,160 @@ import {
 import { cn } from '@/lib/utils';
 import type { MeetingCategory } from '@/types/meeting';
 
+import {
+  actionButtonVariants,
+  CATEGORY_LABEL,
+  iconBgVariants,
+  iconColorVariants,
+  outlineButtonVariants,
+} from './meeting-detail-card.constants';
 import type { MeetingDetailCardProps } from './meeting-detail-card.types';
 
-const categoryColorClass: Record<MeetingCategory, string> = {
-  groupEat: 'bg-sosoeat-orange-600 text-white hover:bg-sosoeat-orange-700',
-  groupBuy: 'bg-sosoeat-blue-600 text-white hover:bg-sosoeat-blue-700',
-};
+// ─────────────────────────────────────────────────────────────
+// 서브 컴포넌트
+// ─────────────────────────────────────────────────────────────
 
-const categoryLabel: Record<MeetingCategory, string> = {
-  groupEat: '같이먹기',
-  groupBuy: '공동구매',
-};
+// ── InfoRow ───────────────────────────────────────────────────
+
+interface InfoRowProps {
+  icon: React.ReactNode;
+  /** iconBgClass/iconColorClass 대신 category 하나로 색상 파생 */
+  category: MeetingCategory;
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}
+
+function InfoRow({ icon, category, label, children, className }: InfoRowProps) {
+  return (
+    <div className={cn('flex items-start gap-3', className)}>
+      <div
+        className={cn(
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+          iconBgVariants({ category })
+        )}
+      >
+        <div className={cn('h-4 w-4 [&>svg]:h-4 [&>svg]:w-4', iconColorVariants({ category }))}>
+          {icon}
+        </div>
+      </div>
+      <div>
+        <p className="text-sosoeat-gray-600 text-xs font-semibold">{label}</p>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ── ParticipantsRow ───────────────────────────────────────────
+
+interface ParticipantsRowProps {
+  meetingId: string;
+  current: number;
+  max: number;
+  category: MeetingCategory;
+  className?: string;
+}
+
+function ParticipantsRow({ meetingId, current, max, category, className }: ParticipantsRowProps) {
+  return (
+    <div className={cn('flex items-start gap-3', className)}>
+      <div className="bg-sosoeat-gray-100 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+        <UsersIcon className="text-sosoeat-gray-700 h-4 w-4" />
+      </div>
+      <div className="flex-1">
+        <p className="text-sosoeat-gray-600 mb-1 text-xs font-semibold lg:text-sm">참여 현황</p>
+        <ProgressWithLabel
+          id={`meeting-${meetingId}-progress`}
+          current={current}
+          max={max}
+          variant={category}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── HostRow ───────────────────────────────────────────────────
+
+interface HostRowProps {
+  name: string;
+  profileImage?: string;
+  className?: string;
+}
+
+function HostRow({ name, profileImage, className }: HostRowProps) {
+  return (
+    <div className={cn('flex items-center gap-3', className)}>
+      <Avatar size="default">
+        <AvatarImage src={profileImage} alt={name} />
+        <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+      </Avatar>
+      <div>
+        <p className="text-sosoeat-gray-600 text-xs font-semibold">호스트</p>
+        <p className="text-xs font-bold">{name}</p>
+      </div>
+    </div>
+  );
+}
+
+// ── ActionRow ─────────────────────────────────────────────────
+
+interface ActionRowProps {
+  layout: 'mobile' | 'tablet' | 'pc';
+  actionButton: React.ReactNode;
+  isLiked: boolean;
+  onLikeToggle: () => void;
+}
+
+function ActionRow({ layout, actionButton, isLiked, onLikeToggle }: ActionRowProps) {
+  const outerClass = cn('flex items-center gap-[10px]', {
+    'pt-[14px]': layout === 'mobile',
+    'pt-[12px]': layout === 'tablet',
+    'gap-2 pt-[10px]': layout === 'pc',
+  });
+
+  const wrapperClass = cn('flex-1', {
+    'h-[40px]': layout !== 'pc',
+    'h-[60px]': layout === 'pc',
+  });
+
+  return (
+    <div className={outerClass}>
+      <div className={wrapperClass}>{actionButton}</div>
+      <HeartButton
+        isLiked={isLiked}
+        onToggle={onLikeToggle}
+        className={cn('border-sosoeat-gray-500 relative inset-auto m-0', {
+          'h-[40px] w-[40px]': layout !== 'pc',
+          'h-[60px] w-[60px]': layout === 'pc',
+        })}
+      />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// 메인 컴포넌트
+// ─────────────────────────────────────────────────────────────
 
 export function MeetingDetailCard(props: MeetingDetailCardProps) {
   const { meeting, status, isLiked, onLikeToggle } = props;
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const colorClass = categoryColorClass[meeting.type];
+  // ── 색상 파생의 단일 출처 ──────────────────────────────────
+  const category = meeting.type;
+  const categoryLabel = CATEGORY_LABEL[category];
 
-  // dateTime 파싱 (예: '2024/03/15(금) 18:30')
-  const [datePart, timePart] = meeting.dateTime.split(' ');
-  const dateMatch = datePart?.match(/\d+\/(\d+)\/(\d+)/);
-  const mobileDateLabel = dateMatch
-    ? `${parseInt(dateMatch[1])}월 ${parseInt(dateMatch[2])}일`
-    : (datePart ?? '');
-  const mobileTimeLabel = timePart ?? '';
+  // ── 날짜 포맷 ─────────────────────────────────────────────
+  const date = new Date(meeting.dateTime);
+  const fullDateLabel = format(date, 'yyyy년 M월 d일 EEEE · HH:mm', { locale: ko });
 
+  // ── 액션 버튼 ─────────────────────────────────────────────
   const actionButton = (() => {
     if (status === 'closed') {
       return (
-        <Button className="flex-1" disabled>
+        <Button className="h-full w-full rounded-2xl" disabled>
           마감된 모임
         </Button>
       );
@@ -63,13 +193,21 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
     if (props.role === 'host') {
       if (status === 'confirmed') {
         return (
-          <Button variant="outline" className="flex-1" onClick={props.onShare}>
+          <Button
+            variant="ghost"
+            className={outlineButtonVariants({ category })}
+            onClick={props.onShare}
+          >
             공유하기
           </Button>
         );
       }
       return (
-        <Button className={cn('flex-1', colorClass)} onClick={props.onConfirm}>
+        <Button
+          variant="ghost"
+          className={actionButtonVariants({ category })}
+          onClick={props.onConfirm}
+        >
           모임 확정하기
         </Button>
       );
@@ -77,19 +215,28 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
 
     if (props.role === 'participant' && props.isJoined) {
       return (
-        <Button variant="outline" className="flex-1" onClick={props.onCancel}>
+        <Button
+          variant="ghost"
+          className={outlineButtonVariants({ category })}
+          onClick={props.onCancel}
+        >
           참여 취소하기
         </Button>
       );
     }
 
     return (
-      <Button className={cn('flex-1', colorClass)} onClick={props.onJoin}>
+      <Button
+        variant="ghost"
+        className={cn(actionButtonVariants({ category }))}
+        onClick={props.onJoin}
+      >
         참여하기
       </Button>
     );
   })();
 
+  // ── 호스트 더보기 메뉴 ────────────────────────────────────
   const ellipsisMenu =
     props.role === 'host' ? (
       <DropdownMenu>
@@ -107,151 +254,53 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
       </DropdownMenu>
     ) : null;
 
+  const likeToggle = onLikeToggle ?? (() => {});
+
   return (
-    <div className="border-sosoeat-gray-300 rounded-2xl border bg-white px-6 py-4 shadow-sm">
-      {/* ── 태블릿+ 레이아웃 (md~) ── */}
-      <div className="hidden md:block">
-        {/* 상단: 마감 뱃지 + 더보기 */}
-        <div className="mb-3 flex items-center justify-between">
-          <DeadlineBadge registrationEnd={meeting.registrationEnd} variant={meeting.type} />
-          {ellipsisMenu}
-        </div>
-
-        {/* 제목 */}
-        <h2 className="mb-4 text-xl leading-snug font-bold">{meeting.name}</h2>
-
-        {/* 날짜/시간 */}
-        <div className="mb-3 flex items-center gap-3">
-          <div className="bg-sosoeat-orange-50 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-            <CalendarIcon className="text-sosoeat-orange-600 h-4 w-4" />
+    <div
+      className={cn(
+        'relative transition-all duration-300',
+        'border-sosoeat-gray-300 rounded-2xl border bg-white px-6 shadow-sm',
+        'pt-[16px] pb-[40px] md:px-[16px] md:py-[14px] lg:px-6 lg:pt-[10px] lg:pb-[16px]',
+        'md:w-[358px] md:overflow-hidden lg:h-[460px] lg:w-[616px] lg:overflow-hidden',
+        'w-[343px]',
+        isExpanded && 'max-md:rounded-b-none'
+      )}
+    >
+      {/* ════════════════════════════════════════
+          모바일 (~md)
+          핵심: 상단은 항상 고정, 확장 영역만 max-height 트랜지션
+          ════════════════════════════════════════ */}
+      <div className="flex flex-col md:hidden">
+        {/* 상단 고정 영역 — 펼치기 여부와 무관하게 항상 표시 */}
+        <div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <DateBadge date={meeting.dateTime} category={category} />
+              <TimeBadge date={meeting.dateTime} />
+            </div>
+            {ellipsisMenu}
           </div>
-          <div>
-            <p className="text-sosoeat-gray-500 text-xs">날짜 및 시간</p>
-            <p className="text-sm font-bold">{meeting.dateTime}</p>
-          </div>
-        </div>
 
-        {/* 장소 */}
-        <div className="mb-3 flex items-start gap-3">
-          <div className="bg-sosoeat-orange-50 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-            <MapPinIcon className="text-sosoeat-orange-600 h-4 w-4" />
-          </div>
-          <div>
-            <p className="text-sosoeat-gray-500 text-xs">장소</p>
-            <p className="text-sm font-bold">{meeting.region}</p>
-            <p className="text-sosoeat-gray-500 text-xs">{meeting.address}</p>
-          </div>
-        </div>
+          <h2 className="mt-3 text-lg leading-snug font-semibold">{meeting.name}</h2>
 
-        {/* 참여 현황 */}
-        <div className="mb-3 flex items-start gap-3">
-          <div className="bg-sosoeat-gray-100 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-            <UsersIcon className="text-sosoeat-gray-700 h-4 w-4" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sosoeat-gray-500 mb-1 text-xs">참여 현황</p>
-            <ProgressWithLabel
-              id={`meeting-${meeting.id}-progress-desktop`}
-              current={meeting.participantCount}
-              max={meeting.capacity}
-              variant={meeting.type}
-            />
-          </div>
-        </div>
-
-        {/* 호스트 */}
-        <div className="mb-4 flex items-center gap-3">
-          <Avatar size="sm">
-            <AvatarImage src={meeting.host.profileImage} alt={meeting.host.name} />
-            <AvatarFallback>{meeting.host.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sosoeat-gray-500 text-xs">호스트</p>
-            <p className="text-sm font-bold">{meeting.host.name}</p>
-          </div>
-        </div>
-
-        {/* 액션 */}
-        <div className="flex items-center gap-2">
-          {actionButton}
-          <HeartButton
-            isLiked={isLiked}
-            onToggle={onLikeToggle ?? (() => {})}
-            className="relative inset-auto m-0"
-          />
-        </div>
-      </div>
-
-      {/* ── 모바일 레이아웃 (~md) ── */}
-      <div className="md:hidden">
-        {/* 상단 행: 날짜·시간 pill + 더보기 */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="border-sosoeat-orange-600 text-sosoeat-orange-600 rounded-full border px-3 py-1 text-sm font-medium">
-              {mobileDateLabel}
-            </span>
-            <span className="border-sosoeat-gray-300 text-sosoeat-gray-700 rounded-full border px-3 py-1 text-sm">
-              {mobileTimeLabel}
+          <div className="mt-2 flex items-center gap-1">
+            <MapPinIcon className="text-sosoeat-gray-500 h-4 w-4 shrink-0" />
+            <span className="text-sosoeat-gray-500 text-sm font-medium">
+              {meeting.region} · {categoryLabel}
             </span>
           </div>
-          {ellipsisMenu}
         </div>
 
-        {/* 제목 */}
-        <h2 className="mt-3 text-lg leading-snug font-bold">{meeting.name}</h2>
+        {/* 항상 고정 — 액션 버튼 + 하트 */}
+        <ActionRow
+          layout="mobile"
+          actionButton={actionButton}
+          isLiked={isLiked}
+          onLikeToggle={likeToggle}
+        />
 
-        {/* 장소 한 줄 */}
-        <div className="mt-2 flex items-center gap-1">
-          <MapPinIcon className="text-sosoeat-gray-500 h-4 w-4 shrink-0" />
-          <span className="text-sosoeat-gray-500 text-sm">
-            {meeting.region} · {categoryLabel[meeting.type]}
-          </span>
-        </div>
-
-        {/* 펼침 영역 */}
-        {isExpanded && (
-          <div className="mt-4 space-y-4">
-            {/* 참여 현황 */}
-            <div className="flex items-start gap-3">
-              <div className="bg-sosoeat-gray-100 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-                <UsersIcon className="text-sosoeat-gray-700 h-4 w-4" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sosoeat-gray-500 mb-1 text-xs">참여 현황</p>
-                <ProgressWithLabel
-                  id={`meeting-${meeting.id}-progress-mobile`}
-                  current={meeting.participantCount}
-                  max={meeting.capacity}
-                  variant={meeting.type}
-                />
-              </div>
-            </div>
-
-            {/* 호스트 */}
-            <div className="flex items-center gap-3">
-              <Avatar size="sm">
-                <AvatarImage src={meeting.host.profileImage} alt={meeting.host.name} />
-                <AvatarFallback>{meeting.host.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sosoeat-gray-500 text-xs">호스트</p>
-                <p className="text-sm font-bold">{meeting.host.name}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 액션 행 */}
-        <div className="mt-4 flex items-center gap-2">
-          {actionButton}
-          <HeartButton
-            isLiked={isLiked}
-            onToggle={onLikeToggle ?? (() => {})}
-            className="relative inset-auto m-0"
-          />
-        </div>
-
-        {/* chevron 토글 */}
+        {/* 항상 고정 — chevron */}
         <div className="mt-2 flex justify-center">
           <button
             type="button"
@@ -265,6 +314,127 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
               <ChevronDownIcon className="h-5 w-5" />
             )}
           </button>
+        </div>
+
+        {/* 하단 확장 영역 — max-height 트랜지션으로 상단 영역이 움직이지 않음 */}
+        <div
+          className={cn(
+            'absolute top-full right-0 left-0 z-10',
+            'rounded-b-2xl bg-white px-6', // border 제거 — 카드 shadow로 이어보이게
+            'shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),4px_0_6px_-1px_rgba(0,0,0,0.05),-4px_0_6px_-1px_rgba(0,0,0,0.05)]',
+            'overflow-hidden transition-all duration-300 ease-in-out',
+            isExpanded ? 'max-h-[200px] py-4 opacity-100' : 'max-h-0 py-0 opacity-0'
+          )}
+        >
+          <div className="flex flex-col gap-4">
+            <ParticipantsRow
+              meetingId={String(meeting.id)}
+              current={meeting.participantCount}
+              max={meeting.capacity}
+              category={category}
+            />
+            <HostRow name={meeting.host.name} profileImage={meeting.host.profileImage} />
+          </div>
+        </div>
+      </div>
+
+      {/* ════════════════════════════════════════
+          태블릿 (md ~ lg)
+          ════════════════════════════════════════ */}
+      <div className="hidden md:flex md:flex-col lg:hidden">
+        <div className="flex flex-col gap-[10px]">
+          <div className="flex items-center justify-between">
+            <DeadlineBadge registrationEnd={meeting.registrationEnd} variant={category} />
+            {ellipsisMenu}
+          </div>
+
+          <h2 className="line-clamp-2 text-xl leading-snug font-semibold">{meeting.name}</h2>
+
+          <InfoRow
+            icon={<CalendarIcon />}
+            category={category}
+            className="text-sosoeat-gray-600 text-xs font-semibold"
+            label="날짜 및 시간"
+          >
+            <p className="text-sosoeat-gray-900 text-xs font-bold">{fullDateLabel}</p>
+          </InfoRow>
+
+          <InfoRow
+            icon={<MapPinIcon />}
+            category={category}
+            className="text-sosoeat-gray-600 text-xs font-semibold"
+            label="장소"
+          >
+            <p className="text-sosoeat-gray-900 text-xs font-bold">{meeting.region}</p>
+            <p className="text-sosoeat-gray-600 text-xs font-bold">{meeting.address}</p>
+          </InfoRow>
+
+          <ParticipantsRow
+            meetingId={String(meeting.id)}
+            current={meeting.participantCount}
+            max={meeting.capacity}
+            category={category}
+          />
+
+          <HostRow name={meeting.host.name} profileImage={meeting.host.profileImage} />
+        </div>
+
+        <ActionRow
+          layout="tablet"
+          actionButton={actionButton}
+          isLiked={isLiked}
+          onLikeToggle={likeToggle}
+        />
+      </div>
+
+      {/* ════════════════════════════════════════
+          PC (lg ~)
+          ════════════════════════════════════════ */}
+      <div className="hidden lg:flex lg:h-full lg:flex-col">
+        <div className="flex h-full flex-col justify-between">
+          <div className="flex flex-col gap-[14px]">
+            <div className="flex items-center justify-between">
+              <DeadlineBadge registrationEnd={meeting.registrationEnd} variant={category} />
+              {ellipsisMenu}
+            </div>
+
+            <h2 className="text-3xl leading-snug font-bold">{meeting.name}</h2>
+
+            <InfoRow
+              icon={<CalendarIcon />}
+              category={category}
+              className="text-sosoeat-gray-600 text-sm font-semibold"
+              label="날짜 및 시간"
+            >
+              <p className="text-sosoeat-gray-900 text-sm font-bold">{fullDateLabel}</p>
+            </InfoRow>
+
+            <InfoRow
+              icon={<MapPinIcon />}
+              category={category}
+              className="text-sosoeat-gray-600 text-sm font-semibold"
+              label="장소"
+            >
+              <p className="text-sosoeat-gray-900 text-sm font-bold">{meeting.region}</p>
+              <p className="text-sosoeat-gray-600 text-sm font-semibold">{meeting.address}</p>
+            </InfoRow>
+
+            <ParticipantsRow
+              meetingId={String(meeting.id)}
+              current={meeting.participantCount}
+              max={meeting.capacity}
+              category={category}
+            />
+
+            <HostRow name={meeting.host.name} profileImage={meeting.host.profileImage} />
+          </div>
+
+          <ActionRow
+            layout="pc"
+            actionButton={actionButton}
+            isLiked={isLiked}
+            onLikeToggle={likeToggle}
+          />
         </div>
       </div>
     </div>
