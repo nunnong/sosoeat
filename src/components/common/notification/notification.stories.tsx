@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { Notification, NotificationList } from './index';
+import { notificationListDemoData } from './_components/notification-list/notification-list';
+import { Notification } from './index';
 
 const meta: Meta<typeof Notification> = {
   title: 'components/common/notification/Notification',
@@ -10,5 +11,7 @@ const meta: Meta<typeof Notification> = {
 export default meta;
 
 export const Default: StoryObj<typeof Notification> = {
-  render: () => <Notification list={<NotificationList />} />,
+  render: () => (
+    <Notification data={notificationListDemoData} nextCursor="" hasMore={false} unreadCount={3} />
+  ),
 };

@@ -1,3 +1,7 @@
-import type { NotificationProps } from '../../notification.types';
+import type { ReactNode } from 'react';
 
-export type NotificationPopoverProps = NotificationProps;
+export interface NotificationPopoverProps {
+  triggerClassName?: string;
+  list: ReactNode;
+  unreadCount?: number;
+}

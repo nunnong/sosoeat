@@ -1,16 +1,13 @@
 import { cn } from '@/lib/utils';
 
-const scrollbarClass =
-  '[scrollbar-width:thin] [scrollbar-color:#CCCCCC_transparent] ' +
-  '[&::-webkit-scrollbar]:w-1 ' +
-  '[&::-webkit-scrollbar-thumb]:rounded-[10px] [&::-webkit-scrollbar-thumb]:bg-[#CCCCCC]';
+import styles from './notification-scroll-area.module.css';
 
 export const scrollAreaDesktopClass = cn(
-  'h-[360px] w-full overflow-x-hidden overflow-y-auto',
-  scrollbarClass
+  styles.scroll,
+  'flex h-[360px] w-full flex-col overflow-x-hidden overflow-y-auto'
 );
 
 export const scrollAreaMobileClass = cn(
-  'min-h-0 flex-1 overflow-x-hidden overflow-y-auto',
-  scrollbarClass
+  styles.scroll,
+  'min-h-0 flex-1 overflow-x-hidden overflow-y-auto'
 );

@@ -13,10 +13,14 @@ import type { NotificationPopoverProps } from './notification-popover.types';
 
 const popoverPanelClass = cn(
   'flex max-w-none flex-col gap-0 overflow-hidden rounded-[24px] bg-white p-0 shadow-[0px_4px_16px_rgba(0,0,0,0.04)] ring-0',
-  'h-112 w-[314px]'
+  'h-[448px] w-[314px]'
 );
 
-export const NotificationPopover = ({ triggerClassName, list }: NotificationPopoverProps) => {
+export const NotificationPopover = ({
+  triggerClassName,
+  list,
+  unreadCount,
+}: NotificationPopoverProps) => {
   const titleId = React.useId();
 
   return (
@@ -36,6 +40,7 @@ export const NotificationPopover = ({ triggerClassName, list }: NotificationPopo
           titleId={titleId}
           listScrollClassName={scrollAreaDesktopClass}
           list={list}
+          unreadCount={unreadCount}
         />
       </PopoverContent>
     </Popover>

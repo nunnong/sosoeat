@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { NotificationList } from '../notification-list';
+import { NotificationTab } from '../notification-list/_components/notification-tab';
+import { notificationListDemoData } from '../notification-list/notification-list';
 
 import { NotificationPopover } from './notification-popover';
 
@@ -12,5 +13,12 @@ const meta: Meta<typeof NotificationPopover> = {
 export default meta;
 
 export const Default: StoryObj<typeof NotificationPopover> = {
-  render: () => <NotificationPopover list={<NotificationList />} />,
+  render: () => (
+    <NotificationPopover
+      list={notificationListDemoData.map((n) => (
+        <NotificationTab key={n.id} {...n} />
+      ))}
+      unreadCount={3}
+    />
+  ),
 };

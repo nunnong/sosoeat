@@ -1,3 +1,7 @@
-import type { NotificationProps } from '../../notification.types';
+import type { ReactNode } from 'react';
 
-export type NotificationDialogProps = NotificationProps;
+export interface NotificationDialogProps {
+  triggerClassName?: string;
+  list: ReactNode;
+  unreadCount?: number;
+}

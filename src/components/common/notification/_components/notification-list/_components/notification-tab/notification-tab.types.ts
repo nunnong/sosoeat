@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 export interface NotificationTabProps {
-  /** slate/50 배경 (#F6F7F9), 기본은 흰색 */
-  variant?: 'muted' | 'default';
+  /** 코랄 톤 배경 (#FFF2EC), 기본은 흰색 */
+  variant?: 'highlight' | 'default';
   /** 왼쪽 썸네일 (40×40 또는 24×24 등) */
   thumbnail: ReactNode;
   /** 상단 강조 한 줄 (12px semibold #333) */

@@ -1,7 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { Notification, NotificationList } from './index';
+import type { Notification as NotificationDto } from '@/types/generated-client';
+
+import { Notification } from './index';
+
+jest.mock('@/lib/api-client', () => ({
+  postsApi: {
+    teamIdPostsPostIdCommentsGet: jest.fn().mockResolvedValue({
+      data: [],
+      nextCursor: '',
+      hasMore: false,
+    }),
+  },
+}));
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -23,7 +35,24 @@ jest.mock('next/image', () => ({
   },
 }));
 
-const list = <NotificationList />;
+const testNotifications: NotificationDto[] = [
+  {
+    id: 1,
+    teamId: 'dallaem',
+    userId: 1,
+    type: 'MEETING_CONFIRMED',
+    message: '',
+    data: { meetingName: '테스트' },
+    isRead: false,
+    createdAt: new Date('2025-01-15T12:00:00Z'),
+  },
+];
+
+const defaultNotificationProps = {
+  data: testNotifications,
+  nextCursor: '',
+  hasMore: false,
+} as const;
 
 const MAX_WIDTH_QUERY = '(max-width: 767px)';
 
@@ -42,25 +71,25 @@ function mockMatchMedia(matchesNarrow: boolean) {
 
 describe('Notification', () => {
   it('알림 열기 트리거가 표시된다', () => {
-    render(<Notification list={list} />);
+    render(<Notification {...defaultNotificationProps} />);
     expect(screen.getByRole('button', { name: '알림 열기' })).toBeInTheDocument();
   });
 
   it('triggerClassName이 트리거 버튼에 적용된다', () => {
-    render(<Notification list={list} triggerClassName="trigger-test-class" />);
+    render(<Notification {...defaultNotificationProps} triggerClassName="trigger-test-class" />);
     expect(screen.getByRole('button', { name: '알림 열기' })).toHaveClass('trigger-test-class');
   });
 
   it('트리거 클릭 시 알림 내역과 목록이 보인다 (넓은 화면: Popover)', async () => {
     const user = userEvent.setup();
-    render(<Notification list={list} />);
+    render(<Notification {...defaultNotificationProps} />);
 
     await user.click(screen.getByRole('button', { name: '알림 열기' }));
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: '알림 내역' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '모두 읽기' })).toBeInTheDocument();
-    expect(screen.getByText('모임 초대')).toBeInTheDocument();
+    expect(screen.getByText('모임 확정')).toBeInTheDocument();
   });
 
   describe('767px 이하 (Dialog)', () => {
@@ -74,13 +103,13 @@ describe('Notification', () => {
 
     it('트리거 클릭 시 Dialog에 주입 목록이 보인다', async () => {
       const user = userEvent.setup();
-      render(<Notification list={list} />);
+      render(<Notification {...defaultNotificationProps} />);
 
       await user.click(screen.getByRole('button', { name: '알림 열기' }));
 
       expect(await screen.findByRole('dialog')).toBeInTheDocument();
       expect(screen.getByRole('heading', { name: '알림 내역' })).toBeInTheDocument();
-      expect(screen.getByText('모임 초대')).toBeInTheDocument();
+      expect(screen.getByText('모임 확정')).toBeInTheDocument();
     });
   });
 });

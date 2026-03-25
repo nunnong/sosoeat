@@ -12,13 +12,17 @@ import { NotificationTrigger } from '../notification-trigger';
 import type { NotificationDialogProps } from './notification-dialog.types';
 
 const mobileDialogContentClass = cn(
-  'flex max-w-none flex-col gap-0 overflow-hidden bg-white p-0 ring-0',
+  'flex max-w-[314px] flex-col gap-0 overflow-hidden bg-white p-0 ring-0',
   'shadow-[0px_4px_16px_rgba(0,0,0,0.04)]',
   'fixed inset-x-0 top-auto bottom-0 left-0 z-50 translate-x-0 translate-y-0',
-  'h-[min(812px,100dvh)] max-h-[100dvh] w-full max-w-none rounded-t-[24px] rounded-r-none'
+  'h-[min(812px,100dvh)] max-h-[100dvh] w-full rounded-t-[24px] rounded-r-none sm:max-w-[314px]'
 );
 
-export const NotificationDialog = ({ triggerClassName, list }: NotificationDialogProps) => {
+export const NotificationDialog = ({
+  triggerClassName,
+  list,
+  unreadCount,
+}: NotificationDialogProps) => {
   const titleId = React.useId();
 
   return (
@@ -36,6 +40,7 @@ export const NotificationDialog = ({ triggerClassName, list }: NotificationDialo
           titleId={titleId}
           listScrollClassName={scrollAreaMobileClass}
           list={list}
+          unreadCount={unreadCount}
         />
       </DialogContent>
     </Dialog>
