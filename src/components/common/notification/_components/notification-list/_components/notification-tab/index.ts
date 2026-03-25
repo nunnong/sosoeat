@@ -1,2 +1,2 @@
-export { NotificationTab } from './notification-tab';
-export type { NotificationTabProps } from './notification-tab.types';
+export * from './notification-tab';
+export type * from './notification-tab.types';

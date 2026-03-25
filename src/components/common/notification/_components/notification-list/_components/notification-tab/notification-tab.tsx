@@ -1,22 +1,20 @@
 'use client';
 
-import { type ReactNode,useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 import { Calendar, ClipboardList, MessageCircle, Users } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { notificationsApi, postsApi } from '@/lib/api-client';
+import { notificationsApi } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
-import type {
-  Notification,
-  NotificationData,
-  NotificationTypeEnum,
-} from '@/types/generated-client';
+import type { Notification, NotificationTypeEnum } from '@/types/generated-client';
 
-import { formatNotificationMetaRelativeTime } from './format-notification-meta-time';
-
-const notificationRowButtonClass =
-  'h-auto w-full shrink-0 flex flex-col items-stretch justify-start gap-0 rounded-none border-0 p-0 text-left font-normal whitespace-normal shadow-none hover:bg-transparent';
+import { formatNotificationMetaRelativeTime } from './_components/format-notification-meta-time.utils';
+import {
+  NOTIFICATION_ICON_BOX_CLASS,
+  NOTIFICATION_ROW_BUTTON_CLASS,
+} from './notification-tab.constants';
+import { getNotificationDescription, notificationTitleForType } from './notification-tab.utils';
 
 const metaDot = (
   <span className="inline-block size-1 shrink-0 rounded-full bg-[#FF6600]" aria-hidden />
@@ -48,29 +46,26 @@ const ReadCheckIcon = ({ className }: ReadCheckIconProps) => {
   );
 };
 
-const iconBoxClass =
-  'flex size-[42px] shrink-0 items-center justify-center rounded-[14px] px-[9.5px] text-white';
-
 const UserIcon = () => (
-  <div className={cn(iconBoxClass, 'bg-[#FF6F0F]')} aria-hidden>
+  <div className={cn(NOTIFICATION_ICON_BOX_CLASS, 'bg-[#FF6F0F]')} aria-hidden>
     <Users className="size-[22px]" strokeWidth={2.5} aria-hidden />
   </div>
 );
 
 const MeetingIcon = () => (
-  <div className={cn(iconBoxClass, 'bg-[#F5A623]')} aria-hidden>
+  <div className={cn(NOTIFICATION_ICON_BOX_CLASS, 'bg-[#F5A623]')} aria-hidden>
     <Calendar className="size-[22px]" strokeWidth={1.1} aria-hidden />
   </div>
 );
 
 const CommentIcon = () => (
-  <div className={cn(iconBoxClass, 'bg-[#00B493]')} aria-hidden>
+  <div className={cn(NOTIFICATION_ICON_BOX_CLASS, 'bg-[#00B493]')} aria-hidden>
     <MessageCircle className="size-[13px]" strokeWidth={1.1} aria-hidden />
   </div>
 );
 
 const ApprovedIcon = () => (
-  <div className={cn(iconBoxClass, 'bg-[#F5A623]')} aria-hidden>
+  <div className={cn(NOTIFICATION_ICON_BOX_CLASS, 'bg-[#F5A623]')} aria-hidden>
     <ClipboardList className="size-[22px]" strokeWidth={1.1} aria-hidden />
   </div>
 );
@@ -119,51 +114,7 @@ const NotificationTabBody = ({
   );
 };
 
-const emptyCommentsFallback = '클라이밍 어때요?-딸기님의 댓글"정말재밌어요:)"';
-
-function commentDescriptionFallback(data: NotificationData, message: string): string {
-  const trimmed = message.trim();
-  if (trimmed) return trimmed;
-  if (data.postTitle) return `${data.postTitle}에 새 댓글이 달렸어요`;
-  return '';
-}
-
-async function getDescription(
-  type: NotificationTypeEnum,
-  data: NotificationData,
-  teamId: string,
-  message: string
-): Promise<string> {
-  switch (type) {
-    case 'MEETING_CONFIRMED':
-      return `${data.meetingName ?? ''} 모임이 확정되었어요!.`;
-    case 'MEETING_CANCELED':
-      return '모임이 취소되었어요';
-    case 'COMMENT': {
-      if (data.postId == null) return commentDescriptionFallback(data, message);
-      try {
-        const response = await postsApi.teamIdPostsPostIdCommentsGet({
-          teamId,
-          postId: data.postId,
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
-          size: 1,
-        });
-        const list = response.data ?? [];
-        if (list.length === 0) return emptyCommentsFallback;
-        const commentHost = list[0].author.name;
-        const comment = list[0].content;
-        return `${data.postTitle ?? ''}에 ${commentHost}님의 댓글 "${comment}"`;
-      } catch {
-        return commentDescriptionFallback(data, message);
-      }
-    }
-    default:
-      return '';
-  }
-}
-
-function thumbnailForType(type: NotificationTypeEnum): ReactNode {
+const thumbnailForType = (type: NotificationTypeEnum): ReactNode => {
   switch (type) {
     case 'MEETING_CONFIRMED':
       return <UserIcon />;
@@ -174,29 +125,18 @@ function thumbnailForType(type: NotificationTypeEnum): ReactNode {
     default:
       return <ApprovedIcon />;
   }
-}
-
-function titleForType(type: NotificationTypeEnum): string {
-  switch (type) {
-    case 'MEETING_CONFIRMED':
-      return '모임 확정';
-    case 'MEETING_CANCELED':
-      return '모임 취소';
-    case 'COMMENT':
-      return '댓글 알림';
-    default:
-      return '알림';
-  }
-}
+};
 
 export const NotificationTab = (props: Notification) => {
   const [description, setDescription] = useState('');
 
   useEffect(() => {
     let cancelled = false;
-    void getDescription(props.type, props.data, props.teamId, props.message).then((text) => {
-      if (!cancelled) setDescription(text);
-    });
+    void getNotificationDescription(props.type, props.data, props.teamId, props.message).then(
+      (text) => {
+        if (!cancelled) setDescription(text);
+      }
+    );
     return () => {
       cancelled = true;
     };
@@ -210,7 +150,7 @@ export const NotificationTab = (props: Notification) => {
     <Button
       type="button"
       variant="ghost"
-      className={notificationRowButtonClass}
+      className={NOTIFICATION_ROW_BUTTON_CLASS}
       onClick={() => {
         void notificationsApi.teamIdNotificationsNotificationIdReadPut({
           teamId: props.teamId,
@@ -220,7 +160,7 @@ export const NotificationTab = (props: Notification) => {
     >
       <NotificationTabBody
         thumbnail={thumbnailForType(props.type)}
-        title={titleForType(props.type)}
+        title={notificationTitleForType(props.type)}
         isMeetingConfirmed={isMeetingConfirmed}
         metaRight={metaRight}
         description={description}

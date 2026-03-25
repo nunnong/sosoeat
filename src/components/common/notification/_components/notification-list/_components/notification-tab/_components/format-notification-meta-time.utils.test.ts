@@ -1,4 +1,4 @@
-import { formatNotificationMetaRelativeTime } from './format-notification-meta-time';
+import { formatNotificationMetaRelativeTime } from './format-notification-meta-time.utils';
 
 describe('formatNotificationMetaRelativeTime', () => {
   const now = new Date('2025-06-15T12:00:00.000Z');

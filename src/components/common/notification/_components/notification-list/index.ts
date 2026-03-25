@@ -1,4 +1,3 @@
-export type { NotificationTabProps } from './_components/notification-tab';
-export { NotificationTab } from './_components/notification-tab';
-export { NotificationList } from './notification-list';
-export type { NotificationListProps } from './notification-list.types';
+export * from './_components/notification-tab';
+export * from './notification-list';
+export type * from './notification-list.types';

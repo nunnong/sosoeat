@@ -1,12 +1,10 @@
-const MINUTE_MS = 60_000;
-const HOUR_MS = 3_600_000;
-const DAY_MS = 86_400_000;
+import { DAY_MS, HOUR_MS, MINUTE_MS } from './format-notification-meta-time.constants';
 
 /** 알림 탭 우측 메타: 경과 시간(분·시간·일) */
-export function formatNotificationMetaRelativeTime(
+export const formatNotificationMetaRelativeTime = (
   createdAt: Date,
   now: Date = new Date()
-): string {
+): string => {
   const ms = now.getTime() - createdAt.getTime();
   if (ms < MINUTE_MS) return '방금 전';
 
@@ -18,4 +16,4 @@ export function formatNotificationMetaRelativeTime(
 
   const days = Math.floor(ms / DAY_MS);
   return `${days}일 전`;
-}
+};
