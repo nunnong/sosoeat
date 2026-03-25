@@ -38,7 +38,7 @@ export const ProgressWithLabel = ({
       <FieldLabel htmlFor={id} className="flex w-full items-center justify-between gap-1">
         <div className="flex items-center gap-1">
           <Users className="h-3 w-3 shrink-0" />
-          <span className="text-xs font-medium">{`${clampedCurrent}/${max} 참여중`}</span>
+          <span className="text-xs font-medium">{`${clampedCurrent}/${max}`}</span>
         </div>
         <span className={progressStateClasses({ variant })}>
           {clampedCurrent === max ? '마감' : null}

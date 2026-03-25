@@ -2,6 +2,8 @@ import { cva } from 'class-variance-authority';
 
 import type { MeetingCategory } from '@/types/meeting';
 
+import type { MeetingRole, MeetingStatus } from './meeting-detail-card.types';
+
 // ── 카테고리 레이블 ───────────────────────────────────────────
 
 export const CATEGORY_LABEL: Record<MeetingCategory, string> = {
@@ -28,20 +30,17 @@ export const actionButtonVariants = cva(
 
 /** 흰 버튼 (참여 취소하기 / 공유하기) */
 export const outlineButtonVariants = cva(
-  'h-full w-full rounded-2xl bg-white text-normal md:text-sm lg:text-xl',
+  'ring-0 h-full w-full rounded-2xl bg-white text-normal md:text-sm lg:text-xl',
   {
     variants: {
       category: {
-        groupEat:
-          'border border-sosoeat-orange-800 shadow-sosoeat-inset text-sosoeat-orange-700 hover:bg-white',
-        groupBuy:
-          'border border-sosoeat-blue-800 shadow-sosoeat-inset text-sosoeat-blue-700 hover:bg-white',
+        groupEat: 'ring-1 text-sosoeat-orange-700 hover:bg-white',
+        groupBuy: 'ring-1 text-sosoeat-blue-700 hover:bg-white',
       },
     },
   }
 );
 
-/** InfoRow 아이콘 컨테이너 배경 */
 export const iconBgVariants = cva('', {
   variants: {
     category: {
@@ -51,7 +50,6 @@ export const iconBgVariants = cva('', {
   },
 });
 
-/** InfoRow 아이콘 색상 */
 export const iconColorVariants = cva('', {
   variants: {
     category: {
@@ -60,3 +58,54 @@ export const iconColorVariants = cva('', {
     },
   },
 });
+
+// ── OCP: 액션 버튼 설정 테이블 ───────────────────────────────
+// 새로운 role/status 조합이 추가될 때 이 테이블에만 항목을 추가합니다.
+// 컴포넌트/훅 내부의 분기 로직을 수정할 필요가 없습니다.
+
+export type ActionButtonType =
+  | 'closed'
+  | 'host-share'
+  | 'host-confirm'
+  | 'participant-cancel'
+  | 'join';
+
+export interface ActionButtonConfig {
+  type: ActionButtonType;
+  match: (args: { role: MeetingRole; status: MeetingStatus; isJoined: boolean }) => boolean;
+  label: string;
+  variant: 'primary' | 'outline' | 'disabled';
+}
+
+export const ACTION_BUTTON_CONFIGS: ActionButtonConfig[] = [
+  {
+    type: 'closed',
+    match: ({ status }) => status === 'closed',
+    label: '모집 마감',
+    variant: 'disabled',
+  },
+  {
+    type: 'host-share',
+    match: ({ role, status }) => role === 'host' && status === 'confirmed',
+    label: '공유하기',
+    variant: 'outline',
+  },
+  {
+    type: 'host-confirm',
+    match: ({ role }) => role === 'host',
+    label: '모임 확정하기',
+    variant: 'primary',
+  },
+  {
+    type: 'participant-cancel',
+    match: ({ role, isJoined }) => role === 'participant' && isJoined,
+    label: '참여 취소하기',
+    variant: 'outline',
+  },
+  {
+    type: 'join',
+    match: () => true,
+    label: '참여하기',
+    variant: 'primary',
+  },
+];

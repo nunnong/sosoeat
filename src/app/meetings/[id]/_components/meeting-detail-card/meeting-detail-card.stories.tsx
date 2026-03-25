@@ -3,6 +3,25 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import type { Meeting } from '@/types/meeting';
 
 import { MeetingDetailCard } from './meeting-detail-card';
+import type { MeetingRole, MeetingStatus } from './meeting-detail-card.types';
+
+// Storybook은 discriminated union을 args composition에 사용할 수 없으므로
+// 스토리 전용 평탄화 타입을 정의합니다.
+// 컴포넌트 자체의 ISP(discriminated union)는 그대로 유지됩니다.
+type StoryArgs = {
+  meeting: Meeting;
+  role: MeetingRole;
+  status: MeetingStatus;
+  isJoined?: boolean;
+  isLiked: boolean;
+  onJoin?: () => void;
+  onCancel?: () => void;
+  onConfirm?: () => void;
+  onShare?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onLikeToggle?: () => void;
+};
 
 const mockMeeting: Meeting = {
   id: '1',
@@ -13,7 +32,7 @@ const mockMeeting: Meeting = {
   latitude: 37.5065,
   longitude: 127.0536,
   dateTime: '2024-03-15T09:30:00.000Z',
-  registrationEnd: '2027-03-14T23:59:59.000Z',
+  registrationEnd: '2026-05-14T23:59:59.000Z',
   participantCount: 3,
   capacity: 6,
   image: '',
@@ -41,17 +60,18 @@ const meta = {
       </div>
     ),
   ],
+  // isJoined는 participant 전용이므로 meta.args에서 제거하고
+  // 각 participant 스토리에서 명시적으로 지정합니다.
   args: {
     meeting: mockMeeting,
     role: 'participant',
     status: 'open',
-    isJoined: false,
     isLiked: false,
   },
-} satisfies Meta<typeof MeetingDetailCard>;
+} as Meta<typeof MeetingDetailCard>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<StoryArgs>;
 
 // ── 모바일 (접힘/펼침) ────────────────────────────────
 
@@ -59,6 +79,9 @@ export const MobileDefault: Story = {
   name: '모바일 — 기본 (접힘)',
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
+  },
+  args: {
+    isJoined: false,
   },
 };
 
@@ -79,6 +102,7 @@ export const MobileClosedMeeting: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   args: {
+    isJoined: false,
     status: 'closed',
   },
 };
@@ -127,6 +151,7 @@ export const HostShare: Story = {
 export const ClosedMeeting: Story = {
   name: '마감된 모임',
   args: {
+    isJoined: false,
     status: 'closed',
   },
 };
@@ -136,12 +161,14 @@ export const GroupBuyCategory: Story = {
   args: {
     meeting: { ...mockMeeting, type: 'groupBuy' },
     role: 'participant',
+    isJoined: false,
   },
 };
 
 export const LikedState: Story = {
   name: '찜한 상태',
   args: {
+    isJoined: false,
     isLiked: true,
   },
 };
@@ -149,6 +176,7 @@ export const LikedState: Story = {
 export const UnlikedState: Story = {
   name: '찜 안 한 상태',
   args: {
+    isJoined: false,
     isLiked: false,
   },
 };
@@ -157,6 +185,7 @@ export const FullParticipants: Story = {
   name: '참여 인원 가득 (100%)',
   args: {
     meeting: { ...mockMeeting, participantCount: 6, capacity: 6 },
+    isJoined: false,
     status: 'full',
   },
 };

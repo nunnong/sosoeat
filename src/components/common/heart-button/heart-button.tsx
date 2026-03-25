@@ -18,8 +18,10 @@ export function HeartButton({ isLiked, onToggle, className, iconSize = 20 }: Hea
         size="icon"
         aria-label={isLiked ? '찜 취소' : '찜하기'}
         onClick={onToggle}
-        style={{ width: iconSize * 2, height: iconSize * 2 }}
-        className="border-sosoeat-gray-500 hover:bg-sosoeat-gray-100 cursor-pointer rounded-full border bg-transparent"
+        className={cn(
+          'border-sosoeat-gray-500 hover:bg-sosoeat-gray-100 cursor-pointer rounded-full border bg-transparent',
+          className
+        )}
       >
         <motion.div
           animate={{ scale: 1 }}
