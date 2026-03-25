@@ -42,8 +42,8 @@ export const SosoTalkFilterBar = ({
 
   return (
     <section className={cn('w-full', className)}>
-      <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 py-4 pr-5 pl-1 md:py-5">
-        <div className="flex items-center gap-6 md:gap-8">
+      <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 py-4 pr-5 pl-1">
+        <div className="flex items-center gap-6">
           {tabs.map((tab) => {
             const isActive = tab.value === activeTab;
 
@@ -53,7 +53,7 @@ export const SosoTalkFilterBar = ({
                 type="button"
                 onClick={() => onTabChange(tab.value)}
                 className={cn(
-                  'text-base leading-none font-semibold transition-colors sm:text-xl',
+                  'inline-flex h-8 items-center text-xl leading-none font-semibold transition-colors',
                   isActive
                     ? 'text-sosoeat-orange-600 font-bold'
                     : 'text-sosoeat-gray-900 hover:text-sosoeat-orange-600'
@@ -76,7 +76,7 @@ export const SosoTalkFilterBar = ({
                 type="button"
                 onClick={() => onSortChange(option.value)}
                 className={cn(
-                  'relative pl-3 text-base leading-none font-semibold transition-colors',
+                  'relative inline-flex h-8 items-center pl-3 text-base leading-none font-semibold transition-colors',
                   isActive
                     ? 'text-sosoeat-gray-900'
                     : 'text-sosoeat-gray-500 hover:text-sosoeat-gray-900'
@@ -100,7 +100,7 @@ export const SosoTalkFilterBar = ({
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="text-sosoeat-gray-900 flex items-center gap-1 text-lg leading-none font-medium md:hidden"
+              className="text-sosoeat-gray-900 inline-flex h-8 items-center gap-1 text-base leading-none font-medium md:hidden"
               aria-label="정렬 옵션"
             >
               <span>{selectedSortOption.label}</span>
