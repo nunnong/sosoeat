@@ -28,7 +28,7 @@ export default function MeetingsPage() {
   }, [regionCommitted, date]);
 
   return (
-    <div className="h-[2398px]">
+    <div className="">
       <MeetingFilterBar
         regionCommitted={regionCommitted}
         date={date}
