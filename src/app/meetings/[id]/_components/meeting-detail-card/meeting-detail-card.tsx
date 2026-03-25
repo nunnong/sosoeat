@@ -19,10 +19,7 @@ import { useMeetingDetailCard } from './hooks/use-meeting-detail-card';
 import { iconBgVariants, iconColorVariants } from './meeting-detail-card.constants';
 import type { MeetingDetailCardProps } from './meeting-detail-card.types';
 
-// ─────────────────────────────────────────────────────────────
-// 컴포넌트 타입 정의
-// ─────────────────────────────────────────────────────────────
-
+// 모임 정보 행 컴포넌트(날짜, 장소)
 interface InfoRowProps {
   icon: React.ReactNode;
   category: MeetingCategory;
@@ -52,6 +49,7 @@ function InfoRow({ icon, category, label, children, className }: InfoRowProps) {
   );
 }
 
+// 참여 현황 행 컴포넌트
 interface ParticipantsRowProps {
   meetingId: string;
   current: number;
@@ -80,6 +78,7 @@ function ParticipantsRow({ meetingId, current, max, category, className }: Parti
   );
 }
 
+// 호스트 행 컴포넌트
 interface HostRowProps {
   name: string;
   profileImage?: string;
@@ -105,50 +104,36 @@ interface InfoSectionProps {
   meeting: MeetingDetailCardProps['meeting'];
   category: MeetingCategory;
   fullDateLabel: string;
-  ellipsisMenu: React.ReactNode;
+  className?: string;
 }
 
-function InfoSection({ meeting, category, fullDateLabel, ellipsisMenu }: InfoSectionProps) {
+function InfoSection({ meeting, category, fullDateLabel, className }: InfoSectionProps) {
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-col gap-[10px]">
-        <div className="flex items-center justify-between">
-          <DeadlineBadge registrationEnd={meeting.registrationEnd} variant={category} />
-          {ellipsisMenu}
-        </div>
+    <div className={cn('flex flex-col gap-[10px]', className)}>
+      <InfoRow icon={<CalendarIcon />} category={category} label="날짜 및 시간">
+        <p className="text-sosoeat-gray-900 text-xs font-bold lg:text-sm">{fullDateLabel}</p>
+      </InfoRow>
 
-        <h2 className="line-clamp-2 text-xl leading-snug font-semibold lg:line-clamp-none lg:text-3xl lg:font-bold">
-          {meeting.name}
-        </h2>
-      </div>
+      <InfoRow icon={<MapPinIcon />} category={category} label="장소">
+        <p className="text-sosoeat-gray-900 text-xs font-bold lg:text-sm">{meeting.region}</p>
+        <p className="text-sosoeat-gray-600 text-xs font-bold lg:text-sm lg:font-semibold">
+          {meeting.address}
+        </p>
+      </InfoRow>
 
-      <div className="flex-1" />
+      <ParticipantsRow
+        meetingId={String(meeting.id)}
+        current={meeting.participantCount}
+        max={meeting.capacity}
+        category={category}
+      />
 
-      <div className="flex flex-col gap-[10px]">
-        <InfoRow icon={<CalendarIcon />} category={category} label="날짜 및 시간">
-          <p className="text-sosoeat-gray-900 text-xs font-bold lg:text-sm">{fullDateLabel}</p>
-        </InfoRow>
-
-        <InfoRow icon={<MapPinIcon />} category={category} label="장소">
-          <p className="text-sosoeat-gray-900 text-xs font-bold lg:text-sm">{meeting.region}</p>
-          <p className="text-sosoeat-gray-600 text-xs font-bold lg:text-sm lg:font-semibold">
-            {meeting.address}
-          </p>
-        </InfoRow>
-
-        <ParticipantsRow
-          meetingId={String(meeting.id)}
-          current={meeting.participantCount}
-          max={meeting.capacity}
-          category={category}
-        />
-
-        <HostRow name={meeting.host.name} profileImage={meeting.host.profileImage} />
-      </div>
+      <HostRow name={meeting.host.name} profileImage={meeting.host.profileImage} />
     </div>
   );
 }
 
+// 버튼, 좋아요
 interface ActionRowProps {
   actionButton: React.ReactNode;
   isLiked: boolean;
@@ -157,7 +142,7 @@ interface ActionRowProps {
 
 function ActionRow({ actionButton, isLiked, onLikeToggle }: ActionRowProps) {
   return (
-    <div className="flex items-center gap-[10px] pt-[14px] md:pt-[12px] lg:gap-2 lg:pt-0">
+    <div className="flex items-center gap-[10px] pt-[14px] md:pt-0 lg:gap-2">
       <div className="h-[40px] w-[245px] md:w-[272px] lg:h-[62px] lg:w-full lg:max-w-[474px]">
         {actionButton}
       </div>
@@ -201,9 +186,9 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
     <div
       className={cn(
         'relative transition-all duration-300',
-        'border-sosoeat-gray-300 rounded-2xl border bg-white px-6 shadow-sm',
-        'pt-[16px] pb-[40px] md:px-[16px] md:py-[14px] lg:px-6 lg:py-[10px]',
-        'md:h-[460px] md:w-[358px] md:overflow-hidden lg:h-[460px] lg:w-[616px] lg:overflow-hidden',
+        'rounded-[20px] bg-white lg:rounded-[32px]',
+        'px-6 pt-[16px] pb-[40px] md:px-4 md:py-6 lg:px-6 lg:py-4',
+        'md:h-[378px] md:w-[358px] md:overflow-hidden lg:h-[460px] lg:w-[616px] lg:overflow-hidden',
         'w-[343px]',
         isExpanded && 'max-md:rounded-b-none'
       )}
@@ -252,12 +237,11 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
           className={cn(
             'absolute top-full right-0 left-0 z-10',
             'rounded-b-2xl bg-white px-6',
-            'shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),4px_0_6px_-1px_rgba(0,0,0,0.05),-4px_0_6px_-1px_rgba(0,0,0,0.05)]',
             'overflow-hidden transition-all duration-300 ease-in-out',
             isExpanded ? 'max-h-[200px] py-4 opacity-100' : 'max-h-0 py-0 opacity-0'
           )}
         >
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-[29px]">
             <ParticipantsRow
               meetingId={String(meeting.id)}
               current={meeting.participantCount}
@@ -272,14 +256,22 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
       {/* ════════════════════════════════════════
           태블릿 + PC (md ~)
           ════════════════════════════════════════ */}
-      <div className="hidden md:flex md:h-full md:flex-col lg:h-full">
-        <InfoSection
-          meeting={meeting}
-          category={category}
-          fullDateLabel={fullDateLabel}
-          ellipsisMenu={ellipsisMenu}
-        />
-        <div className="flex-1" />
+      <div className="hidden md:flex md:h-full md:flex-col md:justify-between lg:h-full">
+        {/* 상단: 마감 배지 + 모임 제목 */}
+        <div className="flex flex-col gap-[10px]">
+          <div className="flex items-center justify-between">
+            <DeadlineBadge registrationEnd={meeting.registrationEnd} variant={category} />
+            {ellipsisMenu}
+          </div>
+          <h2 className="line-clamp-2 text-xl leading-snug font-semibold lg:line-clamp-none lg:text-3xl lg:font-bold">
+            {meeting.name}
+          </h2>
+        </div>
+
+        {/* 중단: 날짜, 장소, 참여현황, 호스트 */}
+        <InfoSection meeting={meeting} category={category} fullDateLabel={fullDateLabel} />
+
+        {/* 하단: 액션버튼 + 좋아요 */}
         <ActionRow actionButton={actionButton} isLiked={isLiked} onLikeToggle={safeOnLikeToggle} />
       </div>
     </div>
