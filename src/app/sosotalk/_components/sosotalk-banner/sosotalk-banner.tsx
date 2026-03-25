@@ -17,13 +17,7 @@ export const SosoTalkBanner = ({
           className
         )}
       >
-        <Image
-          src={imageUrl}
-          alt={alt}
-          fill
-          className="object-cover"
-          sizes="(max-width: 767px) 100vw, (max-width: 1279px) 100vw, 1280px"
-        />
+        <Image src={imageUrl} alt={alt} className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/50" />
       </div>
     </section>
