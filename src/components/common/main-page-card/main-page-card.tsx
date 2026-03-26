@@ -44,7 +44,7 @@ export const MainPageCard = ({ meeting }: MainPageCardProps) => {
   return (
     <Card
       className={cn(
-        'h-105 w-90 gap-0 overflow-hidden rounded-2xl border border-[#F3F4F6] bg-white py-0 font-medium shadow-none ring-0'
+        'h-105 w-full max-w-90 gap-0 overflow-hidden rounded-2xl border border-[#F3F4F6] bg-white py-0 font-medium shadow-none ring-0'
       )}
     >
       <div className="relative h-[180px] w-full shrink-0 overflow-hidden rounded-2xl">

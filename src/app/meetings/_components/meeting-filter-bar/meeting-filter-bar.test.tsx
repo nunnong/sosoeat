@@ -4,9 +4,22 @@ import userEvent from '@testing-library/user-event';
 import { MeetingFilterBar } from './meeting-filter-bar';
 import type { MeetingFilterBarProps } from './meeting-filter-bar.types';
 
-const defaultProps: Pick<MeetingFilterBarProps, 'date' | 'regionCommitted'> = {
+const testOptions: MeetingFilterBarProps['options'] = [
+  { label: '인기순', sortBy: 'participantCount', sortOrder: 'desc' },
+  { label: '모임일 임박순', sortBy: 'dateTime', sortOrder: 'asc' },
+  { label: '모집 마감 임박 순', sortBy: 'registrationEnd', sortOrder: 'asc' },
+  { label: '모집 마감 먼 순', sortBy: 'registrationEnd', sortOrder: 'desc' },
+];
+
+const defaultProps: Pick<
+  MeetingFilterBarProps,
+  'date' | 'regionCommitted' | 'typeFilter' | 'sort' | 'options'
+> = {
   date: null,
   regionCommitted: null,
+  typeFilter: 'all',
+  sort: 'participantCount',
+  options: testOptions,
 };
 
 describe('MeetingFilterBar', () => {
