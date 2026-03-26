@@ -15,7 +15,7 @@ export function MeetingTabs() {
 
   return (
     <Tabs
-      className="p-6 px-4 max-md:w-[674px] md:w-[1108px]"
+      className="p-6 px-2 max-md:w-[674px] max-sm:flex max-sm:flex-col max-sm:items-center md:w-[1108px]"
       value={activeTab}
       onValueChange={(v) => setActiveTab(v as TabValue)}
     >

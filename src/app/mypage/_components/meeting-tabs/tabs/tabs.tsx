@@ -58,7 +58,9 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
       data-slot="tabs-trigger"
       className={cn(
         'relative rounded-none border-transparent bg-transparent px-8 pb-5 text-xl font-semibold text-gray-400',
-        'shadow-none transition-colors after:absolute after:bottom-2 after:left-0 after:h-[2px] after:w-full after:bg-transparent data-[state=active]:text-orange-600 data-[state=active]:after:bg-orange-500',
+        'shadow-none transition-colors after:absolute after:bottom-2 after:left-0 after:h-0.5 after:w-full after:bg-transparent data-[state=active]:text-orange-600 data-[state=active]:after:bg-orange-500',
+        'max-sm:w-full max-sm:items-center max-sm:px-0 max-sm:text-sm max-sm:after:bottom-1',
+
         className
       )}
       {...props}
@@ -76,4 +78,4 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
   );
 }
 
-export { Tabs, TabsContent, TabsList, tabsListVariants,TabsTrigger };
+export { Tabs, TabsContent, TabsList, tabsListVariants, TabsTrigger };

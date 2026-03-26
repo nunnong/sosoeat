@@ -12,5 +12,3 @@ export default meta;
 type Story = StoryObj<typeof MeetingTabs>;
 
 export const Default: Story = {};
-
-export const Empty: Story = {};
