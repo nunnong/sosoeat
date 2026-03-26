@@ -38,7 +38,9 @@ function recordToSelection(r: Record<string, string>): RegionSelection {
 function omitRegionModalValueOnChange(
   sub: RegionModalDropdownSub
 ): Omit<DropdownSubProp, 'value' | 'onChange'> {
-  const { value: _v, onChange: _o, ...rest } = sub;
+  const { value, onChange, ...rest } = sub;
+  void value;
+  void onChange;
   return rest;
 }
 
