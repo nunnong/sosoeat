@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import Link from 'next/link';
 
@@ -29,6 +29,9 @@ interface SosoTalkMainPost extends SosoTalkCardProps {
 
 const SOSOTALK_BANNER_IMAGE =
   'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1600&auto=format&fit=crop';
+
+const INITIAL_POST_COUNT = 8;
+const LOAD_MORE_COUNT = 4;
 
 const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
@@ -64,7 +67,8 @@ const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
     id: 3,
     title: '비 오는 날 생각나는 국물 요리 TALK',
-    content: '칼국수, 순두부, 쌀국수 중에서 오늘 같은 날 제일 당기는 메뉴가 뭔지 궁금해요.',
+    content:
+      '칼국수, 순두부, 쌀국수 중에서 오늘 같은 날 제일 당기는 메뉴가 뭔지 궁금해요.',
     imageUrl:
       'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop',
     authorName: '서현',
@@ -78,7 +82,8 @@ const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
     id: 4,
     title: '야식으로 먹기 좋은 배달 메뉴 추천',
-    content: '너무 헤비하지 않으면서 만족감 있는 메뉴 찾고 있어요. 최근에 괜찮았던 조합 있나요?',
+    content:
+      '너무 헤비하지 않으면서 만족감 있는 메뉴 찾고 있어요. 최근에 괜찮았던 조합 있나요?',
     imageUrl:
       'https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1200&auto=format&fit=crop',
     authorName: '지훈',
@@ -92,7 +97,8 @@ const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
     id: 5,
     title: '다이어트 중인데 맛있었던 샐러드집 있어요?',
-    content: '포만감 있고 재료 신선한 샐러드집 찾고 있어요. 배달 말고 매장 방문 기준도 좋아요.',
+    content:
+      '포만감 있고 재료 신선한 샐러드집 찾고 있어요. 배달 말고 매장 방문 기준도 좋아요.',
     imageUrl:
       'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop',
     authorName: '하린',
@@ -227,10 +233,74 @@ const sortPosts = (posts: SosoTalkMainPost[], activeSort: SosoTalkSortValue) => 
 export const SosoTalkMainPage = ({ className }: SosoTalkMainPageProps) => {
   const [activeTab, setActiveTab] = useState<SosoTalkTabValue>('all');
   const [activeSort, setActiveSort] = useState<SosoTalkSortValue>('latest');
+  const [visiblePostCount, setVisiblePostCount] = useState(INITIAL_POST_COUNT);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const posts =
-    activeTab === 'popular' ? SOSOTALK_POSTS.filter((post) => post.isPopular) : SOSOTALK_POSTS;
-  const filteredPosts = sortPosts(posts, activeSort);
+  const observerTargetRef = useRef<HTMLDivElement | null>(null);
+
+  const filteredPosts = useMemo(() => {
+    const posts =
+      activeTab === 'popular' ? SOSOTALK_POSTS.filter((post) => post.isPopular) : SOSOTALK_POSTS;
+
+    return sortPosts(posts, activeSort);
+  }, [activeSort, activeTab]);
+
+  const visiblePosts = filteredPosts.slice(0, visiblePostCount);
+  const hasMorePosts = visiblePostCount < filteredPosts.length;
+
+  const handleTabChange = (value: SosoTalkTabValue) => {
+    setActiveTab(value);
+    setVisiblePostCount(INITIAL_POST_COUNT);
+    setIsLoadingMore(false);
+  };
+
+  const handleSortChange = (value: SosoTalkSortValue) => {
+    setActiveSort(value);
+    setVisiblePostCount(INITIAL_POST_COUNT);
+    setIsLoadingMore(false);
+  };
+
+  useEffect(() => {
+    const target = observerTargetRef.current;
+
+    if (!target || !hasMorePosts || isLoadingMore) {
+      return;
+    }
+
+    // 목록 하단 sentinel이 보이면 다음 카드 묶음을 로드합니다.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        setIsLoadingMore(true);
+      },
+      {
+        rootMargin: '160px',
+      }
+    );
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [hasMorePosts, isLoadingMore]);
+
+  useEffect(() => {
+    if (!isLoadingMore) {
+      return;
+    }
+
+    // API 연동 전까지는 지연 시간을 두고 추가 로딩 동작만 시뮬레이션합니다.
+    const timeout = window.setTimeout(() => {
+      setVisiblePostCount((previousCount) =>
+        Math.min(previousCount + LOAD_MORE_COUNT, filteredPosts.length)
+      );
+      setIsLoadingMore(false);
+    }, 500);
+
+    return () => window.clearTimeout(timeout);
+  }, [filteredPosts.length, isLoadingMore]);
 
   return (
     <div className={cn('bg-background min-h-screen w-full bg-[#f9f9f9] pb-24 md:pb-28', className)}>
@@ -242,15 +312,28 @@ export const SosoTalkMainPage = ({ className }: SosoTalkMainPageProps) => {
         <SosoTalkFilterBar
           activeTab={activeTab}
           activeSort={activeSort}
-          onTabChange={setActiveTab}
-          onSortChange={setActiveSort}
+          onTabChange={handleTabChange}
+          onSortChange={handleSortChange}
         />
 
         <section className="pt-2">
           <div className="grid grid-cols-1 justify-items-center gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:justify-items-stretch">
-            {filteredPosts.map(({ id, isPopular: _isPopular, ...post }) => (
+            {visiblePosts.map(({ id, isPopular: _isPopular, ...post }) => (
               <SosoTalkCard key={id} {...post} />
             ))}
+          </div>
+
+          <div className="flex flex-col items-center justify-center py-8">
+            {hasMorePosts ? (
+              <>
+                <div ref={observerTargetRef} className="h-4 w-full" aria-hidden />
+                <p className="text-sosoeat-gray-500 text-sm">
+                  {isLoadingMore ? '게시글을 더 불러오는 중이에요.' : '아래로 스크롤하면 게시글이 더 보여요.'}
+                </p>
+              </>
+            ) : (
+              <p className="text-sosoeat-gray-400 text-sm">마지막 게시글까지 모두 확인했어요.</p>
+            )}
           </div>
         </section>
       </main>
