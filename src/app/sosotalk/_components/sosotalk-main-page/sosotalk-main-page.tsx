@@ -33,6 +33,8 @@ const SOSOTALK_BANNER_IMAGE =
 const INITIAL_POST_COUNT = 8;
 const LOAD_MORE_COUNT = 4;
 
+// 실제 API 연동 전까지는 더미 데이터를 사용하여 구현합니다. 게시글 ID는 정수형으로 가정하고, 최신 게시글이 ID가 더 큰 형태로 정렬되어 있다고 가정합니다.
+
 const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
     id: 1,
@@ -67,8 +69,7 @@ const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
     id: 3,
     title: '비 오는 날 생각나는 국물 요리 TALK',
-    content:
-      '칼국수, 순두부, 쌀국수 중에서 오늘 같은 날 제일 당기는 메뉴가 뭔지 궁금해요.',
+    content: '칼국수, 순두부, 쌀국수 중에서 오늘 같은 날 제일 당기는 메뉴가 뭔지 궁금해요.',
     imageUrl:
       'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop',
     authorName: '서현',
@@ -82,8 +83,7 @@ const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
     id: 4,
     title: '야식으로 먹기 좋은 배달 메뉴 추천',
-    content:
-      '너무 헤비하지 않으면서 만족감 있는 메뉴 찾고 있어요. 최근에 괜찮았던 조합 있나요?',
+    content: '너무 헤비하지 않으면서 만족감 있는 메뉴 찾고 있어요. 최근에 괜찮았던 조합 있나요?',
     imageUrl:
       'https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1200&auto=format&fit=crop',
     authorName: '지훈',
@@ -97,8 +97,7 @@ const SOSOTALK_POSTS: SosoTalkMainPost[] = [
   {
     id: 5,
     title: '다이어트 중인데 맛있었던 샐러드집 있어요?',
-    content:
-      '포만감 있고 재료 신선한 샐러드집 찾고 있어요. 배달 말고 매장 방문 기준도 좋아요.',
+    content: '포만감 있고 재료 신선한 샐러드집 찾고 있어요. 배달 말고 매장 방문 기준도 좋아요.',
     imageUrl:
       'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop',
     authorName: '하린',
@@ -328,7 +327,9 @@ export const SosoTalkMainPage = ({ className }: SosoTalkMainPageProps) => {
               <>
                 <div ref={observerTargetRef} className="h-4 w-full" aria-hidden />
                 <p className="text-sosoeat-gray-500 text-sm">
-                  {isLoadingMore ? '게시글을 더 불러오는 중이에요.' : '아래로 스크롤하면 게시글이 더 보여요.'}
+                  {isLoadingMore
+                    ? '게시글을 더 불러오는 중이에요.'
+                    : '아래로 스크롤하면 게시글이 더 보여요.'}
                 </p>
               </>
             ) : (
