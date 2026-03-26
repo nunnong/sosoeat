@@ -1,3 +1,5 @@
+import type { CommentItemData } from '@/components/common/comment-item';
+
 export interface SosoTalkPostDetailProps {
   title: string;
   content: string;
@@ -16,6 +18,13 @@ export interface SosoTalkPostDetailProps {
   onEditClick?: () => void;
   onDeleteClick?: () => void;
   onShareClick?: () => void;
+  comments?: CommentItemData[];
+  inputValue?: string;
+  inputPlaceholder?: string;
+  onChangeInput?: (value: string) => void;
+  onSubmitComment?: () => void;
+  currentUserName?: string;
+  currentUserImageUrl?: string;
 }
 
 export interface SosoTalkPostHeaderProps {
