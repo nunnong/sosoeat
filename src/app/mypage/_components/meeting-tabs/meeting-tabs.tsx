@@ -14,14 +14,18 @@ export function MeetingTabs() {
 
   return (
     <Tabs
-      className="max-w-[1108px] p-6 px-2 max-sm:flex max-sm:w-full max-sm:flex-col max-sm:items-center md:w-[674px]"
+      className="max-w-[1108px] p-6 px-2 max-sm:flex max-sm:w-full max-sm:flex-col"
       value={activeTab}
       onValueChange={(v) => setActiveTab(v as TabValue)}
     >
       <MeetingTabsList activeTab={activeTab} onTabChange={setActiveTab} />
 
       {MYPAGE_TABS.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value}>
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          className="w-full items-center justify-center"
+        >
           {isEmpty ? (
             <MeetingTabsEmpty />
           ) : (
