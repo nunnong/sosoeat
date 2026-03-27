@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
 
-import type { MeetingDetailBannerProps } from './meeting-detail-banner.type';
+import type { MeetingDetailBannerProps } from './meeting-search-banner.type';
 
 // mobile-first (no arbitrary px): base layout first, scale with sm/md/lg.
 const bannerShellClass =
