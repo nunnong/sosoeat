@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
-export interface AuthUser {
-  id: number;
-  email: string;
-  name: string;
-  teamId?: string;
-  companyName?: string;
-  image?: string | null;
-}
+import { User } from '@/types/generated-client/models';
+
+/**
+ * [Domain Layer] AuthUser
+ * OpenAPI User 모델에서 클라이언트 상태 관리에 필요한 필드만 추출하여 정의합니다.
+ */
+export type AuthUser = Pick<User, 'id' | 'email' | 'name'> &
+  Partial<Pick<User, 'teamId' | 'companyName' | 'image'>>;
 
 interface AuthState {
   accessToken: string | null;

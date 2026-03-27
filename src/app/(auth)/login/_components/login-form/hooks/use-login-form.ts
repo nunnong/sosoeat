@@ -5,8 +5,10 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { LoginRequest } from '@/types/generated-client/models';
+
 import { loginSchema } from '../login-form.schema';
-import { LoginFormProps, LoginFormValues } from '../login-form.types';
+import { LoginFormProps } from '../login-form.types';
 
 export const useLoginForm = ({ onSubmit, isLoading, defaultValues }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,7 +17,7 @@ export const useLoginForm = ({ onSubmit, isLoading, defaultValues }: LoginFormPr
     register,
     handleSubmit,
     formState: { isSubmitting, isValid, errors },
-  } = useForm<LoginFormValues>({
+  } = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
     mode: 'onTouched',
     defaultValues,
@@ -23,7 +25,7 @@ export const useLoginForm = ({ onSubmit, isLoading, defaultValues }: LoginFormPr
 
   const isPending = isLoading || isSubmitting;
 
-  const handleFormSubmit = handleSubmit(async (data: LoginFormValues) => {
+  const handleFormSubmit = handleSubmit(async (data: LoginRequest) => {
     if (onSubmit) {
       await onSubmit(data);
     }

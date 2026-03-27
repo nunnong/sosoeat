@@ -1,3 +1,5 @@
+import { SignupRequest } from '@/types/generated-client/models';
+
 export type SignupStep = 'email' | 'password' | 'name';
 
 export type EmailValues = {
@@ -20,9 +22,8 @@ export interface SignupFormValues extends EmailValues, PasswordValues, NameValue
 
 /**
  * 서버 API에 전달할 회원가입 payload 타입
- * passwordConfirm은 클라이언트 검증 전용 필드이므로 제외합니다.
  */
-export type SignupApiPayload = Omit<SignupFormValues, 'passwordConfirm'>;
+export type SignupApiPayload = SignupRequest;
 
 /**
  * 공통 스텝 Props 인터페이스

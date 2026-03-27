@@ -1,10 +1,7 @@
-export type LoginFormValues = {
-  email: string; // 이메일
-  password: string; // 비밀번호
-};
+import { LoginRequest } from '@/types/generated-client/models';
 
 export interface LoginFormProps {
-  onSubmit?: (data: LoginFormValues) => void | Promise<unknown>;
+  onSubmit?: (data: LoginRequest) => void | Promise<unknown>;
   isLoading?: boolean;
-  defaultValues?: Partial<LoginFormValues>;
+  defaultValues?: Partial<LoginRequest>;
 }
