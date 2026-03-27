@@ -24,10 +24,13 @@ export async function silentRefresh(): Promise<boolean> {
     return false;
   }
 
+  const user = await CookieStorage.getUser();
   const data = await response.json();
+
   await CookieStorage.setSession({
     accessToken: data.accessToken,
     refreshToken: data.refreshToken || refreshToken,
+    user: user ?? undefined,
   });
 
   return true;

@@ -28,7 +28,7 @@ const NAV_ITEMS = [
 export function NavigationBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
   const { mutate: performLogout } = useLogout();
 
   const visibleNavItems = NAV_ITEMS;
