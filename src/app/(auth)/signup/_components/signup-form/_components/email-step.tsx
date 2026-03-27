@@ -23,7 +23,6 @@ export const EmailStep = ({ onNext, defaultValues }: FirstStepProps<EmailValues>
   } = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
     mode: 'onTouched',
-    delayError: 1000,
     defaultValues,
   });
 

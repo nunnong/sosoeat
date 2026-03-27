@@ -18,7 +18,6 @@ export const useLoginForm = ({ onSubmit, isLoading, defaultValues }: LoginFormPr
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     mode: 'onTouched',
-    delayError: 1000,
     defaultValues,
   });
 

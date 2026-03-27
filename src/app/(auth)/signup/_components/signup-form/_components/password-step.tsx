@@ -29,12 +29,10 @@ export const PasswordStep = ({
   const {
     register,
     handleSubmit,
-    trigger,
     formState: { errors, isValid },
   } = useForm<PasswordValues>({
     resolver: zodResolver(passwordSchema),
     mode: 'onTouched',
-    delayError: 1000,
     defaultValues,
   });
 
@@ -63,11 +61,7 @@ export const PasswordStep = ({
                 type={showPassword ? 'text' : 'password'}
                 placeholder="비밀번호를 입력하세요"
                 className={getInputClasses(hasPasswordError)}
-                {...register('password', {
-                  onChange: () => {
-                    trigger('passwordConfirm');
-                  },
-                })}
+                {...register('password')}
                 aria-invalid={hasPasswordError}
               />
               <button

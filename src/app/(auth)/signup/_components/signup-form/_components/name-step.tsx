@@ -30,7 +30,6 @@ export const NameStep = ({
   } = useForm<NameValues>({
     resolver: zodResolver(nameSchema),
     mode: 'onTouched',
-    delayError: 1000,
     defaultValues,
   });
 
