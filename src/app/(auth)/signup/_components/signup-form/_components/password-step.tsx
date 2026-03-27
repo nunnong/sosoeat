@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
 
 import {
   AuthSubmitButton,
-  getAuthFieldError,
   getErrorAnimationClasses,
   getInputClasses,
 } from '@/app/(auth)/_components';
@@ -16,8 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-import { passwordSchema, PasswordValues } from '../signup-form.schema';
-import { MiddleStepProps } from '../signup-form.types';
+import { passwordSchema } from '../signup-form.schema';
+import { MiddleStepProps, PasswordValues } from '../signup-form.types';
 
 export const PasswordStep = ({
   onNext,
@@ -30,7 +29,6 @@ export const PasswordStep = ({
   const {
     register,
     handleSubmit,
-    control,
     trigger,
     formState: { errors, isValid },
   } = useForm<PasswordValues>({
@@ -40,31 +38,10 @@ export const PasswordStep = ({
     defaultValues,
   });
 
-  const passwordValue = useWatch({
-    control,
-    name: 'password',
-  });
-  const passwordConfirmValue = useWatch({
-    control,
-    name: 'passwordConfirm',
-  });
-
-  // 이전 비밀번호 값을 ref로 관리
-  const prevPasswordRef = useRef(passwordValue);
-
-  // 비밀번호가 실제로 변경되었을 때만 비밀번호 확인 필드 유효성 재검사 (일치 여부 확인)
-  useEffect(() => {
-    if (prevPasswordRef.current !== passwordValue && passwordConfirmValue) {
-      trigger('passwordConfirm');
-    }
-    prevPasswordRef.current = passwordValue;
-  }, [passwordValue, passwordConfirmValue, trigger]);
-
-  // 공통 헬퍼 함수를 사용하여 에러 노출 여부 결정
-  const passwordError = getAuthFieldError(errors.password, passwordValue);
+  const passwordError = errors.password;
   const hasPasswordError = !!passwordError;
 
-  const confirmError = getAuthFieldError(errors.passwordConfirm, passwordConfirmValue);
+  const confirmError = errors.passwordConfirm;
   const hasConfirmError = !!confirmError;
 
   const onSubmit = (data: PasswordValues) => {
@@ -86,7 +63,11 @@ export const PasswordStep = ({
                 type={showPassword ? 'text' : 'password'}
                 placeholder="비밀번호를 입력하세요"
                 className={getInputClasses(hasPasswordError)}
-                {...register('password')}
+                {...register('password', {
+                  onChange: () => {
+                    trigger('passwordConfirm');
+                  },
+                })}
                 aria-invalid={hasPasswordError}
               />
               <button

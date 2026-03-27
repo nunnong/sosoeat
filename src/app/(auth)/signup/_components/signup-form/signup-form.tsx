@@ -6,7 +6,7 @@ import { Funnel, Step } from '@/components/common/funnel/funnel';
 
 import {
   EmailStep,
-  NicknameStep,
+  NameStep,
   PasswordStep,
   SignupHeader,
   SignupStepHeader,
@@ -23,7 +23,7 @@ interface SignupFormProps {
 }
 
 export const SignupForm = ({ onSubmit, isLoading, defaultStep = 'email' }: SignupFormProps) => {
-  const { step, formData, handleEmailNext, handlePasswordNext, handleNicknameNext, handlePrev } =
+  const { step, formData, handleEmailNext, handlePasswordNext, handleNameNext, handlePrev } =
     useSignupForm({
       onSubmit,
       defaultStep,
@@ -55,12 +55,12 @@ export const SignupForm = ({ onSubmit, isLoading, defaultStep = 'email' }: Signu
                 }}
               />
             </Step>
-            <Step name="nickname">
-              <NicknameStep
-                onNext={handleNicknameNext}
+            <Step name="name">
+              <NameStep
+                onNext={handleNameNext}
                 onPrev={handlePrev}
                 isLoading={isLoading} // 최종 제출이 발생하는 단계이므로 isLoading 전달
-                defaultValues={{ nickname: formData.nickname }}
+                defaultValues={{ name: formData.name }}
               />
             </Step>
           </Funnel>

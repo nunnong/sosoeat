@@ -1,11 +1,22 @@
-import { EmailValues, NicknameValues, PasswordValues } from './signup-form.schema';
+export type SignupStep = 'email' | 'password' | 'name';
 
-export type SignupStep = 'email' | 'password' | 'nickname';
+export type EmailValues = {
+  email: string;
+};
+
+export type PasswordValues = {
+  password: string;
+  passwordConfirm: string;
+};
+
+export type NameValues = {
+  name: string;
+};
 
 /**
  * 전체 회원가입 폼 데이터 타입 (클라이언트 전용 필드 포함)
  */
-export interface SignupFormValues extends EmailValues, PasswordValues, NicknameValues {}
+export interface SignupFormValues extends EmailValues, PasswordValues, NameValues {}
 
 /**
  * 서버 API에 전달할 회원가입 payload 타입

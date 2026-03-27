@@ -1,26 +1,24 @@
 'use client';
 
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
   AuthSubmitButton,
-  getAuthFieldError,
   getErrorAnimationClasses,
   getInputClasses,
 } from '@/app/(auth)/_components';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-import { emailSchema, EmailValues } from '../signup-form.schema';
-import { FirstStepProps } from '../signup-form.types';
+import { emailSchema } from '../signup-form.schema';
+import { EmailValues, FirstStepProps } from '../signup-form.types';
 
 export const EmailStep = ({ onNext, defaultValues }: FirstStepProps<EmailValues>) => {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors, isValid },
   } = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
@@ -29,18 +27,9 @@ export const EmailStep = ({ onNext, defaultValues }: FirstStepProps<EmailValues>
     defaultValues,
   });
 
-  const emailValue = useWatch({
-    control,
-    name: 'email',
-  });
-
-  // 공통 헬퍼 함수를 사용하여 에러 노출 여부 결정
-  const emailError = getAuthFieldError(errors.email, emailValue);
+  const emailError = errors.email;
   const hasError = !!emailError;
 
-  /**
-   * TODO: 추후 API 연동 시 실제 이메일 중복 확인 로직 구현 필요
-   */
   const onSubmit = (data: EmailValues) => {
     onNext(data);
   };

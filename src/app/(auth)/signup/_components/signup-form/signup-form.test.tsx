@@ -142,7 +142,7 @@ describe('SignupForm', () => {
   });
 
   it('닉네임 단계에서 이전 버튼을 누르면 비밀번호 단계로 이동해야 합니다', async () => {
-    const { user } = setup(<SignupForm onSubmit={mockOnSubmit} defaultStep="nickname" />);
+    const { user } = setup(<SignupForm onSubmit={mockOnSubmit} defaultStep="name" />);
 
     // 닉네임 단계인지 검증
     expect(screen.getByText('프로필을 설정하세요')).toBeInTheDocument();
@@ -184,11 +184,11 @@ describe('SignupForm', () => {
   });
 
   it('닉네임에 특수문자, 공백, 자음/모음 단일 사용 시 에러 메시지를 표시해야 합니다', async () => {
-    const { user } = setup(<SignupForm onSubmit={mockOnSubmit} defaultStep="nickname" />);
-    const nicknameInput = screen.getByLabelText(/닉네임/);
+    const { user } = setup(<SignupForm onSubmit={mockOnSubmit} defaultStep="name" />);
+    const nameInput = screen.getByLabelText(/이름/);
 
     // 공백 포함 입력
-    await user.type(nicknameInput, 'hello 123');
+    await user.type(nameInput, 'hello 123');
     await user.tab();
 
     await waitFor(
@@ -201,8 +201,8 @@ describe('SignupForm', () => {
     );
 
     // 지우고 단일 자음 입력
-    await user.clear(nicknameInput);
-    await user.type(nicknameInput, 'ㄱㄴㄷ');
+    await user.clear(nameInput);
+    await user.type(nameInput, 'ㄱㄴㄷ');
     await user.tab();
 
     await waitFor(
@@ -216,7 +216,7 @@ describe('SignupForm', () => {
   });
 
   it('로딩 중일 때는 버튼에 "회원가입 중..."이 표시되고 버튼이 비활성화되어야 합니다', () => {
-    setup(<SignupForm onSubmit={mockOnSubmit} defaultStep="nickname" isLoading={true} />);
+    setup(<SignupForm onSubmit={mockOnSubmit} defaultStep="name" isLoading={true} />);
 
     const submitButton = screen.getByRole('button', { name: /회원가입 중.../ });
     expect(submitButton).toBeInTheDocument();
@@ -266,9 +266,9 @@ describe('SignupForm', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: /다음/ })).not.toBeDisabled());
     await user.click(screen.getByRole('button', { name: /다음/ }));
 
-    // Step 3: 닉네임
+    // Step 3: 이름
     await waitFor(() => expect(screen.getByText('프로필을 설정하세요')).toBeInTheDocument());
-    await user.type(screen.getByLabelText(/닉네임/), '테스터');
+    await user.type(screen.getByLabelText(/이름/), '테스터');
     await waitFor(() =>
       expect(screen.getByRole('button', { name: /회원가입$/ })).not.toBeDisabled()
     );
@@ -279,7 +279,7 @@ describe('SignupForm', () => {
       expect(mockOnSubmit).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'password123',
-        nickname: '테스터',
+        name: '테스터',
       });
     });
   });
