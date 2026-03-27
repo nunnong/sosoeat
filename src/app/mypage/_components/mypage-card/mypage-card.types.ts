@@ -10,5 +10,6 @@ export interface MyPageCardProps {
   imageUrl?: string;
   imageAlt?: string;
   variant: 'groupBuy' | 'groupEat';
+  confirmedAt?: Date | null;
   className?: string;
 }

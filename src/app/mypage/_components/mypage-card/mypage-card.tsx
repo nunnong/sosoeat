@@ -2,16 +2,19 @@
 
 import Image from 'next/image';
 
-import { Calendar, Clock, LucideIcon,MapPin, UserRound } from 'lucide-react';
+import { Calendar, Clock, LucideIcon, MapPin, UserRound } from 'lucide-react';
 
 import { EstablishmentStatusBadge } from '@/components/common/establishment-status-badge';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent,CardDescription, CardTitle } from '@/components/ui/card';
+import { HeartButton } from '@/components/common/heart-button';
+import { UseStateBadge } from '@/components/common/use-state-badge';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-import { MyPageCardProps } from './mypage-card.types';
+import type { MyPageCardProps } from './mypage-card.types';
 
-const VARIANT_CONFIG = {
+type Variant = MyPageCardProps['variant'];
+
+const VARIANT_CONFIG: Record<Variant, { label: string; icon: string; badgeStyle: string }> = {
   groupBuy: {
     label: '공동구매',
     icon: '/icons/main-page-buy.svg',
@@ -22,51 +25,54 @@ const VARIANT_CONFIG = {
     icon: '/icons/main-page-fork.svg',
     badgeStyle: 'bg-sosoeat-orange-600/90 text-white hover:bg-sosoeat-orange-600',
   },
-} as const;
+};
 
-const VariantBadge = ({
-  config,
-}: {
-  config: (typeof VARIANT_CONFIG)[keyof typeof VARIANT_CONFIG];
-}) => (
-  <span
-    className={cn(
-      'flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold',
-      config.badgeStyle
-    )}
-  >
-    <Image src={config.icon} alt="" width={11} height={11} className="shrink-0" />
-    {config.label}
-  </span>
-);
+const DEFAULT_IMAGE_URL =
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=720';
 
-const InfoItem = ({ Icon, text }: { Icon: LucideIcon; text?: string }) => {
-  if (!text) return null;
+const formatDate = (month: number, day: number) => `${month}월 ${day}일`;
+const formatTime = (hour: number, minute: number) => `${hour}:${String(minute).padStart(2, '0')}`;
+
+function VariantBadge({ variant }: { variant: Variant }) {
+  const { label, icon, badgeStyle } = VARIANT_CONFIG[variant];
+  return (
+    <span
+      className={cn(
+        'flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold',
+        badgeStyle
+      )}
+    >
+      <Image src={icon} alt="" width={11} height={11} className="shrink-0" />
+      {label}
+    </span>
+  );
+}
+
+function InfoItem({ Icon, text }: { Icon: LucideIcon; text: string }) {
   return (
     <span className="flex items-center gap-1">
       <Icon className="text-sosoeat-gray-600 size-3" />
       {text}
     </span>
   );
-};
+}
 
-const StatusBadgeGroup = ({
+// 상태 뱃지
+function StatusBadgeGroup({
   confirmedAt,
   variant,
 }: {
-  confirmedAt: null;
-  variant: keyof typeof VARIANT_CONFIG;
-}) => (
-  <div className="flex items-center gap-2">
-    <Badge
-      variant="secondary"
-      className="bg-sosoeat-orange-100 text-sosoeat-orange-700 h-8 shrink-0 rounded-full px-3 text-sm font-medium shadow-none"
-    >
-      이용 예정
-    </Badge>
-    <EstablishmentStatusBadge confirmedAt={confirmedAt} variant={variant} />
-  </div>
-);
+  confirmedAt: Date | null;
+  variant: Variant;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <UseStateBadge variant={variant}></UseStateBadge>
+      <EstablishmentStatusBadge confirmedAt={confirmedAt} variant={variant} />
+      <HeartButton className="relative -top-2 left-1 ml-16 max-md:hidden" />
+    </div>
+  );
+}
 
 export function MyPageCard({
   title,
@@ -77,17 +83,12 @@ export function MyPageCard({
   day,
   hour,
   minute,
-  imageUrl = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=720',
+  confirmedAt = null,
+  imageUrl = DEFAULT_IMAGE_URL,
+  imageAlt,
   variant = 'groupEat',
   className,
 }: MyPageCardProps) {
-  const config = VARIANT_CONFIG[variant];
-  const dateText = month && day ? `${month}월 ${day}일` : undefined;
-  const timeText =
-    hour !== undefined && minute !== undefined
-      ? `${hour}:${String(minute).padStart(2, '0')}`
-      : undefined;
-
   return (
     <Card
       className={cn(
@@ -96,50 +97,50 @@ export function MyPageCard({
         className
       )}
     >
-      {/* 이미지 영역 */}
+      {/* 이미지 */}
       <div className="relative shrink-0 overflow-hidden max-md:h-[156px] max-md:w-full max-md:rounded-t-4xl md:size-47 md:rounded-2xl">
-        <Image src={imageUrl} alt={title} fill className="object-cover" />
-        <div className="absolute top-4 left-4 md:hidden">
-          <VariantBadge config={config} />
+        <Image src={imageUrl} alt={imageAlt ?? title} fill className="object-cover" />
+
+        {/* 이미지 위 오버레이 (모바일 전용) */}
+        <div className="absolute top-1 right-4 left-4 flex items-center justify-between md:hidden">
+          <VariantBadge variant={variant} />
+          <HeartButton className="relative top-3 left-1" />
         </div>
       </div>
 
       {/* 정보 영역 */}
       <div className="flex h-full flex-1 flex-col justify-between p-3 md:px-0 md:py-4">
-        {/* 상단 섹션 */}
-        <div className="flex flex-col gap-3">
-          {/* 카테고리 뱃지 - 웹 */}
-          <div className="mt-3 hidden md:block">
-            <VariantBadge config={config} />
-          </div>
-
-          {/* 상태 뱃지 - 모바일 */}
-          <div className="md:hidden">
-            <StatusBadgeGroup confirmedAt={null} variant={variant} />
-          </div>
-
-          {/* 제목 및 인원 */}
-          <div className="flex flex-col gap-1">
-            <CardTitle className="text-sosoeat-gray-800 line-clamp-1 text-lg font-bold">
-              {title}
-            </CardTitle>
-            <CardDescription className="text-sosoeat-gray-800 flex items-center gap-1 font-medium">
-              <UserRound className="text-sosoeat-gray-600 size-3" />
-              {currentCount}/{maxCount}
-            </CardDescription>
-          </div>
-
-          {/* 위치 / 날짜 / 시간 */}
-          <CardContent className="text-sosoeat-gray-600 flex flex-wrap gap-x-3 gap-y-1 p-0 text-sm font-medium">
-            <InfoItem Icon={MapPin} text={location} />
-            <InfoItem Icon={Calendar} text={dateText} />
-            <InfoItem Icon={Clock} text={timeText} />
-          </CardContent>
+        {/* 카테고리 뱃지 (웹) */}
+        <div className="mt-3 hidden md:block">
+          <VariantBadge variant={variant} />
         </div>
 
-        {/* 상태 뱃지 - 웹 */}
+        {/* 상태 뱃지 (모바일) */}
+        <div className="py-2 md:hidden">
+          <StatusBadgeGroup confirmedAt={confirmedAt} variant={variant} />
+        </div>
+
+        {/* 제목 / 인원 */}
+        <div className="flex flex-col gap-1">
+          <CardTitle className="text-sosoeat-gray-800 line-clamp-1 text-lg font-bold">
+            {title}
+          </CardTitle>
+          <CardDescription className="text-sosoeat-gray-800 flex items-center gap-1 font-medium">
+            <UserRound className="text-sosoeat-gray-600 size-3" />
+            {currentCount}/{maxCount}
+          </CardDescription>
+        </div>
+
+        {/* 위치 / 날짜 / 시간 */}
+        <CardContent className="text-sosoeat-gray-600 flex flex-wrap gap-x-3 gap-y-1 p-0 text-sm font-medium">
+          <InfoItem Icon={MapPin} text={location} />
+          <InfoItem Icon={Calendar} text={formatDate(month, day)} />
+          <InfoItem Icon={Clock} text={formatTime(hour, minute)} />
+        </CardContent>
+
+        {/* 상태 뱃지 (웹) */}
         <div className="mt-4 hidden md:block">
-          <StatusBadgeGroup confirmedAt={null} variant={variant} />
+          <StatusBadgeGroup confirmedAt={confirmedAt} variant={variant} />
         </div>
       </div>
     </Card>

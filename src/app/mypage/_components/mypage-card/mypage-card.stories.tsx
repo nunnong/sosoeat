@@ -18,16 +18,25 @@ const meta: Meta<typeof MyPageCard> = {
     imageUrl:
       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=720',
     variant: 'groupEat',
+    confirmedAt: new Date(),
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof MyPageCard>;
 
-export const GroupEat: Story = {};
+export const GroupEat: Story = {
+  args: {},
+};
 
 export const GroupBuy: Story = {
   args: {
     variant: 'groupBuy',
+  },
+};
+
+export const Unconfirmed: Story = {
+  args: {
+    confirmedAt: null,
   },
 };
