@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 
 import { Providers } from '@/app/providers';
+import { NavigationBarClient } from '@/components/common/navigation-bar/navigation-bar-client';
 import { Toaster } from '@/components/ui/sonner/index';
-
-import '@/app/globals.css';
 
 export const metadata: Metadata = {
   title: '소소잇 | 일상과 만남을 잇다',
@@ -18,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="min-w-[375px]">
-        <Providers>{children}</Providers>
+        <Providers>
+          <NavigationBarClient />
+          <main>{children}</main>
+        </Providers>
         <Toaster />
       </body>
     </html>
