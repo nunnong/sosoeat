@@ -1,7 +1,8 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import { NavigationBar } from '@/components/common/navigation-bar';
 import { useAuthStore } from '@/store/auth-store';
+
+import { NavigationBar } from './navigation-bar';
 
 const meta: Meta<typeof NavigationBar> = {
   title: 'components/common/navigation-bar',
@@ -23,7 +24,7 @@ const withAuthState =
     return <Story />;
   };
 
-const MOCK_USER = { id: '1', name: '홍길동' };
+const MOCK_USER = { id: 1, name: '홍길동', email: 'test@example.com', teamId: 'dallaem' };
 
 // ── 비로그인 ──────────────────────────────────────────
 
@@ -40,6 +41,14 @@ export const NotLoggedInActiveMenu: Story = {
   },
 };
 
+export const NotLoggedInWishList: Story = {
+  name: '비로그인 / 찜한 모임 클릭 → 로그인 이동',
+  decorators: [withAuthState({ user: null })],
+  parameters: {
+    nextjs: { navigation: { pathname: '/mypage?tab=liked' } },
+  },
+};
+
 // ── 로그인 ────────────────────────────────────────────
 
 export const LoggedIn: Story = {
@@ -51,7 +60,7 @@ export const LoggedInActiveMenu: Story = {
   name: '로그인 / 활성메뉴',
   decorators: [withAuthState({ user: MOCK_USER })],
   parameters: {
-    nextjs: { navigation: { pathname: '/together' } },
+    nextjs: { navigation: { pathname: '/meetings' } },
   },
 };
 
@@ -59,7 +68,13 @@ export const LoggedInWithProfileImage: Story = {
   name: '로그인 / 프로필이미지',
   decorators: [
     withAuthState({
-      user: { id: '2', name: '김소소', profileImage: 'https://i.pravatar.cc/32?img=47' },
+      user: {
+        id: 1,
+        name: '김철수',
+        email: 'test@example.com',
+        image: 'https://i.pravatar.cc/32?img=47',
+        teamId: 'dallaem',
+      },
     }),
   ],
 };
