@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { AuthUser } from '@/types/auth';
+import { AuthUser } from '@/types/auth';
 
 export type { AuthUser };
 
@@ -14,43 +14,32 @@ interface AuthActions {
   login: (user: AuthUser) => void;
   logout: () => void;
   setInitialized: (val: boolean) => void;
-  /**
-   * Compatibility helper for older stories/tests that still seed the store
-   * directly without going through the auth service layer.
-   */
-  setUser: (user: AuthUser | null) => void;
 }
 
 export type AuthStore = AuthState & AuthActions;
 
 /**
- * Client-side auth UI state.
- * Access tokens are handled elsewhere, so this store only keeps view state.
+ * [Application Layer] useAuthStore
+ * 클라이언트 사이드 인증 상태 관리 (UI용)
+ * accessToken은 httpOnly 쿠키에서 프록시가 처리하므로 여기서는 관리하지 않습니다.
  */
 export const useAuthStore = create<AuthStore>()((set) => ({
+  // State
   isAuthenticated: false,
   user: null,
   isInitialized: false,
 
-  login: (user) => {
+  // Actions
+  login: (userData: AuthUser) => {
     set({
       isAuthenticated: true,
-      user,
+      user: userData,
     });
   },
 
   logout: () => {
-    set({
-      isAuthenticated: false,
-      user: null,
-    });
+    set({ isAuthenticated: false, user: null });
   },
 
-  setInitialized: (val) => set({ isInitialized: val }),
-
-  setUser: (user) =>
-    set({
-      user,
-      isAuthenticated: Boolean(user),
-    }),
+  setInitialized: (val: boolean) => set({ isInitialized: val }),
 }));

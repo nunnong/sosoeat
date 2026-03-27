@@ -15,10 +15,7 @@ const meta: Meta<typeof NavigationBar> = {
 export default meta;
 type Story = StoryObj<typeof NavigationBar>;
 
-type AuthSnapshot = Pick<
-  ReturnType<typeof useAuthStore.getState>,
-  'user' | 'isAuthenticated' | 'isInitialized'
->;
+type AuthSnapshot = Pick<ReturnType<typeof useAuthStore.getState>, 'user'>;
 
 const withAuthState =
   (state: AuthSnapshot): Decorator =>
@@ -27,24 +24,24 @@ const withAuthState =
     return <Story />;
   };
 
-const MOCK_USER = { id: '1', name: '김민수' };
+const MOCK_USER = { id: 1, name: '홍길동', email: 'test@example.com', teamId: 'dallaem' };
 
 export const NotLoggedIn: Story = {
   name: '비로그인',
-  decorators: [withAuthState({ user: null, isAuthenticated: false, isInitialized: true })],
+  decorators: [withAuthState({ user: null })],
 };
 
 export const NotLoggedInActiveMenu: Story = {
   name: '비로그인 / 활성메뉴',
-  decorators: [withAuthState({ user: null, isAuthenticated: false, isInitialized: true })],
+  decorators: [withAuthState({ user: null })],
   parameters: {
     nextjs: { navigation: { pathname: '/meetings' } },
   },
 };
 
 export const NotLoggedInWishList: Story = {
-  name: '비로그인 / 찜한 모임 클릭 -> 로그인 이동',
-  decorators: [withAuthState({ user: null, isAuthenticated: false, isInitialized: true })],
+  name: '비로그인 / 찜한 모임 클릭 → 로그인 이동',
+  decorators: [withAuthState({ user: null })],
   parameters: {
     nextjs: { navigation: { pathname: '/mypage?tab=liked' } },
   },
@@ -52,12 +49,12 @@ export const NotLoggedInWishList: Story = {
 
 export const LoggedIn: Story = {
   name: '로그인',
-  decorators: [withAuthState({ user: MOCK_USER, isAuthenticated: true, isInitialized: true })],
+  decorators: [withAuthState({ user: MOCK_USER })],
 };
 
 export const LoggedInActiveMenu: Story = {
   name: '로그인 / 활성메뉴',
-  decorators: [withAuthState({ user: MOCK_USER, isAuthenticated: true, isInitialized: true })],
+  decorators: [withAuthState({ user: MOCK_USER })],
   parameters: {
     nextjs: { navigation: { pathname: '/meetings' } },
   },
@@ -67,9 +64,13 @@ export const LoggedInWithProfileImage: Story = {
   name: '로그인 / 프로필이미지',
   decorators: [
     withAuthState({
-      user: { id: '2', name: '김소소', image: 'https://i.pravatar.cc/32?img=47' },
-      isAuthenticated: true,
-      isInitialized: true,
+      user: {
+        id: 1,
+        name: '김철수',
+        email: 'test@example.com',
+        image: 'https://i.pravatar.cc/32?img=47',
+        teamId: 'dallaem',
+      },
     }),
   ],
 };

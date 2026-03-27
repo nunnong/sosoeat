@@ -17,10 +17,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-type AuthSnapshot = Pick<
-  ReturnType<typeof useAuthStore.getState>,
-  'user' | 'isAuthenticated' | 'isInitialized'
->;
+type AuthSnapshot = Pick<ReturnType<typeof useAuthStore.getState>, 'user'>;
 
 const withAuthState =
   (state: AuthSnapshot): Decorator =>
@@ -32,11 +29,10 @@ const withAuthState =
 export const Default: Story = {
   decorators: [
     withAuthState({
-      isAuthenticated: true,
-      isInitialized: true,
       user: {
-        id: '1',
-        name: '김민주',
+        id: 1,
+        email: 'user@example.com',
+        name: '김민준',
         image: 'https://i.pravatar.cc/80?img=12',
       },
     }),

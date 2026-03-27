@@ -1,11 +1,8 @@
 export interface AuthUser {
-  id: string;
+  id: number;
+  email: string;
   name: string;
-  email?: string;
-  image?: string;
-  /**
-   * Temporary compatibility field for older mocks/stories.
-   * New auth data should use `image`.
-   */
-  profileImage?: string;
+  teamId?: string;
+  companyName?: string;
+  image?: string | null;
 }
