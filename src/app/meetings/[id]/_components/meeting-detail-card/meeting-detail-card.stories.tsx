@@ -13,14 +13,12 @@ type StoryArgs = {
   role: MeetingRole;
   status: MeetingStatus;
   isJoined?: boolean;
-  isLiked: boolean;
   onJoin?: () => void;
   onCancel?: () => void;
   onConfirm?: () => void;
   onShare?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
-  onLikeToggle?: () => void;
 };
 
 const mockMeeting: Meeting = {
@@ -66,7 +64,6 @@ const meta = {
     meeting: mockMeeting,
     role: 'participant',
     status: 'open',
-    isLiked: false,
   },
 } as Meta<typeof MeetingDetailCard>;
 
@@ -169,7 +166,7 @@ export const LikedState: Story = {
   name: '찜한 상태',
   args: {
     isJoined: false,
-    isLiked: true,
+    meeting: { ...mockMeeting, isFavorited: true },
   },
 };
 
@@ -177,7 +174,7 @@ export const UnlikedState: Story = {
   name: '찜 안 한 상태',
   args: {
     isJoined: false,
-    isLiked: false,
+    meeting: { ...mockMeeting, isFavorited: false },
   },
 };
 

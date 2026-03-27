@@ -31,7 +31,6 @@ const mockMeeting: Meeting = {
 const BASE_PROPS = {
   meeting: mockMeeting,
   status: 'open' as MeetingStatus,
-  isLiked: false,
 };
 
 // role별 기본 props

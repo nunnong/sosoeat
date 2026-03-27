@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SosoTalkPostDetail } from './sosotalk-post-detail';
 
 const meta = {
-  title: 'SosoTalk/SosoTalkPostDetail',
+  title: 'pages/sosotalk/sosotalk-post-detail',
   component: SosoTalkPostDetail,
   tags: ['autodocs'],
   parameters: {
@@ -18,7 +18,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof SosoTalkPostDetail>;
+} as Meta<typeof SosoTalkPostDetail>;
 
 export default meta;
 

@@ -1,6 +1,7 @@
-export interface HeartButtonProps {
-  isLiked: boolean;
-  onToggle: () => void;
+import { MeetingWithHost } from '@/types/generated-client';
+
+export interface HeartButtonProps extends Pick<MeetingWithHost, 'isFavorited'> {
   className?: string;
-  iconSize?: number;
+  //크기는 3가지
+  size?: 'lg' | 'md' | 'sm';
 }

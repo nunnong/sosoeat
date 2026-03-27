@@ -136,22 +136,26 @@ function InfoSection({ meeting, category, fullDateLabel, className }: InfoSectio
 // 버튼, 좋아요
 interface ActionRowProps {
   actionButton: React.ReactNode;
-  isLiked: boolean;
-  onLikeToggle: () => void;
+  isFavorited: boolean;
 }
 
-function ActionRow({ actionButton, isLiked, onLikeToggle }: ActionRowProps) {
+function ActionRow({ actionButton, isFavorited }: ActionRowProps) {
   return (
     <div className="flex items-center gap-[10px] pt-[14px] md:pt-0 lg:gap-2">
       <div className="h-[40px] w-[245px] md:w-[272px] lg:h-[62px] lg:w-full lg:max-w-[474px]">
         {actionButton}
       </div>
+      {/* 모바일·태블릿: 40×40 */}
       <HeartButton
-        isLiked={isLiked}
-        onToggle={onLikeToggle}
-        className="border-sosoeat-gray-500 relative inset-auto m-0"
-        // TODO: 다른 팀원 작업 완료 후 사이즈 적용
-        // className={cn('border-sosoeat-gray-500 relative inset-auto m-0', 'h-[40px] w-[40px] lg:h-[60px] lg:w-[60px]')}
+        isFavorited={isFavorited}
+        size="sm"
+        className="border-sosoeat-gray-500 relative inset-auto m-0 lg:hidden"
+      />
+      {/* PC: 60×60 */}
+      <HeartButton
+        isFavorited={isFavorited}
+        size="lg"
+        className="border-sosoeat-gray-500 relative inset-auto m-0 hidden lg:block"
       />
     </div>
   );
@@ -168,12 +172,11 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
     fullDateLabel,
     isExpanded,
     toggleExpanded,
-    safeOnLikeToggle,
     activeConfig,
     actionHandler,
   } = useMeetingDetailCard(props);
 
-  const { meeting, isLiked } = props;
+  const { meeting } = props;
 
   const ellipsisMenu =
     props.role === 'host' ? <EllipsisMenu onEdit={props.onEdit} onDelete={props.onDelete} /> : null;
@@ -216,7 +219,7 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
           </div>
         </div>
 
-        <ActionRow actionButton={actionButton} isLiked={isLiked} onLikeToggle={safeOnLikeToggle} />
+        <ActionRow actionButton={actionButton} isFavorited={meeting.isFavorited ?? false} />
 
         <div className="mt-2 flex justify-center">
           <button
@@ -260,7 +263,7 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
         {/* 상단: 마감 배지 + 모임 제목 */}
         <div className="flex flex-col gap-[10px]">
           <div className="flex items-center justify-between">
-            <DeadlineBadge registrationEnd={meeting.registrationEnd} variant={category} />
+            <DeadlineBadge registrationEnd={new Date(meeting.registrationEnd)} variant={category} />
             {ellipsisMenu}
           </div>
           <h2 className="line-clamp-2 text-xl leading-snug font-semibold lg:line-clamp-none lg:text-3xl lg:font-bold">
@@ -272,7 +275,7 @@ export function MeetingDetailCard(props: MeetingDetailCardProps) {
         <InfoSection meeting={meeting} category={category} fullDateLabel={fullDateLabel} />
 
         {/* 하단: 액션버튼 + 좋아요 */}
-        <ActionRow actionButton={actionButton} isLiked={isLiked} onLikeToggle={safeOnLikeToggle} />
+        <ActionRow actionButton={actionButton} isFavorited={meeting.isFavorited ?? false} />
       </div>
     </div>
   );

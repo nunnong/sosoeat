@@ -10,8 +10,6 @@ export type MeetingStatus = 'open' | 'closed' | 'confirmed' | 'full';
 type BaseProps = {
   meeting: Meeting;
   status: MeetingStatus;
-  isLiked: boolean;
-  onLikeToggle?: () => void;
 };
 
 type GuestProps = BaseProps & {

@@ -18,17 +18,22 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
+//하트버튼
 describe('HeartButton', () => {
-  it('찜하기 버튼이 렌더링된다', () => {
-    render(<HeartButton isLiked={false} onToggle={() => {}} />);
+  it('기본 상태에서 빈 하트 아이콘이 렌더링된다', () => {
+    render(<HeartButton isFavorited={false} />);
 
-    expect(screen.getByRole('button', { name: '찜하기' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '좋아요' })).toBeInTheDocument();
+    expect(screen.getByTestId('heart-button-image')).toHaveAttribute(
+      'src',
+      '/icons/main-page-not-heart.svg'
+    );
   });
 
-  it('isLiked가 true이면 찜 취소 버튼이 렌더링된다', () => {
-    render(<HeartButton isLiked={true} onToggle={() => {}} />);
+  it('찜 상태에서 채운 하트 아이콘이 렌더링된다', () => {
+    render(<HeartButton isFavorited />);
 
-    expect(screen.getByRole('button', { name: '찜 취소' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '좋아요' })).toBeInTheDocument();
     expect(screen.getByTestId('heart-button-image')).toHaveAttribute(
       'src',
       '/icons/main-page-heart.svg'
@@ -36,9 +41,7 @@ describe('HeartButton', () => {
   });
 
   it('className이 CardAction에 합쳐진다', () => {
-    const { container } = render(
-      <HeartButton isLiked={false} onToggle={() => {}} className="custom-heart-class" />
-    );
+    const { container } = render(<HeartButton className="custom-heart-class" />);
 
     expect(container.querySelector('.custom-heart-class')).toBeInTheDocument();
   });

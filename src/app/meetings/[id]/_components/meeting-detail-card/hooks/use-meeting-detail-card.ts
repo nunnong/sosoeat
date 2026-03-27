@@ -38,7 +38,6 @@ export function useMeetingDetailCard(props: MeetingDetailCardProps) {
   const category = props.meeting.type;
   const categoryLabel = CATEGORY_LABEL[category];
   const fullDateLabel = formatMeetingDateTime(props.meeting.dateTime);
-  const safeOnLikeToggle = props.onLikeToggle ?? (() => {});
 
   const isJoined = props.role === 'participant' ? props.isJoined : false;
   const activeConfig = ACTION_BUTTON_CONFIGS.find((c) =>
@@ -52,7 +51,6 @@ export function useMeetingDetailCard(props: MeetingDetailCardProps) {
     fullDateLabel,
     isExpanded,
     toggleExpanded: () => setIsExpanded((prev) => !prev),
-    safeOnLikeToggle,
     activeConfig,
     actionHandler,
   };
