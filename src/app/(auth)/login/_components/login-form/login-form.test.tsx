@@ -114,8 +114,9 @@ describe('LoginForm (로그인 폼)', () => {
       expect(screen.getByText('올바른 이메일 형식이 아닙니다.')).toBeInTheDocument();
     });
 
-    // 입력 삭제
+    // 입력 삭제 후 blur
     fireEvent.change(emailInput, { target: { value: '' } });
+    fireEvent.blur(emailInput);
     await waitFor(
       () => {
         expect(screen.queryByText('올바른 이메일 형식이 아닙니다.')).not.toBeInTheDocument();
@@ -136,8 +137,9 @@ describe('LoginForm (로그인 폼)', () => {
       expect(screen.getByText('비밀번호가 8자 이상이 되도록 해 주세요.')).toBeInTheDocument();
     });
 
-    // 입력 삭제
+    // 입력 삭제 후 blur
     fireEvent.change(passwordInput, { target: { value: '' } });
+    fireEvent.blur(passwordInput);
     await waitFor(
       () => {
         expect(

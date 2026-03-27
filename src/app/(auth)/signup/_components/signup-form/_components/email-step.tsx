@@ -23,15 +23,15 @@ export const EmailStep = ({ onNext, defaultValues, serverError }: EmailStepProps
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, touchedFields },
   } = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
-    mode: 'onTouched',
+    mode: 'all',
     defaultValues,
   });
 
-  const emailError = errors.email;
-  const hasError = !!emailError || !!serverError;
+  const emailError = touchedFields.email ? errors.email : undefined;
+  const hasError = !!emailError?.message?.trim() || !!serverError;
 
   const onSubmit = (data: EmailValues) => {
     onNext(data);
@@ -47,7 +47,7 @@ export const EmailStep = ({ onNext, defaultValues, serverError }: EmailStepProps
           <FieldContent className="gap-1.5">
             <Input
               id="email"
-              type="email"
+              type="text"
               placeholder="example@email.com"
               className={getInputClasses(hasError)}
               {...register('email')}

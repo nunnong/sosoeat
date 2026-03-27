@@ -29,18 +29,18 @@ export const PasswordStep = ({
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, touchedFields },
   } = useForm<PasswordValues>({
     resolver: zodResolver(passwordSchema),
-    mode: 'onTouched',
+    mode: 'all',
     defaultValues,
   });
 
-  const passwordError = errors.password;
-  const hasPasswordError = !!passwordError;
+  const passwordError = touchedFields.password ? errors.password : undefined;
+  const hasPasswordError = !!passwordError?.message?.trim();
 
-  const confirmError = errors.passwordConfirm;
-  const hasConfirmError = !!confirmError;
+  const confirmError = touchedFields.passwordConfirm ? errors.passwordConfirm : undefined;
+  const hasConfirmError = !!confirmError?.message?.trim();
 
   const onSubmit = (data: PasswordValues) => {
     onNext(data);

@@ -26,15 +26,15 @@ export const NameStep = ({
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, touchedFields },
   } = useForm<NameValues>({
     resolver: zodResolver(nameSchema),
-    mode: 'onTouched',
+    mode: 'all',
     defaultValues,
   });
 
-  const nameError = errors.name;
-  const hasError = !!nameError;
+  const nameError = touchedFields.name ? errors.name : undefined;
+  const hasError = !!nameError?.message?.trim();
 
   const onSubmit = (data: NameValues) => {
     onNext(data);
