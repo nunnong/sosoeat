@@ -1,11 +1,15 @@
 'use client';
 
+import { useState } from 'react';
+
 import { ImagePlus, MapPin } from 'lucide-react';
 
 import { Input } from '@/components/ui/input/input';
 import { cn } from '@/lib/utils';
 
 import type { StepProps } from '../meeting-create-modal.types';
+
+import { ImageSubmit } from './_components/step2-basic-info/image-submit/image-submit';
 
 /**
  * 2단계: 모임 기본 정보 입력 (이름, 장소, 이미지)
@@ -54,10 +58,7 @@ export const StepBasicInfo = ({ form }: StepProps) => {
         <label className="text-sosoeat-gray-900 ml-1 text-sm font-medium md:text-base">
           이미지{requiredIndicator}
         </label>
-        <div className="bg-sosoeat-gray-100 text-sosoeat-gray-500 flex h-[147px] w-[147px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed text-sm">
-          <ImagePlus className="h-6 w-6" />
-          <span className="text-center text-xs font-medium">파일 첨부</span>
-        </div>
+        <ImageSubmit form={form} />
       </div>
     </div>
   );
