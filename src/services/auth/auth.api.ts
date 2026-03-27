@@ -1,6 +1,7 @@
-import { LoginRequest, LoginResponse, SignupRequest } from '@/types/generated-client/models';
+import { AuthUser } from '@/types/auth';
+import { LoginRequest, SignupRequest } from '@/types/generated-client/models';
 
-export type AuthResponse = Omit<LoginResponse, 'refreshToken'>;
+export type AuthResponse = { user: AuthUser };
 
 /**
  * [Service Layer] authApi

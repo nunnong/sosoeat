@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-import { AuthUser } from '@/store/auth-store';
+import { AuthUser } from '@/types/auth';
 
 export interface SessionData {
   accessToken?: string;
@@ -46,7 +46,7 @@ export class CookieStorage {
     if (data.accessToken) {
       cookieStore.set('accessToken', data.accessToken, {
         ...COOKIE_OPTIONS,
-        maxAge: 60 * 60, // 1 hour
+        maxAge: 60 * 15, // 15 minutes
       });
     }
 

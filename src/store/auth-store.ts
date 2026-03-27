@@ -1,25 +1,18 @@
 import { create } from 'zustand';
 
-import { User } from '@/types/generated-client/models';
+import { AuthUser } from '@/types/auth';
 
-/**
- * [Domain Layer] AuthUser
- * OpenAPI User 모델에서 클라이언트 상태 관리에 필요한 필드만 추출하여 정의합니다.
- */
-export type AuthUser = Pick<User, 'id' | 'email' | 'name'> &
-  Partial<Pick<User, 'teamId' | 'companyName' | 'image'>>;
+export type { AuthUser };
 
 interface AuthState {
-  accessToken: string | null;
   isAuthenticated: boolean;
   user: AuthUser | null;
   isInitialized: boolean;
 }
 
 interface AuthActions {
-  login: (token: string, user: AuthUser) => void;
+  login: (user: AuthUser) => void;
   logout: () => void;
-  updateToken: (newToken: string) => void;
   setInitialized: (val: boolean) => void;
 }
 
@@ -27,37 +20,25 @@ export type AuthStore = AuthState & AuthActions;
 
 /**
  * [Application Layer] useAuthStore
- * 클라이언트 사이드 인증 상태 관리
- * BFF로부터 직접 토큰과 유저 정보를 주입받아 관리합니다.
+ * 클라이언트 사이드 인증 상태 관리 (UI용)
+ * accessToken은 httpOnly 쿠키에서 프록시가 처리하므로 여기서는 관리하지 않습니다.
  */
 export const useAuthStore = create<AuthStore>()((set) => ({
   // State
-  accessToken: null,
   isAuthenticated: false,
   user: null,
   isInitialized: false,
 
   // Actions
-  login: (token: string, userData: AuthUser) => {
+  login: (userData: AuthUser) => {
     set({
-      accessToken: token,
       isAuthenticated: true,
       user: userData,
     });
   },
 
   logout: () => {
-    set({ accessToken: null, isAuthenticated: false, user: null });
-  },
-
-  /**
-   * 토큰 갱신 시 호출 (Refresh 시 토큰 정보만 업데이트)
-   */
-  updateToken: (newToken: string) => {
-    set({
-      accessToken: newToken,
-      isAuthenticated: true, // 토큰이 존재하면 인증됨으로 간주
-    });
+    set({ isAuthenticated: false, user: null });
   },
 
   setInitialized: (val: boolean) => set({ isInitialized: val }),

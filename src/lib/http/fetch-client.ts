@@ -1,70 +1,27 @@
-import { TokenProviderRegistry } from '@/lib/auth/token-registry';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-const TEAM_ID = process.env.NEXT_PUBLIC_TEAM_ID;
-
-let refreshPromise: Promise<string | null> | null = null;
-
-/**
- * [Client-only] silentRefresh
- * - 용도: 엑세스 토큰이 만료되었을 때 BFF(/api/auth/refresh)에 갱신 요청을 보냅니다.
- */
-async function silentRefresh(): Promise<string | null> {
-  if (refreshPromise) return refreshPromise;
-
-  refreshPromise = (async () => {
-    try {
-      const res = await fetch(`/api/auth/refresh`, { method: 'POST' });
-      if (!res.ok) throw new Error('Refresh failed');
-      const data = await res.json();
-      TokenProviderRegistry.client.setAccessToken(data.accessToken);
-      return data.accessToken;
-    } catch {
-      return null;
-    } finally {
-      refreshPromise = null;
-    }
-  })();
-
-  return refreshPromise;
-}
-
 /**
  * [Client-only] fetchClient
- * - 기반 함수: 모든 요청의 공통 로직(URL 결합, 토큰 주입, 401 재시도)을 처리합니다.
+ * - 모든 API 요청을 /api/proxy/[...path]를 통해 백엔드로 전달합니다.
+ * - Authorization 헤더 삽입 및 토큰 갱신은 프록시 Route Handler에서 처리합니다.
  */
-const request = async (
-  url: string,
-  options: RequestInit = {},
-  _retryCount = 0
-): Promise<Response> => {
-  const accessToken = await TokenProviderRegistry.client.getAccessToken();
-
+const request = async (url: string, options: RequestInit = {}): Promise<Response> => {
   /**
    * URL 처리 전략:
-   * 1. http:// 또는 https://로 시작하는 완전한 URL은 그대로 사용합니다. (하드코딩 지원)
-   * 2. /api/로 시작하는 내부 경로는 그대로 사용합니다. (BFF 호출 지원)
-   * 3. 그 외의 상대 경로는 기본 BASE_URL + TEAM_ID 환경 변수를 조합합니다.
+   * 1. /api/로 시작하는 내부 경로(BFF)는 그대로 사용합니다.
+   * 2. 그 외의 상대 경로는 /api/proxy/ 를 앞에 붙여 프록시를 경유합니다.
    */
-  const fullUrl =
-    url.startsWith('http') || url.startsWith('/api/') ? url : `${BASE_URL}/${TEAM_ID}${url}`;
+  const fullUrl = url.startsWith('/api/') ? url : `/api/proxy${url}`;
 
   const headers = new Headers(options.headers);
-  if (accessToken) {
-    headers.set('Authorization', `Bearer ${accessToken}`);
-  }
   if (!headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
 
   const response = await fetch(fullUrl, { ...options, headers });
 
-  // 401 발생 시 최대 1회 재시도
-  if (response.status === 401 && _retryCount < 1) {
-    const newToken = await silentRefresh();
-    if (newToken) {
-      return request(url, options, _retryCount + 1);
-    }
+  // proxy를 경유한 요청에서 silentRefresh까지 실패한 401 → 세션 만료 → 로그인 페이지로
+  // /api/auth/* 등 BFF 직접 호출은 제외 (로그인 실패 등 정상적인 401 포함)
+  if (response.status === 401 && fullUrl.startsWith('/api/proxy/')) {
+    window.location.href = '/login';
   }
 
   return response;

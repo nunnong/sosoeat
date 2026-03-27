@@ -1,31 +1,28 @@
+import { redirect } from 'next/navigation';
+
 import { CookieStorage } from '@/lib/auth/cookie-storage';
-import { TokenProviderRegistry } from '@/lib/auth/token-registry';
+import { silentRefresh } from '@/lib/auth/silent-refresh';
 
 const BASE_URL = process.env.API_BASE_URL;
 const TEAM_ID = process.env.NEXT_PUBLIC_TEAM_ID;
 
 /**
- * [의존성 주입] TokenProviderRegistry (Server-side)
- */
-TokenProviderRegistry.setServerProvider({
-  getAccessToken: () => CookieStorage.getAccessToken(),
-  setAccessToken: (token: string) => CookieStorage.setSession({ accessToken: token }),
-});
-/**
  * [Server-only] apiServer
- * - 기반 함수: 세션 토큰 자동 주입 및 서버 사이드 Fetch 처리
+ * - 서버 컴포넌트, Route Handler, Server Action에서 사용합니다.
+ * - httpOnly 쿠키에서 accessToken을 읽어 Authorization 헤더에 삽입합니다.
+ * - 401 응답 시 refreshToken으로 토큰을 갱신하고 원래 요청을 1회 재시도합니다.
  */
-const request = async (url: string, options: RequestInit = {}) => {
-  const accessToken = await TokenProviderRegistry.server.getAccessToken();
+const request = async (
+  url: string,
+  options: RequestInit = {},
+  retry = false
+): Promise<Response> => {
+  const accessToken = await CookieStorage.getAccessToken();
 
-  /**
-   * URL 처리 전략: http로 시작하거나 /api/로 시작하는 경우 그대로 사용, 그 외에는 BASE_URL 조합
-   */
   const fullUrl =
     url.startsWith('http') || url.startsWith('/api/') ? url : `${BASE_URL}/${TEAM_ID}${url}`;
 
   const headers = new Headers(options.headers);
-
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
@@ -33,7 +30,18 @@ const request = async (url: string, options: RequestInit = {}) => {
     headers.set('Content-Type', 'application/json');
   }
 
-  return fetch(fullUrl, { ...options, headers });
+  const response = await fetch(fullUrl, { ...options, headers });
+
+  if (response.status === 401 && !retry) {
+    const refreshed = await silentRefresh();
+    if (refreshed) {
+      return request(url, options, true);
+    }
+    // silentRefresh 실패 시 세션 만료 → 로그인 페이지로
+    redirect('/login');
+  }
+
+  return response;
 };
 
 /**

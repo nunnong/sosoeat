@@ -39,7 +39,7 @@ function OAuthCallbackContent() {
         if (response.ok) {
           const data = await response.json();
           // 3. Zustand 클라이언트 상태 업데이트
-          login(data.accessToken, data.user);
+          login(data.user);
           // 4. 성공 시 메인 페이지로 이동
           router.replace('/');
         } else {

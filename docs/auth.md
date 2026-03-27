@@ -22,21 +22,21 @@
 
 ## 1. 아키텍처 개요
 
-BFF(Backend-for-Frontend) 패턴을 사용한다. Next.js가 클라이언트와 외부 백엔드 사이의 중간 계층으로 동작하며, 민감한 토큰(refreshToken)을 클라이언트에 노출하지 않는다.
+BFF(Backend-for-Frontend) 패턴을 사용한다. 모든 API 요청이 Next.js catch-all 프록시(`/api/proxy/[...path]`)를 경유하며, 토큰은 클라이언트 JS에 노출되지 않고 httpOnly 쿠키에서만 관리된다.
 
 ```
 브라우저 (React)
-    ↕ fetch (accessToken in memory)
-Next.js BFF (/api/auth/*)
-    ↕ httpOnly 쿠키 (access_token, refresh_token)
+    ↕ fetch (/api/proxy/... 또는 /api/auth/...)
+Next.js BFF (/api/proxy/[...path], /api/auth/*)
+    ↕ httpOnly 쿠키 (accessToken, refreshToken, user)
 외부 백엔드 API
 ```
 
 **설계 원칙:**
 
-- `refreshToken`은 httpOnly 쿠키에만 존재 → 클라이언트 JS에서 접근 불가
-- `accessToken`은 Zustand 메모리에 보관 → 페이지 새로고침 시 `/api/auth/refresh`로 복원
-- 서버/클라이언트 환경에서 토큰을 읽는 방식의 차이를 `TokenProviderRegistry`로 추상화
+- `accessToken`, `refreshToken` 모두 httpOnly 쿠키에만 존재 → 클라이언트 JS 접근 불가
+- 모든 API 요청은 `/api/proxy/[...path]`를 경유 → 프록시가 쿠키에서 토큰을 읽어 Authorization 헤더 삽입
+- Zustand는 `user`, `isAuthenticated` UI 상태만 관리 (토큰 미보관)
 
 ---
 
@@ -46,64 +46,42 @@ Next.js BFF (/api/auth/*)
 src/
 ├── lib/
 │   ├── auth/
-│   │   ├── token-registry.ts      # 토큰 제공자 레지스트리 (DIP 인터페이스)
-│   │   └── cookie-storage.ts      # 서버 사이드 쿠키 읽기/쓰기
+│   │   └── cookie-storage.ts          # 서버 사이드 쿠키 읽기/쓰기
 │   └── http/
-│       ├── api-server.ts          # 서버 컴포넌트/라우트용 HTTP 클라이언트
-│       └── fetch-client.ts        # 클라이언트 컴포넌트용 HTTP 클라이언트 (자동 갱신)
+│       ├── api-server.ts              # 서버 컴포넌트/라우트용 HTTP 클라이언트
+│       └── fetch-client.ts            # 클라이언트 컴포넌트용 HTTP 클라이언트
 │
 ├── store/
-│   └── auth-store.ts              # Zustand 전역 인증 상태
+│   └── auth-store.ts                  # Zustand 전역 인증 상태 (user, isAuthenticated)
 │
 ├── services/
 │   └── auth/
-│       ├── auth.api.ts            # 인증 API 호출 함수
-│       ├── auth.queries.ts        # useLogin, useSignUp, useLogout
-│       └── index.ts               # 외부 export 관리
+│       ├── auth.api.ts                # 인증 API 호출 함수
+│       ├── auth.queries.ts            # useLogin, useSignUp, useLogout
+│       └── index.ts                   # 외부 export 관리
 │
 ├── app/
-│   ├── api/auth/
-│   │   ├── login/route.ts         # BFF: 로그인
-│   │   ├── logout/route.ts        # BFF: 로그아웃
-│   │   └── refresh/route.ts       # BFF: 토큰 갱신
+│   ├── api/
+│   │   ├── proxy/[...path]/route.ts   # catch-all 프록시 (Authorization 헤더 삽입, 토큰 갱신)
+│   │   └── auth/
+│   │       ├── login/route.ts         # BFF: 로그인
+│   │       ├── logout/route.ts        # BFF: 로그아웃
+│   │       ├── refresh/route.ts       # BFF: 토큰 갱신
+│   │       ├── signup/route.ts        # BFF: 회원가입
+│   │       └── social-callback/route.ts # BFF: 소셜 로그인 세션 설정
 │   ├── (auth)/
-│   │   ├── login/                 # 로그인 페이지 + 폼
-│   │   └── signup/                # 회원가입 페이지 + 다단계 폼
-│   ├── oauth/callback/page.tsx    # OAuth 콜백 처리
+│   │   ├── login/                     # 로그인 페이지 + 폼
+│   │   └── signup/                    # 회원가입 페이지 + 다단계 폼
+│   ├── oauth/callback/page.tsx        # OAuth 콜백 처리
 │   └── _components/
-│       └── auth-initializer.tsx   # 앱 최초 로드 시 세션 복원
+│       └── auth-initializer.tsx       # 앱 최초 로드 시 세션 복원
 │
-└── proxy.ts                        # Next.js 미들웨어 (라우트 보호)
+└── proxy.ts                           # Next.js 미들웨어 (라우트 보호)
 ```
 
 ---
 
 ## 3. 토큰 저장소 및 관리
-
-### TokenProviderRegistry (`src/lib/auth/token-registry.ts`)
-
-서버/클라이언트 환경에서 토큰을 다루는 방식의 차이를 인터페이스로 추상화한다.
-
-```ts
-export interface IAuthTokenProvider {
-  getAccessToken(): Promise<string | null> | string | null;
-  setAccessToken(token: string): Promise<void> | void;
-}
-```
-
-- **클라이언트 제공자** (`providers.tsx`에서 등록): Zustand 스토어에서 읽고 씀
-- **서버 제공자** (`api-server.ts`에서 등록): `CookieStorage`에서 읽고 씀
-
-클라이언트 제공자는 `providers.tsx`에서 앱 초기화 시 등록한다.
-
-```ts
-TokenProviderRegistry.setClientProvider({
-  getAccessToken: () => useAuthStore.getState().accessToken,
-  setAccessToken: (token: string) => {
-    useAuthStore.getState().updateToken(token);
-  },
-});
-```
 
 ### CookieStorage (`src/lib/auth/cookie-storage.ts`)
 
@@ -111,7 +89,7 @@ TokenProviderRegistry.setClientProvider({
 
 | 쿠키 이름      | 유효 시간 | 목적                              |
 | -------------- | --------- | --------------------------------- |
-| `accessToken`  | 1시간     | API 요청 인증                     |
+| `accessToken`  | 15분      | API 요청 인증 (JWT 만료와 동일)   |
 | `refreshToken` | 7일       | 액세스 토큰 갱신                  |
 | `user`         | 7일       | 새로고침 시 유저 정보 복원 (JSON) |
 
@@ -129,11 +107,10 @@ TokenProviderRegistry.setClientProvider({
 
 ### Zustand AuthStore (`src/store/auth-store.ts`)
 
-클라이언트 메모리에 인증 상태를 보관한다. 새로고침 시 초기화되며, `AuthInitializer`가 서버 세션으로부터 복원한다.
+클라이언트 메모리에 UI용 인증 상태만 보관한다. accessToken은 관리하지 않으며, 새로고침 시 초기화되면 `AuthInitializer`가 복원한다.
 
 ```ts
 interface AuthState {
-  accessToken: string | null;
   isAuthenticated: boolean;
   user: AuthUser | null;
   isInitialized: boolean; // AuthInitializer 완료 여부
@@ -153,14 +130,11 @@ export interface AuthUser {
 
 **액션:**
 
-| 액션             | 설명                                                |
-| ---------------- | --------------------------------------------------- |
-| `login`          | accessToken + user 저장, isAuthenticated = true     |
-| `logout`         | 상태 전체 초기화                                    |
-| `updateToken`    | silentRefresh 시 accessToken만 업데이트 (user 유지) |
-| `setInitialized` | AuthInitializer 완료 여부 설정                      |
-
-> `AuthInitializer`는 refresh 응답에 `user`가 포함된 경우 `login()`을 호출해 user까지 함께 복원한다. silentRefresh(`fetchClient` 내부)는 토큰만 갱신하므로 `updateToken()`을 사용한다.
+| 액션             | 설명                              |
+| ---------------- | --------------------------------- |
+| `login`          | user 저장, isAuthenticated = true |
+| `logout`         | 상태 전체 초기화                  |
+| `setInitialized` | AuthInitializer 완료 여부 설정    |
 
 ---
 
@@ -170,16 +144,24 @@ export interface AuthUser {
 
 클라이언트 컴포넌트와 `services/` 훅에서 사용한다.
 
-- 모든 요청에 `Authorization: Bearer <accessToken>` 자동 첨부
-- 401 응답 시 `silentRefresh()` → `/api/auth/refresh` → 원래 요청 재시도 (최대 1회)
-- 동시에 여러 요청이 401을 받아도 refresh는 1번만 실행 (`refreshPromise` 싱글턴)
+- `/api/`로 시작하는 경로(BFF)는 그대로 호출
+- 그 외 경로는 `/api/proxy/`를 앞에 붙여 catch-all 프록시를 경유
+- Authorization 헤더 삽입 및 토큰 갱신은 프록시가 처리하므로 fetchClient에서 별도 처리 없음
+- 프록시에서 silentRefresh까지 실패해 401이 반환되면 세션 만료로 판단 → `window.location.href = '/login'`
 
 ### apiServer (서버 전용)
 
 서버 컴포넌트, Route Handler, Server Action에서 사용한다.
 
 - `CookieStorage`에서 `accessToken`을 읽어 헤더에 첨부
-- 토큰 갱신 로직 없음 (서버에서는 쿠키가 항상 최신 상태)
+- 401 응답 시 silentRefresh 후 1회 재시도
+- silentRefresh 실패 시 세션 만료로 판단 → `redirect('/login')`
+
+### catch-all 프록시 (`/api/proxy/[...path]`)
+
+- httpOnly 쿠키에서 accessToken을 읽어 Authorization 헤더 삽입
+- 401 응답 시 refreshToken으로 토큰 갱신 후 원래 요청 1회 재시도
+- 갱신 실패 시 쿠키 전체 삭제 후 401 반환
 
 ---
 
@@ -187,14 +169,16 @@ export interface AuthUser {
 
 ### 5.1 앱 초기화 (Hydration)
 
-새로고침 시 메모리의 인증 상태가 사라지므로, `AuthInitializer`가 서버 쿠키의 `refresh_token`으로 상태를 복원한다.
+새로고침 시 Zustand 상태가 초기화되므로, `AuthInitializer`가 쿠키에서 유저 정보를 복원한다.
 
 ```
 앱 로드
   → providers.tsx에서 <AuthInitializer /> 마운트
-  → POST /api/auth/refresh 호출 (쿠키의 refreshToken 사용)
-  → 성공: { accessToken, user } 응답
-  → useAuthStore.login(accessToken, user)
+  → GET /api/auth/me 호출
+    → accessToken 쿠키 있음: user 쿠키 바로 반환 (백엔드 요청 없음)
+    → accessToken 없음 (만료): silentRefresh 후 user 쿠키 반환
+    → silentRefresh 실패 (세션 만료): 401 → router.push('/login')
+  → 성공: { user } 응답 → useAuthStore.login(user)
   → setInitialized(true)
 ```
 
@@ -209,13 +193,11 @@ LoginForm (Zod 검증)
   → POST /api/auth/login { email, password }
   → BFF: 백엔드 POST /{teamId}/auth/login 호출
   → BFF: CookieStorage.setSession() (accessToken, refreshToken, user 쿠키 설정)
-  → BFF: { accessToken, user } 반환 (refreshToken 제외)
-  → useAuthStore.login(accessToken, user)
+  → BFF: { user } 반환 (accessToken, refreshToken 제외)
+  → useAuthStore.login(user)
   → toast.success('로그인에 성공했습니다.')
   → router.push('/')
 ```
-
-로그인 페이지(`login/page.tsx`)는 `'use client'`로 선언되며, `useLogin()` 훅을 직접 사용한다.
 
 ### 5.3 회원가입
 
@@ -241,18 +223,11 @@ Step 3: 이름 입력
 | passwordConfirm | password와 일치             |
 | name            | 한글/영문/숫자만, 최대 20자 |
 
-> 기존 `nickname` 필드는 `name`으로 변경되었다. `NicknameStep` → `NameStep`, `nicknameSchema` → `nameSchema`.
-
 ### 5.4 OAuth 소셜 로그인
 
 OAuth 인증 자체는 백엔드에서 처리한다. 완료 후 `/oauth/callback` 페이지로 토큰을 쿼리 파라미터로 전달한다.
 
 소셜 로그인 버튼은 `<button>`이 아닌 `<Link>`로 구현되어 백엔드 OAuth 엔드포인트로 직접 이동한다.
-
-```
-<Link href={`${NEXT_PUBLIC_API_BASE_URL}/${NEXT_PUBLIC_TEAM_ID}/auth/google`}>
-<Link href={`${NEXT_PUBLIC_API_BASE_URL}/${NEXT_PUBLIC_TEAM_ID}/auth/kakao`}>
-```
 
 ```
 백엔드 OAuth 처리 완료
@@ -261,8 +236,8 @@ OAuth 인증 자체는 백엔드에서 처리한다. 완료 후 `/oauth/callback
   → POST /api/auth/social-callback { accessToken, refreshToken }
   → BFF: GET /{teamId}/users/me (accessToken으로 유저 정보 조회)
   → BFF: CookieStorage.setSession() (accessToken, refreshToken, user 쿠키 저장)
-  → BFF: { accessToken, user } 반환
-  → useAuthStore.login(accessToken, user)
+  → BFF: { user } 반환
+  → useAuthStore.login(user)
   → router.replace('/')
 ```
 
@@ -277,22 +252,31 @@ OAuth 인증 자체는 백엔드에서 처리한다. 완료 후 `/oauth/callback
 
 ### 5.5 토큰 자동 갱신 (Silent Refresh)
 
-`fetchClient`가 자동으로 처리하며, 서비스 코드에서 별도 처리가 필요 없다.
+catch-all 프록시와 apiServer가 자동으로 처리하며, 서비스 코드에서 별도 처리가 필요 없다.
+
+**fetchClient (클라이언트) 경유 시**
 
 ```
-API 요청 → 401 응답
-  → silentRefresh() 실행
-    → POST /api/auth/refresh
-    → BFF: 쿠키의 refreshToken으로 백엔드에 갱신 요청
-    → 새 accessToken 발급
-    → CookieStorage 업데이트 (accessToken, refreshToken만 — user 쿠키 유지)
-    → Zustand updateToken() 업데이트 (user는 변경하지 않음)
-  → 원래 요청 재시도 (1회)
-    → 성공: 응답 반환
-    → 실패: 에러 반환 (로그아웃 처리는 호출부가 담당)
+API 요청 → /api/proxy/[...path]
+  → 쿠키에서 accessToken 읽어 Authorization 헤더 삽입
+  → 백엔드 401 응답
+    → silentRefresh: refreshToken으로 새 accessToken 발급 후 쿠키 업데이트
+    → 원래 요청 재시도 (1회)
+      → 성공: 응답 반환
+      → 실패: 쿠키 전체 삭제 후 401 반환 → fetchClient가 /login으로 리다이렉트
 ```
 
-refresh_token도 만료된 경우: 쿠키 전체 삭제 후 401 반환.
+**apiServer (서버) 경유 시**
+
+```
+API 요청 → apiServer
+  → 쿠키에서 accessToken 읽어 Authorization 헤더 삽입
+  → 백엔드 401 응답
+    → silentRefresh: refreshToken으로 새 accessToken 발급 후 쿠키 업데이트
+    → 원래 요청 재시도 (1회)
+      → 성공: 응답 반환
+      → 실패: redirect('/login')
+```
 
 ### 5.6 로그아웃
 
@@ -307,19 +291,19 @@ useLogout() [React Query mutation]
   → router.push('/')
 ```
 
-> `NavigationBar`에서는 `useAuthStore`의 `logout`을 직접 호출하지 않고 `useLogout()` 훅을 사용한다.
-
 ---
 
 ## 6. BFF API 엔드포인트
 
-| 엔드포인트                  | 메서드 | 요청                            | 응답                    | 설명                     |
-| --------------------------- | ------ | ------------------------------- | ----------------------- | ------------------------ |
-| `/api/auth/login`           | POST   | `{ email, password }`           | `{ accessToken, user }` | 일반 로그인 및 세션 설정 |
-| `/api/auth/social-callback` | POST   | `{ accessToken, refreshToken }` | `{ accessToken, user }` | 소셜 로그인 세션 설정    |
-| `/api/auth/logout`          | POST   | -                               | `{ success: true }`     | 세션 파기                |
-| `/api/auth/refresh`         | POST   | - (쿠키 자동 사용)              | `{ accessToken, user }` | 액세스 토큰 갱신         |
-| `/api/auth/signup`          | POST   | `{ email, password, name }`     | -                       | 회원가입 BFF 프록시      |
+| 엔드포인트                  | 메서드 | 요청                            | 응답          | 설명                                          |
+| --------------------------- | ------ | ------------------------------- | ------------- | --------------------------------------------- |
+| `/api/proxy/[...path]`      | ALL    | 원본 요청 그대로                | 백엔드 응답   | catch-all 프록시 (토큰 자동 삽입)             |
+| `/api/auth/login`           | POST   | `{ email, password }`           | `{ user }`    | 일반 로그인 및 세션 설정                      |
+| `/api/auth/social-callback` | POST   | `{ accessToken, refreshToken }` | `{ user }`    | 소셜 로그인 세션 설정                         |
+| `/api/auth/logout`          | POST   | -                               | `{ success }` | 세션 파기                                     |
+| `/api/auth/me`              | GET    | - (쿠키 자동 사용)              | `{ user }`    | 세션 복원 (accessToken 만료 시 silentRefresh) |
+| `/api/auth/refresh`         | POST   | - (쿠키 자동 사용)              | `{ success }` | 액세스 토큰 갱신                              |
+| `/api/auth/signup`          | POST   | `{ email, password, name }`     | -             | 회원가입 BFF 프록시                           |
 
 ---
 
@@ -347,10 +331,10 @@ if (pathname.startsWith('/mypage') && !hasSession) {
 
 ## 8. 보안 설계
 
-### 토큰 이중 보호
+### 토큰 완전 은닉
 
-- `refreshToken`: httpOnly 쿠키 전용 → 클라이언트 JS 접근 불가
-- `accessToken`: 메모리(Zustand) 보관 → XSS로 쿠키를 탈취해도 refresh는 불가
+- `accessToken`, `refreshToken` 모두 httpOnly 쿠키에만 존재 → 클라이언트 JS 접근 불가
+- XSS 공격으로 토큰 탈취 불가
 
 ### 쿠키 보안 설정
 
@@ -360,49 +344,49 @@ secure: true     → HTTPS 환경에서만 전송 (프로덕션)
 sameSite: 'lax'  → 대부분의 CSRF 공격 차단
 ```
 
-### Refresh 중복 방지
+### Refresh 중복 방지 (프록시)
 
-`refreshPromise` 싱글턴 패턴으로, 동시에 401이 발생한 여러 요청이 각각 refresh를 시도하지 않도록 막는다.
+프록시에서 401 발생 시 refreshToken으로 갱신 후 재시도하는 구조이므로, 동시 요청이 여러 개여도 각각 프록시를 경유해 개별 갱신을 시도한다. refreshToken이 단 한 번만 유효한 경우 백엔드에서 처리한다.
 
-### API 응답에서 refreshToken 제거
+### API 응답에서 토큰 제거
 
-BFF 로그인 응답에서 `refreshToken`을 제거하고 클라이언트에 반환한다. 클라이언트는 refresh 토큰의 실제 값을 알 수 없다.
+BFF 로그인/소셜 로그인/refresh 응답에서 `accessToken`, `refreshToken`을 제거하고 `user`만 클라이언트에 반환한다.
 
 ### BFF를 통한 백엔드 주소 은닉
 
-클라이언트는 외부 백엔드 API 주소를 알 필요가 없다. `/api/auth/*` 경로만 노출된다.
+클라이언트는 외부 백엔드 API 주소를 알 필요가 없다. `/api/proxy/*`, `/api/auth/*` 경로만 노출된다.
 
 ---
 
 ## 9. 설계 결정 이유
 
+### 모든 토큰을 httpOnly 쿠키에 보관
+
+accessToken을 Zustand 메모리에 보관하면 XSS 공격 시 JS로 접근 가능하다. httpOnly 쿠키는 JS에서 읽을 수 없으므로 XSS로 토큰 탈취가 불가능하다. accessToken 만료 시간(15분)이 짧더라도 탈취 자체를 막는 것이 더 안전하다.
+
+### catch-all 프록시로 API 요청 일원화
+
+클라이언트가 직접 백엔드를 호출하려면 Authorization 헤더에 토큰이 필요한데, httpOnly 쿠키는 JS가 읽을 수 없다. 모든 요청을 `/api/proxy/[...path]`로 경유시키면 서버에서 쿠키를 읽어 헤더를 삽입할 수 있다. 엔드포인트마다 Route Handler를 작성하는 대신 catch-all 방식으로 단일 프록시가 모든 API를 커버한다.
+
+### Zustand에서 accessToken 제거
+
+토큰이 httpOnly 쿠키에만 존재하므로 Zustand가 토큰을 알 필요가 없다. Zustand는 네비게이션 바 유저 이름/이미지 표시, 로그인 여부 조건부 렌더링 등 UI 상태만 담당한다.
+
+### 새로고침 시 user를 쿠키에서 복원 (백엔드 요청 없음)
+
+백엔드 refresh 응답은 토큰만 반환한다. 새로고침마다 `/users/me`를 호출하는 대신, 로그인/소셜 로그인 시 저장해둔 user 쿠키(7일)를 꺼내 반환한다. accessToken 쿠키(15분)가 존재하면 silentRefresh 없이 바로 user 쿠키를 반환하므로 네트워크 요청이 발생하지 않는다. user 정보가 변경(프로필 수정)되는 경우에만 쿠키의 user를 함께 업데이트한다.
+
 ### BFF 패턴 (Backend-for-Frontend)
 
-refreshToken을 클라이언트에 전달하지 않기 위해 도입했다. 클라이언트가 직접 백엔드를 호출하면 refreshToken이 JS 코드에 노출될 수밖에 없다. BFF가 중간에서 토큰 발급·갱신·파기를 모두 처리하고, refreshToken은 BFF↔쿠키 사이에서만 움직인다.
-
-### refreshToken을 httpOnly 쿠키에 보관
-
-`localStorage`나 일반 쿠키에 저장하면 XSS 공격으로 탈취 가능하다. httpOnly 쿠키는 JS에서 읽을 수 없으므로, 스크립트 삽입이 발생해도 refreshToken은 접근 불가다.
-
-### accessToken을 Zustand 메모리에 보관
-
-쿠키에 저장하면 CSRF 공격에 취약하고, localStorage는 XSS에 취약하다. 메모리(Zustand)는 탭을 닫으면 사라지고 JS가 아닌 경로로는 접근할 수 없어 두 공격 벡터를 모두 차단한다. 페이지 새로고침 시 소멸되는 단점은 `AuthInitializer`의 자동 복원으로 보완한다.
-
-### TokenProviderRegistry (DIP 적용)
-
-`fetchClient`(클라이언트)와 `apiServer`(서버)는 토큰을 읽는 방법이 다르다. 클라이언트는 Zustand에서, 서버는 `next/headers`의 쿠키에서 읽어야 한다. 이 차이를 각 HTTP 클라이언트 내부에 직접 박아두면 환경 분기 로직이 퍼지고, 저장소를 교체할 때 HTTP 클라이언트를 고쳐야 한다. `IAuthTokenProvider` 인터페이스를 중간에 두고 제공자를 주입하는 방식으로 HTTP 클라이언트가 저장소 구현에 의존하지 않도록 분리했다(의존성 역전 원칙).
+refreshToken을 클라이언트에 전달하지 않기 위해 도입했다. 클라이언트가 직접 백엔드를 호출하면 refreshToken이 JS 코드에 노출될 수밖에 없다. BFF가 중간에서 토큰 발급·갱신·파기를 모두 처리하고, 토큰은 BFF↔쿠키 사이에서만 움직인다.
 
 ### fetchClient를 Axios 없이 네이티브 fetch로 구현
 
 Next.js는 `fetch`를 확장해 캐싱·revalidation 기능을 제공한다. Axios는 이 확장 fetch를 우회하므로 Next.js의 데이터 패칭 전략을 활용할 수 없다. 서버/클라이언트 환경 모두에서 동일하게 동작하고 번들 크기도 줄이기 위해 네이티브 fetch 기반으로 구현했다.
 
-### silentRefresh의 싱글턴 Promise (`refreshPromise`)
-
-SPA에서는 여러 API 요청이 동시에 401을 받을 수 있다. 각 요청이 독립적으로 refresh를 시도하면 refreshToken이 중복 소모되어 첫 번째 갱신 외 나머지는 실패한다. `refreshPromise`를 모듈 스코프에서 공유해 첫 번째 호출만 실제 fetch를 수행하고 나머지는 같은 Promise를 재사용하도록 했다.
-
 ### AuthInitializer를 별도 컴포넌트로 분리
 
-`providers.tsx`에 세션 복원 로직을 직접 넣으면 Providers 자체가 비대해지고 테스트가 어렵다. UI 없이 로직만 담당하는 컴포넌트를 분리해 관심사를 나눴다. `useEffect` 안에서 `/api/auth/refresh`를 호출하므로 SSR 중 실행되지 않고, 클라이언트 마운트 직후에만 동작한다.
+`providers.tsx`에 세션 복원 로직을 직접 넣으면 Providers 자체가 비대해지고 테스트가 어렵다. UI 없이 로직만 담당하는 컴포넌트를 분리해 관심사를 나눴다. `useEffect` 안에서 `/api/auth/me`를 호출하므로 SSR 중 실행되지 않고, 클라이언트 마운트 직후에만 동작한다.
 
 ### React Query mutation으로 로그인/로그아웃 처리
 
@@ -414,7 +398,7 @@ SPA에서는 여러 API 요청이 동시에 401을 받을 수 있다. 각 요청
 
 ### 소셜 로그인 시 BFF에서 `/users/me`로 user 조회
 
-백엔드 OAuth 콜백은 URL 쿼리 파라미터로 `accessToken`과 `refreshToken`만 전달한다. URL에 user 정보를 포함하면 브라우저 히스토리와 서버 로그에 개인정보가 남으므로 토큰만 전달하는 것이 맞다. 대신 BFF `/api/auth/social-callback`에서 받은 `accessToken`으로 `/{teamId}/users/me`를 서버 사이드에서 호출해 user를 가져온 뒤 쿠키에 저장한다. 이 시점부터는 일반 로그인과 동일한 경로로 합류한다.
+백엔드 OAuth 콜백은 URL 쿼리 파라미터로 `accessToken`과 `refreshToken`만 전달한다. URL에 user 정보를 포함하면 브라우저 히스토리와 서버 로그에 개인정보가 남으므로 토큰만 전달하는 것이 맞다. 대신 BFF `/api/auth/social-callback`에서 받은 `accessToken`으로 `/{teamId}/users/me`를 서버 사이드에서 호출해 user를 가져온 뒤 쿠키에 저장한다.
 
 ### OAuth 소셜 로그인 버튼을 `<Link>`로 구현
 
@@ -426,4 +410,4 @@ SPA에서는 여러 API 요청이 동시에 401을 받을 수 있다. 각 요청
 
 ### 미들웨어에서 refreshToken 쿠키 유무로 인증 판단
 
-미들웨어는 Edge Runtime에서 실행되어 JWT 검증 라이브러리를 사용하기 어렵다. accessToken은 메모리에 보관하므로 미들웨어에서 읽을 수 없다. refreshToken 쿠키의 존재 여부는 "세션이 발급된 적 있는가"를 나타내는 충분한 신호이며, 실제 유효성 검증은 API 호출 시 백엔드에서 이루어지므로 미들웨어에서는 가볍게 유무만 확인한다.
+미들웨어는 Edge Runtime에서 실행되어 JWT 검증 라이브러리를 사용하기 어렵다. refreshToken 쿠키의 존재 여부는 "세션이 발급된 적 있는가"를 나타내는 충분한 신호이며, 실제 유효성 검증은 API 호출 시 백엔드에서 이루어지므로 미들웨어에서는 가볍게 유무만 확인한다.

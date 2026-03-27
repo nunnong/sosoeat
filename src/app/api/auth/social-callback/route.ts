@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     await CookieStorage.setSession({ accessToken, refreshToken, user });
 
-    return NextResponse.json({ accessToken, user });
+    return NextResponse.json({ user });
   } catch (error) {
     console.error('[SocialCallbackBFF] Error:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });

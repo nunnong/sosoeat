@@ -19,7 +19,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (payload: LoginRequest) => authApi.login(payload),
     onSuccess: (data) => {
-      login(data.accessToken, data.user);
+      login(data.user);
       toast.success('로그인에 성공했습니다.');
       router.push('/');
     },
