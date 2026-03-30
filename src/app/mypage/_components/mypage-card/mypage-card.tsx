@@ -51,7 +51,7 @@ function VariantBadge({ variant }: { variant: Variant }) {
 function InfoItem({ Icon, text }: { Icon: LucideIcon; text: string }) {
   return (
     <span className="flex items-center gap-1">
-      <Icon className="text-sosoeat-gray-600 size-3" />
+      <Icon className="text-sosoeat-gray-600 size-3" aria-hidden="true" />
       {text}
     </span>
   );
@@ -86,7 +86,7 @@ export function MyPageCard({
   confirmedAt = null,
   imageUrl = DEFAULT_IMAGE_URL,
   imageAlt,
-  variant = 'groupEat',
+  variant,
   className,
 }: MyPageCardProps) {
   return (
@@ -126,7 +126,7 @@ export function MyPageCard({
             {title}
           </CardTitle>
           <CardDescription className="text-sosoeat-gray-800 flex items-center gap-1 font-medium">
-            <UserRound className="text-sosoeat-gray-600 size-3" />
+            <UserRound className="text-sosoeat-gray-600 size-3" aria-hidden focusable={false} />
             {currentCount}/{maxCount}
           </CardDescription>
         </div>

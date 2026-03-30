@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-import { UseStateBadgeProps } from './use-state-badge.types';
+import type { UseStateBadgeProps } from './use-state-badge.types';
 
 const usageVariantClassName = {
   groupEat: 'border-0 bg-sosoeat-orange-100 text-sosoeat-orange-700',
