@@ -1,6 +1,6 @@
 import { fetchClient } from '@/lib/http/fetch-client';
 
-import { getSosoTalkPostList } from './sosotalk.api';
+import { getSosoTalkPostDetail, getSosoTalkPostList } from './sosotalk.api';
 
 jest.mock('@/lib/http/fetch-client', () => ({
   fetchClient: {
@@ -104,6 +104,103 @@ describe('getSosoTalkPostList', () => {
 
     await expect(getSosoTalkPostList()).rejects.toThrow(
       '소소톡 게시글 목록을 불러오지 못했습니다.'
+    );
+  });
+});
+
+describe('getSosoTalkPostDetail', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('전달한 postId로 상세 조회 요청을 보낸다', async () => {
+    jest.mocked(fetchClient.get).mockResolvedValue(
+      createSuccessResponse({
+        id: 1,
+        teamId: 'dallaem',
+        title: '소소톡 제목',
+        content: '<p>소소톡 내용</p>',
+        image: 'https://example.com/post-image.jpg',
+        authorId: 10,
+        viewCount: 20,
+        likeCount: 3,
+        createdAt: '2026-03-30T00:00:00.000Z',
+        updatedAt: '2026-03-30T00:00:00.000Z',
+        author: {
+          id: 10,
+          name: '소소',
+          image: 'https://example.com/author-image.jpg',
+        },
+        _count: {
+          comments: 2,
+        },
+        comments: [],
+        isLiked: false,
+      })
+    );
+
+    await getSosoTalkPostDetail(1);
+
+    expect(fetchClient.get).toHaveBeenCalledWith('/posts/1');
+  });
+
+  it('응답을 PostWithComments 형태로 변환한다', async () => {
+    jest.mocked(fetchClient.get).mockResolvedValue(
+      createSuccessResponse({
+        id: 1,
+        teamId: 'dallaem',
+        title: '소소톡 제목',
+        content: '<p>소소톡 내용</p>',
+        image: 'https://example.com/post-image.jpg',
+        authorId: 10,
+        viewCount: 20,
+        likeCount: 3,
+        createdAt: '2026-03-30T00:00:00.000Z',
+        updatedAt: '2026-03-30T00:00:00.000Z',
+        author: {
+          id: 10,
+          name: '소소',
+          image: 'https://example.com/author-image.jpg',
+        },
+        _count: {
+          comments: 2,
+        },
+        comments: [
+          {
+            id: 5,
+            teamId: 'dallaem',
+            postId: 1,
+            authorId: 11,
+            author: {
+              id: 11,
+              name: '달래',
+              image: 'https://example.com/comment-author-image.jpg',
+            },
+            content: '댓글입니다.',
+            createdAt: '2026-03-30T01:00:00.000Z',
+            updatedAt: '2026-03-30T01:00:00.000Z',
+          },
+        ],
+        isLiked: true,
+      })
+    );
+
+    const result = await getSosoTalkPostDetail(1);
+
+    expect(result.createdAt).toBeInstanceOf(Date);
+    expect(result.comments[0].createdAt).toBeInstanceOf(Date);
+    expect(result.count.comments).toBe(2);
+    expect(result.isLiked).toBe(true);
+  });
+
+  it('요청 실패 시 에러를 던진다', async () => {
+    jest.mocked(fetchClient.get).mockResolvedValue({
+      ok: false,
+      json: jest.fn(),
+    } as unknown as Response);
+
+    await expect(getSosoTalkPostDetail(1)).rejects.toThrow(
+      '소소톡 게시글을 불러오지 못했습니다.'
     );
   });
 });
