@@ -33,7 +33,6 @@ const meta = {
   },
   args: {
     meeting: mockMeeting,
-    isLiked: false,
   },
 } satisfies Meta<typeof RecommendedMeetingCard>;
 
@@ -47,7 +46,7 @@ export const Default: Story = {
 export const Liked: Story = {
   name: '찜한 상태',
   args: {
-    isLiked: true,
+    meeting: { ...mockMeeting, isFavorited: true },
   },
 };
 

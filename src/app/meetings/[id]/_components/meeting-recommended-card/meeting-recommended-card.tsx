@@ -5,24 +5,16 @@ import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 
 import { DateBadge, TimeBadge } from '@/app/meetings/_components/date-badge/date-badge';
-// import { HeartButton } from '@/components/common/heart-button';
+import { HeartButton } from '@/components/common/heart-button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Meeting } from '@/types/meeting';
 
 interface RecommendedMeetingCardProps {
   meeting: Meeting;
-  isLiked?: boolean;
-  onLikeToggle?: (id: string) => void;
   onClick?: (id: string) => void;
 }
 
-/** 하트버튼 merge 되면 실제 컴포넌트로 교체할 예정 */
-export default function RecommendedMeetingCard({
-  meeting,
-  isLiked = false,
-  onLikeToggle,
-  onClick,
-}: RecommendedMeetingCardProps) {
+export default function RecommendedMeetingCard({ meeting, onClick }: RecommendedMeetingCardProps) {
   return (
     <Card
       className="h-[286px] w-[302px] cursor-pointer border-none pt-0 shadow-none ring-0"
@@ -33,15 +25,9 @@ export default function RecommendedMeetingCard({
         <div className="pb-[14px]">
           <div className="relative h-[160px] w-full overflow-hidden rounded-3xl">
             <Image src={meeting.image} alt={meeting.name} fill className="object-cover" />
-            {/* TODO: HeartButton 연동 예정
             <div className="absolute right-5 bottom-5">
-              <HeartButton
-                size="small"
-                isLiked={isLiked}
-                onToggle={() => onLikeToggle?.(meeting.id)}
-              />
+              <HeartButton size="sm" isFavorited={meeting.isFavorited} />
             </div>
-            */}
           </div>
         </div>
 

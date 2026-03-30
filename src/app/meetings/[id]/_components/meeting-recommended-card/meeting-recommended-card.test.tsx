@@ -14,10 +14,8 @@ jest.mock('next/image', () => ({
 }));
 
 jest.mock('@/components/common/heart-button', () => ({
-  HeartButton: ({ isLiked, onToggle }: { isLiked?: boolean; onToggle?: () => void }) => (
-    <button onClick={onToggle} aria-label={isLiked ? '좋아요 취소' : '좋아요'}>
-      heart
-    </button>
+  HeartButton: ({ isFavorited }: { isFavorited?: boolean }) => (
+    <button aria-label={isFavorited ? '좋아요 취소' : '좋아요'}>heart</button>
   ),
 }));
 
@@ -61,7 +59,15 @@ describe('RecommendedMeetingCard', () => {
     expect(onClick).toHaveBeenCalledWith('1');
   });
 
-  // TODO: HeartButton 연동 후 활성화
-  // it('하트 클릭 시 onLikeToggle이 meeting.id와 함께 호출된다', async () => { ... });
-  // it('isLiked가 true이면 찜 취소 버튼이 렌더링된다', () => { ... });
+  it('isFavorited가 false이면 좋아요 버튼이 렌더링된다', () => {
+    render(<RecommendedMeetingCard meeting={mockMeeting} />);
+
+    expect(screen.getByRole('button', { name: '좋아요' })).toBeInTheDocument();
+  });
+
+  it('isFavorited가 true이면 좋아요 취소 버튼이 렌더링된다', () => {
+    render(<RecommendedMeetingCard meeting={{ ...mockMeeting, isFavorited: true }} />);
+
+    expect(screen.getByRole('button', { name: '좋아요 취소' })).toBeInTheDocument();
+  });
 });
