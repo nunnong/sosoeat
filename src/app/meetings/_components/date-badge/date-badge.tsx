@@ -16,7 +16,7 @@ import type { MeetingCategory } from '@/types/meeting';
 // ── variants ─────────────────────────────────────────────────
 
 const dateBadgeVariants = cva(
-  'inline-flex h-[24px] items-center justify-center rounded-lg border px-2 text-xs font-medium',
+  'inline-flex h-[24px] items-center justify-center rounded-[6px] border px-2 text-xs font-medium',
   {
     variants: {
       category: {
@@ -29,7 +29,7 @@ const dateBadgeVariants = cva(
 
 // 시간 뱃지는 항상 뉴트럴 색상 — variant 불필요
 const timeBadgeClass =
-  'inline-flex h-[24px] items-center justify-center rounded-lg border border-sosoeat-gray-500 bg-white px-2 text-xs font-medium text-sosoeat-gray-700';
+  'inline-flex h-[24px] items-center justify-center rounded-[6px] border border-sosoeat-gray-500 bg-white px-2 text-xs font-medium text-sosoeat-gray-600';
 
 // ── Props ─────────────────────────────────────────────────────
 
