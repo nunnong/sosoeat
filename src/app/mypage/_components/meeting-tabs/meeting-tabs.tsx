@@ -18,7 +18,7 @@ export function MeetingTabs() {
       value={activeTab}
       onValueChange={(v) => setActiveTab(v as TabValue)}
     >
-      <MeetingTabsList activeTab={activeTab} onTabChange={setActiveTab} />
+      <MeetingTabsList />
 
       {MYPAGE_TABS.map((tab) => (
         <TabsContent
