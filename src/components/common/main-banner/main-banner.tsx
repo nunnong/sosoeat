@@ -130,7 +130,7 @@ export function MainBanner() {
 
       <div className="absolute inset-0 z-20 flex flex-col justify-center">
         <div className="mx-auto w-full max-w-[1140px] px-6 md:px-20 lg:px-24">
-          <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full border border-white/30 px-3 py-1 text-sm text-white">
+          <span className="border-sosoeat-orange-600/33 bg-sosoeat-orange-600/13 text-sosoeat-orange-600 mb-3 inline-flex w-fit items-center gap-1 rounded-full border px-3 py-1 text-sm font-bold">
             🍽 함께먹기
           </span>
           <h2 className="text-[28px] leading-tight font-extrabold tracking-[-1.38px] text-white md:text-[36px] lg:text-[48px]">

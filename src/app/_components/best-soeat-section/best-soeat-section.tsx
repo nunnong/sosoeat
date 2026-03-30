@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import { BestSoeatCard } from '@/app/_components/best-soeat-card/best-soeat-card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
@@ -42,7 +44,10 @@ const MOCK_DATA = [
 export function BestSoeatSection() {
   return (
     <section className="px-4 py-6 md:px-4 md:py-7.5 lg:px-4 lg:py-7.5">
-      <h2 className="mb-3 text-lg font-bold md:text-xl lg:text-2xl">베스트 소잇 🔥</h2>
+      <h2 className="mb-3 flex items-center gap-3 text-lg font-bold md:text-xl lg:text-2xl">
+        <Image src="icons/main-page-twinkle.svg" alt="twinkle" width={18} height={18} />
+        지금 뜨는 베스트 소잇 🔥
+      </h2>
       <ScrollArea className="w-full">
         <div className="flex w-max gap-3 pb-3">
           {MOCK_DATA.map((meeting) => (
