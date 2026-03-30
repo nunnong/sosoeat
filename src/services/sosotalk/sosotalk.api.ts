@@ -1,7 +1,12 @@
 import { fetchClient } from '@/lib/http/fetch-client';
 import { PostListFromJSON } from '@/types/generated-client/models/PostList';
+import { PostWithCommentsFromJSON } from '@/types/generated-client/models/PostWithComments';
 
-import type { GetSosoTalkPostListParams, GetSosoTalkPostListResponse } from './sosotalk.types';
+import type {
+  GetSosoTalkPostDetailResponse,
+  GetSosoTalkPostListParams,
+  GetSosoTalkPostListResponse,
+} from './sosotalk.types';
 
 const DEFAULT_SOSOTALK_POST_LIST_PARAMS: Required<
   Pick<GetSosoTalkPostListParams, 'type' | 'sortBy' | 'sortOrder' | 'size'>
@@ -36,4 +41,16 @@ export const getSosoTalkPostList = async (
   }
 
   return PostListFromJSON(await response.json()) as GetSosoTalkPostListResponse;
+};
+
+export const getSosoTalkPostDetail = async (
+  postId: number
+): Promise<GetSosoTalkPostDetailResponse> => {
+  const response = await fetchClient.get(`/posts/${postId}`);
+
+  if (!response.ok) {
+    throw new Error('소소톡 게시글을 불러오지 못했습니다.');
+  }
+
+  return PostWithCommentsFromJSON(await response.json()) as GetSosoTalkPostDetailResponse;
 };
