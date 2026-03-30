@@ -1,12 +1,6 @@
-import type { PostList, PostWithAuthor } from '@/types/generated-client';
+import type { PostList, PostWithAuthor, TeamIdPostsGetRequest } from '@/types/generated-client';
 
-export interface GetSosoTalkPostListParams {
-  type?: 'all' | 'best';
-  sortBy?: 'createdAt' | 'viewCount' | 'likeCount' | 'commentCount';
-  sortOrder?: 'asc' | 'desc';
-  cursor?: string;
-  size?: number;
-}
+export type GetSosoTalkPostListParams = Omit<TeamIdPostsGetRequest, 'teamId'>;
 
 export type GetSosoTalkPostListResponse = PostList;
 
