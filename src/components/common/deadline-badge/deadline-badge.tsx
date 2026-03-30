@@ -21,9 +21,9 @@ export function DeadlineBadge({ registrationEnd, variant, className }: DeadlineB
   const [, setNow] = useState(() => new Date());
 
   const startDate = new TZDate(new Date(), 'Asia/Seoul');
-  const endDate = new TZDate(registrationEnd, 'Asia/Seoul');
+  const endDate = registrationEnd === null ? null : new TZDate(registrationEnd, 'Asia/Seoul');
 
-  const diffMs = endDate.getTime() - startDate.getTime();
+  const diffMs = endDate === null ? -1 : endDate.getTime() - startDate.getTime();
   const oneDayMs = 24 * 60 * 60 * 1000;
   const oneHourMs = 60 * 60 * 1000;
   const isEnded = diffMs <= 0;
@@ -47,16 +47,20 @@ export function DeadlineBadge({ registrationEnd, variant, className }: DeadlineB
   })();
 
   useEffect(() => {
-    if (isEnded) return;
+    if (registrationEnd === null || isEnded) return;
     const id = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(id);
-  }, [isEnded]);
+  }, [registrationEnd, isEnded]);
+
+  if (registrationEnd === null) {
+    return null;
+  }
 
   return (
     <Badge
       variant="outline"
       className={cn(
-        'mt-3.5 h-auto min-h-0 w-61.75 items-center gap-1 rounded-[14px] border-0 py-1.5 pr-3 pl-1.5 text-sm leading-5 font-medium shadow-none',
+        'h-auto min-h-0 w-61.75 items-center gap-1 rounded-[14px] border-0 py-1.5 pr-3 pl-1.5 text-sm leading-5 font-medium shadow-none',
         variantBadgeClassName[variant],
         className
       )}

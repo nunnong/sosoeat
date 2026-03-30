@@ -1,60 +1,66 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
+import { Footer } from '@/components/common/footer';
 import { MainPageCard } from '@/components/common/main-page-card';
-import { MeetingsApi } from '@/types/generated-client/apis/MeetingsApi';
-import type { MeetingWithHost } from '@/types/generated-client/models/MeetingWithHost';
-import type { Meeting } from '@/types/meeting/meeting.type';
+import { NavigationBar } from '@/components/common/navigation-bar';
 
-import { MeetingFilterBar } from './_components/meeting-filter-bar';
-import type { RegionSelection } from './_components/region-select-modal';
+import { MeetingFilterBar, MeetingFilterBarProps } from './_components/meeting-filter-bar';
+import { MeetingMakeButton } from './_components/meeting-make-button.tsx';
+import { MeetingSearchBanner } from './_components/meeting-search-banner';
+import useMeetingPage from './usehooks/use-meeting-page';
 
 export default function MeetingsPage() {
-  const [regionCommitted, setRegionCommitted] = useState<RegionSelection>(null);
-  const [date, setDate] = useState<Date | null>(null);
+  const {
+    regionCommitted,
+    handleRegionChange,
+    date,
+    handleDateChange,
+    meetingData,
+    handleTypeFilterChange,
+    typeFilter,
+    handleSortChange,
+    sort,
+  } = useMeetingPage();
 
-  const [meetingData, setMeetingData] = useState<Meeting[]>([]);
+  //sort는 dateTime, registrationEnd, participantCount를 가짐
 
-  useEffect(() => {
-    const toMeeting = (meeting: MeetingWithHost): Meeting => ({
-      ...meeting,
-      dateTime: meeting.dateTime.toISOString(),
-      registrationEnd: meeting.registrationEnd.toISOString(),
-      canceledAt: meeting.canceledAt ? meeting.canceledAt.toISOString() : null,
-      confirmedAt: meeting.confirmedAt ? meeting.confirmedAt.toISOString() : null,
-      createdAt: meeting.createdAt.toISOString(),
-      updatedAt: meeting.updatedAt.toISOString(),
-      host: {
-        id: meeting.host.id,
-        name: meeting.host.name,
-        image: meeting.host.image,
-      },
-      variant: meeting.type === 'groupEat' ? 'groupEat' : 'groupBuy',
-      isFavorited: false,
-    });
+  //근데 options는 인기순, 모임일 임박순, 모집 마감 임박 순, 모집 마감 먼 순을 가짐
 
-    const fetchData = async () => {
-      const data = (await new MeetingsApi().teamIdMeetingsGet({ teamId: 'sosoeattest', size: 10 }))
-        .data;
-      setMeetingData(data.map(toMeeting));
-      console.log(data);
-    };
-
-    fetchData();
-  }, [regionCommitted, date]);
-
+  //근데 vlaue===sort value === options 즉 sort === options임
+  //sortBy는 dateTime, registrationEnd, participantCount
   return (
-    <div>
-      <MeetingFilterBar
-        regionCommitted={regionCommitted}
-        date={date}
-        onDateChange={setDate}
-        onRegionChange={setRegionCommitted}
+    <div className="mx-auto flex max-w-[1140px] flex-col justify-center gap-4 sm:px-4">
+      <MeetingSearchBanner
+        alt="모임 배너"
+        imageUrl="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=80"
+        titleContent={
+          <span>
+            함께하면
+            <br />더 맛있어요
+          </span>
+        }
+        subtitleContent={
+          <p>가고 싶었던 맛집, 혼자 가기 아쉬웠죠? 모여요에서 같이 먹을 사람을 찾아보세요.</p>
+        }
       />
-      {meetingData.map((meeting) => (
-        <MainPageCard key={meeting.id} {...meeting} />
-      ))}
+      <div className="flex flex-col gap-4 px-4 sm:px-0">
+        <MeetingFilterBar
+          regionCommitted={regionCommitted}
+          date={date}
+          typeFilter={typeFilter}
+          onTypeFilterChange={handleTypeFilterChange}
+          onDateChange={handleDateChange}
+          onRegionChange={handleRegionChange}
+          onSortChange={handleSortChange}
+          sort={sort}
+        />
+        <div className="grid grid-cols-1 justify-center gap-1 md:grid-cols-2 md:gap-[20px] lg:grid-cols-3 lg:gap-[27px]">
+          {meetingData.map((meeting) => (
+            <MainPageCard key={meeting.id} meeting={meeting} />
+          ))}
+        </div>
+        <MeetingMakeButton onClick={() => {}} />
+      </div>
     </div>
   );
 }

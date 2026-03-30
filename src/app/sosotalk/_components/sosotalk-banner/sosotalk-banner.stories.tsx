@@ -3,13 +3,13 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SosoTalkBanner } from './sosotalk-banner';
 
 const meta = {
-  title: 'SosoTalk/SosoTalkBanner',
+  title: 'pages/sosotalk/sosotalk-banner',
   component: SosoTalkBanner,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
   },
-} satisfies Meta<typeof SosoTalkBanner>;
+} as Meta<typeof SosoTalkBanner>;
 
 export default meta;
 

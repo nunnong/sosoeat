@@ -1,7 +1,7 @@
 import type { ProgressProps } from '@/components/ui/progress-bar';
 
 export interface EstablishmentStatusBadgeProps {
-  confirmedAt: string | null;
+  confirmedAt: Date | null;
   variant: ProgressProps['variant'];
   className?: string;
 }

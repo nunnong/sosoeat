@@ -1,8 +1,7 @@
-export type HeartSize = 'large' | 'medium' | 'small';
+import { MeetingWithHost } from '@/types/generated-client';
 
-export interface HeartButtonProps {
-  size?: HeartSize;
-  isLiked?: boolean;
-  onToggle?: (isLiked: boolean) => void;
+export interface HeartButtonProps extends Pick<MeetingWithHost, 'isFavorited'> {
   className?: string;
+  //크기는 3가지
+  size?: 'lg' | 'md' | 'sm';
 }
