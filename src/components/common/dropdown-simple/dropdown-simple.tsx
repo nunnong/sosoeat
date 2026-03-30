@@ -20,7 +20,7 @@ export function DropdownSimple({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={triggerClassName}>{placeholder}</DropdownMenuTrigger>
-      <DropdownMenuContent className={cn('w-full', contentClassName)}>
+      <DropdownMenuContent className={cn(contentClassName)}>
         {options.map((option) => (
           <DropdownMenuCheckboxItem
             key={option}

@@ -1,12 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
-import type {
-  RegionModalDropdownSub,
-  RegionSelection,
-  RegionSelectModalProps,
-} from '../region-select-modal.types';
+import type { RegionSelection } from '../region-select-modal.types';
 
 import { UseRegionSelectModalParams } from './use-region-select-modal.types';
 

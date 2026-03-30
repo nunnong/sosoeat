@@ -16,6 +16,6 @@ export function recordToSelection(r: Record<string, string>): RegionSelection {
 export function omitRegionModalValueOnChange(
   sub: RegionModalDropdownSub
 ): Omit<DropdownSubProp, 'value' | 'onChange'> {
-  const { value: _v, onChange: _o, ...rest } = sub;
-  return rest;
+  const { data, triggerClassName, contentClassName, itemClassName } = sub;
+  return { data, triggerClassName, contentClassName, itemClassName };
 }
