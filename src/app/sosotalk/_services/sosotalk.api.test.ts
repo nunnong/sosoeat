@@ -37,7 +37,7 @@ describe('getSosoTalkPostList', () => {
     jest.clearAllMocks();
   });
 
-  it('requests the default post list query', async () => {
+  it('기본 게시글 목록 요청을 보낸다', async () => {
     jest.mocked(fetchClient.get).mockResolvedValue(
       createSuccessResponse({
         data: [],
@@ -53,7 +53,7 @@ describe('getSosoTalkPostList', () => {
     );
   });
 
-  it('requests the post list with custom params', async () => {
+  it('커스텀 파라미터로 게시글 목록 요청을 보낸다', async () => {
     jest.mocked(fetchClient.get).mockResolvedValue(
       createSuccessResponse({
         data: [],
@@ -75,7 +75,7 @@ describe('getSosoTalkPostList', () => {
     );
   });
 
-  it('converts the response to PostList', async () => {
+  it('응답을 PostList 형태로 변환한다', async () => {
     jest.mocked(fetchClient.get).mockResolvedValue(
       createSuccessResponse({
         data: [
@@ -114,7 +114,7 @@ describe('getSosoTalkPostList', () => {
     expect(result.data[0].author.name).toBe('author');
   });
 
-  it('throws when the list request fails', async () => {
+  it('목록 요청이 실패하면 에러를 던진다', async () => {
     jest.mocked(fetchClient.get).mockResolvedValue({
       ok: false,
       json: jest.fn(),
@@ -131,7 +131,7 @@ describe('getSosoTalkPostDetail', () => {
     jest.clearAllMocks();
   });
 
-  it('requests the post detail by postId', async () => {
+  it('postId로 게시글 상세 요청을 보낸다', async () => {
     jest.mocked(fetchClient.get).mockResolvedValue(
       createSuccessResponse({
         id: 1,
@@ -162,7 +162,7 @@ describe('getSosoTalkPostDetail', () => {
     expect(fetchClient.get).toHaveBeenCalledWith('/posts/1');
   });
 
-  it('converts the response to PostWithComments', async () => {
+  it('응답을 PostWithComments 형태로 변환한다', async () => {
     jest.mocked(fetchClient.get).mockResolvedValue(
       createSuccessResponse({
         id: 1,
@@ -211,7 +211,7 @@ describe('getSosoTalkPostDetail', () => {
     expect(result.isLiked).toBe(true);
   });
 
-  it('throws when the detail request fails', async () => {
+  it('상세 요청이 실패하면 에러를 던진다', async () => {
     jest.mocked(fetchClient.get).mockResolvedValue({
       ok: false,
       json: jest.fn(),
@@ -232,7 +232,7 @@ describe('post actions', () => {
     jest.restoreAllMocks();
   });
 
-  it('creates the post', async () => {
+  it('게시글을 생성한다', async () => {
     jest.mocked(fetchClient.post).mockResolvedValue(
       createSuccessResponse({
         id: 8,
@@ -271,7 +271,7 @@ describe('post actions', () => {
     expect(result.createdAt).toBeInstanceOf(Date);
   });
 
-  it('requests a presigned upload url for a post image', async () => {
+  it('게시글 이미지용 presigned 업로드 URL을 요청한다', async () => {
     const file = new File(['image'], 'post-image.png', { type: 'image/png' });
     jest.mocked(fetchClient.post).mockResolvedValue(
       createSuccessResponse({
@@ -290,7 +290,7 @@ describe('post actions', () => {
     expect(result.publicUrl).toBe('https://cdn.example.com/post-image.png');
   });
 
-  it('uploads the image file and returns the public url', async () => {
+  it('이미지 파일을 업로드하고 public URL을 반환한다', async () => {
     const file = new File(['image'], 'post-image.png', { type: 'image/png' });
     jest.mocked(fetchClient.post).mockResolvedValue(
       createSuccessResponse({
@@ -319,7 +319,7 @@ describe('post actions', () => {
     expect(result).toBe('https://cdn.example.com/post-image.png');
   });
 
-  it('creates a like for the post', async () => {
+  it('게시글 좋아요를 생성한다', async () => {
     jest.mocked(fetchClient.post).mockResolvedValue(
       createSuccessResponse({
         id: 1,
@@ -336,7 +336,7 @@ describe('post actions', () => {
     expect(result.createdAt).toBeInstanceOf(Date);
   });
 
-  it('deletes a like for the post', async () => {
+  it('게시글 좋아요를 취소한다', async () => {
     jest.mocked(fetchClient.delete).mockResolvedValue(
       createSuccessResponse({
         message: '좋아요가 취소되었습니다.',
@@ -349,7 +349,7 @@ describe('post actions', () => {
     expect(result.message).toBe('좋아요가 취소되었습니다.');
   });
 
-  it('creates a comment for the post', async () => {
+  it('게시글 댓글을 생성한다', async () => {
     jest.mocked(fetchClient.post).mockResolvedValue(
       createSuccessResponse({
         id: 10,
@@ -379,7 +379,7 @@ describe('post actions', () => {
     expect(result.content).toBe('new comment');
   });
 
-  it('updates a comment for the post', async () => {
+  it('게시글 댓글을 수정한다', async () => {
     jest.mocked(fetchClient.patch).mockResolvedValue(
       createSuccessResponse({
         id: 10,
@@ -410,7 +410,7 @@ describe('post actions', () => {
     expect(result.content).toBe('updated comment');
   });
 
-  it('deletes a comment for the post', async () => {
+  it('게시글 댓글을 삭제한다', async () => {
     jest.mocked(fetchClient.delete).mockResolvedValue(
       createSuccessResponse({
         message: '댓글이 삭제되었습니다.',
@@ -426,7 +426,7 @@ describe('post actions', () => {
     expect(result.message).toBe('댓글이 삭제되었습니다.');
   });
 
-  it('updates the post', async () => {
+  it('게시글을 수정한다', async () => {
     jest.mocked(fetchClient.patch).mockResolvedValue(
       createSuccessResponse({
         id: 3,
@@ -466,7 +466,7 @@ describe('post actions', () => {
     expect(result.title).toBe('updated title');
   });
 
-  it('deletes the post', async () => {
+  it('게시글을 삭제한다', async () => {
     jest.mocked(fetchClient.delete).mockResolvedValue(
       createSuccessResponse({
         message: '게시글이 삭제되었습니다.',

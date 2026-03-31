@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { SosoTalkPostDetailPage } from './sosotalk-post-detail-page';
@@ -198,9 +198,14 @@ describe('SosoTalkPostDetailPage', () => {
     expect(window.HTMLElement.prototype.scrollIntoView).toHaveBeenCalled();
   });
 
-  it('좋아요 버튼을 누르면 좋아요 mutation을 호출한다', async () => {
+  it('좋아요 버튼을 누르면 좋아요 mutation을 호출하고 완료 후 서버 상태를 다시 따른다', async () => {
     const user = userEvent.setup();
-    mockCreateLikeMutateAsync.mockResolvedValue(undefined);
+    let resolveLike: (() => void) | undefined;
+    mockCreateLikeMutateAsync.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveLike = resolve;
+      })
+    );
 
     render(<SosoTalkPostDetailPage postId="1" />);
 
@@ -208,6 +213,12 @@ describe('SosoTalkPostDetailPage', () => {
 
     expect(mockCreateLikeMutateAsync).toHaveBeenCalledWith(1);
     expect(screen.getByRole('button', { name: '좋아요 25개' })).toBeInTheDocument();
+
+    resolveLike?.();
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '좋아요 24개' })).toBeInTheDocument();
+    });
   });
 
   it('댓글 작성 시 댓글 생성 mutation을 호출하고 입력창을 비운다', async () => {
@@ -240,14 +251,14 @@ describe('SosoTalkPostDetailPage', () => {
 
     const [editTextarea] = screen.getAllByRole('textbox');
     await user.clear(editTextarea);
-    await user.type(editTextarea, '수정한 댓글입니다.');
-    await user.click(screen.getByRole('button', { name: '수정' }));
+    await user.type(editTextarea, '수정된 댓글입니다.');
+    await user.click(screen.getByRole('button', { name: '댓글 수정' }));
 
     expect(mockUpdateCommentMutateAsync).toHaveBeenCalledWith({
       postId: 1,
       commentId: 101,
       payload: {
-        content: '수정한 댓글입니다.',
+        content: '수정된 댓글입니다.',
       },
     });
     expect(screen.queryByRole('button', { name: '취소' })).not.toBeInTheDocument();

@@ -80,6 +80,8 @@ export function SosoTalkPostDetailPage({ postId }: SosoTalkPostDetailPageProps) 
       }
     } catch {
       setOptimisticIsLiked(data.isLiked);
+    } finally {
+      setOptimisticIsLiked(null);
     }
   };
 

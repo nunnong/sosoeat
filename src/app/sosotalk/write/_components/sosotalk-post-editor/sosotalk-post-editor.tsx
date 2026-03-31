@@ -61,7 +61,7 @@ export const SosoTalkPostEditor = ({
             id="sosotalk-post-title"
             value={title}
             onChange={handleTitleChange}
-            placeholder="게시글 제목을 입력해 주세요. (최대 30자)"
+            placeholder={`게시글 제목을 입력해 주세요. (최대 ${SOSOTALK_POST_EDITOR_TITLE_MAX_LENGTH}자)`}
             className="border-sosoeat-gray-400 placeholder:text-sosoeat-gray-500 w-full border-b bg-transparent pb-2 text-sm font-semibold outline-none md:text-xl lg:text-3xl"
           />
         </div>
@@ -94,7 +94,7 @@ export const SosoTalkPostEditor = ({
         <div className="relative mt-4 min-h-[360px] flex-1 md:mt-6">
           {!contentText ? (
             <p className="text-sosoeat-gray-600 pointer-events-none absolute top-0 left-0 text-sm font-medium">
-              게시글 내용을 입력해 주세요. (최대 {SOSOTALK_POST_EDITOR_CONTENT_MAX_LENGTH}자)
+              {`게시글 내용을 입력해 주세요. (최대 ${SOSOTALK_POST_EDITOR_CONTENT_MAX_LENGTH}자)`}
             </p>
           ) : null}
 
@@ -118,8 +118,7 @@ export const SosoTalkPostEditor = ({
             onRemove={handleImageRemove}
           />
           <p className="text-sosoeat-gray-600 mt-8 text-sm">
-            공백 포함 : 총 {effectiveContentLength}자 | 공백 제외 : 총 {contentLengthWithoutSpaces}
-            자
+            {`공백 포함 : 총 ${effectiveContentLength}자 | 공백 제외 : 총 ${contentLengthWithoutSpaces}자`}
           </p>
         </div>
       </div>

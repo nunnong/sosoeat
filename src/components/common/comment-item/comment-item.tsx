@@ -2,7 +2,6 @@ import { MoreHorizontal } from 'lucide-react';
 
 import { CommentInput } from '@/components/common/comment-input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -94,22 +93,15 @@ export function CommentItem({
               currentUserName={authorName}
               currentUserImageUrl={authorImageUrl}
             />
-            <div className="flex justify-end gap-2">
-              <Button
+            <div className="flex justify-end">
+              <button
                 type="button"
-                variant="outline"
                 onClick={onEditCancel}
                 disabled={isEditPending}
+                className="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
               >
                 취소
-              </Button>
-              <Button
-                type="button"
-                onClick={onEditSubmit}
-                disabled={isEditPending || editValue.trim().length === 0}
-              >
-                수정
-              </Button>
+              </button>
             </div>
           </div>
         ) : (
