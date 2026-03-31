@@ -1,4 +1,3 @@
-import { postsApi } from '@/lib/api-client';
 import { fetchClient } from '@/lib/http/fetch-client';
 import type { Notification, NotificationList } from '@/types/generated-client';
 
@@ -6,14 +5,15 @@ export const notificationApi = {
   readNotification: ({ notificationId }: { notificationId: number }) => {
     return fetchClient.put(`/notifications/${notificationId}/read`);
   },
-  fetchLatestPostComment: ({ teamId, postId }: { teamId: string; postId: number }) => {
-    return postsApi.teamIdPostsPostIdCommentsGet({
-      teamId,
-      postId,
+  fetchLatestPostComment: async ({ postId }: { postId: number }) => {
+    const params = new URLSearchParams({
       sortBy: 'createdAt',
       sortOrder: 'desc',
-      size: 1,
+      size: '1',
     });
+
+    const response = await fetchClient.get(`/posts/${postId}/comments?${params.toString()}`);
+    return response.json();
   },
   fetchUsersUserId: async ({ userId }: { userId: number }) => {
     const response = await fetchClient.get(`/users/${userId}`);
