@@ -78,7 +78,7 @@ const SOSOTALK_AUTHOR_IMAGE_FALLBACK =
 const stripHtmlTags = (content: string) =>
   content
     .replace(/<(\/p|\/div|br)\s*>/gi, ' ')
-    .replace(/<li\b[^>]*>/gi, '• ')
+    .replace(/<li\b[^>]*>/gi, '- ')
     .replace(/<\/li>/gi, ' ')
     .replace(/<\/(ul|ol)>/gi, ' ')
     .replace(/<[^>]+>/g, '')
