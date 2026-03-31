@@ -199,8 +199,6 @@ describe('getSosoTalkPostDetail', () => {
       json: jest.fn(),
     } as unknown as Response);
 
-    await expect(getSosoTalkPostDetail(1)).rejects.toThrow(
-      '소소톡 게시글을 불러오지 못했습니다.'
-    );
+    await expect(getSosoTalkPostDetail(1)).rejects.toThrow('소소톡 게시글을 불러오지 못했습니다.');
   });
 });

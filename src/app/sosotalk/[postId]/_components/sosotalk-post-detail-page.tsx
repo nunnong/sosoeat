@@ -1,8 +1,9 @@
 'use client';
 
+import { type ReactNode, useEffect, useRef, useState } from 'react';
+
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import type { CommentItemData } from '@/components/common/comment-item';
 import { Footer } from '@/components/common/footer';
@@ -34,6 +35,7 @@ export function SosoTalkPostDetailPage({ postId }: SosoTalkPostDetailPageProps) 
   const comments = data?.comments ?? [];
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLiked(data?.isLiked ?? false);
   }, [data?.id, data?.isLiked]);
 
@@ -115,7 +117,9 @@ export function SosoTalkPostDetailPage({ postId }: SosoTalkPostDetailPageProps) 
           onLikeClick={() => setIsLiked((prev) => !prev)}
           onCommentClick={handleCommentClick}
           onShareClick={handleShareClick}
-          comments={comments.map((comment) => mapCommentToCommentItemData(comment, currentUser?.id))}
+          comments={comments.map((comment) =>
+            mapCommentToCommentItemData(comment, currentUser?.id)
+          )}
           inputValue={commentInput}
           inputPlaceholder="댓글을 입력해 주세요"
           onChangeInput={setCommentInput}
