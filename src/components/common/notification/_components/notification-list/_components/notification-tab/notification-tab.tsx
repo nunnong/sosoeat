@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { notificationApi } from '@/components/common/notification/repository/api';
+import { notificationRepository } from '@/components/common/notification/repository';
 import { Button } from '@/components/ui/button';
 import type { Notification } from '@/types/generated-client';
 
@@ -27,7 +27,7 @@ export const NotificationTab = (props: Notification) => {
     return () => {
       cancelled = true;
     };
-  }, [props]);
+  }, [props.id, props.type, props.message]);
 
   const metaRight = formatNotificationMetaRelativeTime(props.createdAt);
   const highlighted = !props.isRead;
@@ -39,7 +39,7 @@ export const NotificationTab = (props: Notification) => {
       variant="ghost"
       className={NOTIFICATION_ROW_BUTTON_CLASS}
       onClick={() => {
-        void notificationApi.readNotification({
+        void notificationRepository.readNotification({
           notificationId: props.id,
         });
       }}

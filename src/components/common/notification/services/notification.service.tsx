@@ -7,7 +7,7 @@ import { CommentIcon } from '../_components/notification-list/_components/notifi
 import { MeetingIcon } from '../_components/notification-list/_components/notification-tab/_components/icons/meeting-icon';
 import { UserIcon } from '../_components/notification-list/_components/notification-tab/_components/icons/user-icon';
 import { useIsMaxWidth767 } from '../hook';
-import { notificationApi } from '../repository/api';
+import { notificationRepository } from '../repository';
 
 export const getNotificationDescription = async (props: Notification) => {
   switch (props.type) {
@@ -16,7 +16,7 @@ export const getNotificationDescription = async (props: Notification) => {
     case 'MEETING_CANCELED':
       return `${props.message ?? '모임이 취소되었어요.'}`;
     case 'COMMENT': {
-      return `${props.message}`;
+      return `${props.message ?? '새 댓글이 달렸어요.'}`;
     }
     default:
       return '';
@@ -55,21 +55,25 @@ export const useNotificationService = () => {
   const [list, setList] = useState<Notification[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
     const fetchLatestNotifications = async () => {
       try {
         const teamId: string | undefined = process.env.NEXT_PUBLIC_TEAM_ID;
-        const { data, unread } = await notificationApi.fetchLatestNotifications({
-          teamId: teamId ?? '',
-        });
-
-        setList(data);
-        setUnreadCount(unread);
+        const { data, unread } = await notificationRepository.fetchLatestNotifications({});
+        if (!cancelled) {
+          setList(data);
+          setUnreadCount(unread);
+        }
       } catch (error) {
         console.error('알림을 불러오는 중 오류가 발생했습니다:', error);
       }
     };
 
     fetchLatestNotifications();
+    return () => {
+      // 컴포넌트가 언마운트될 때 취소 플래그 설정
+      cancelled = true;
+    };
   }, []);
 
   return {

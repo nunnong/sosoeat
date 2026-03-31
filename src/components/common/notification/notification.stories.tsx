@@ -1,11 +1,12 @@
+import type React from 'react';
 import { useEffect } from 'react';
 
 import type { Decorator, Meta, StoryObj } from '@storybook/nextjs-vite';
 
 import type { Notification, NotificationTypeEnum } from '@/types/generated-client';
 
-import { notificationApi } from './repository/api';
 import { Notification as NotificationComponent } from './index';
+import { notificationRepository } from './repository';
 
 const mockNotificationList: { data: Notification[]; nextCursor: string; hasMore: boolean } = {
   data: [
@@ -40,25 +41,25 @@ const mockNotificationList: { data: Notification[]; nextCursor: string; hasMore:
   hasMore: false,
 };
 
-const MockNotificationApiDecorator = ({ Story }: { Story: React.ComponentType }) => {
+const MockNotificationRepositoryDecorator = ({ Story }: { Story: React.ComponentType }) => {
   useEffect(() => {
-    const original = notificationApi.fetchLatestNotifications;
+    const original = notificationRepository.fetchLatestNotifications;
 
-    notificationApi.fetchLatestNotifications = async () => ({
+    notificationRepository.fetchLatestNotifications = async () => ({
       data: mockNotificationList.data,
       unread: mockNotificationList.data.filter((notification) => !notification.isRead).length,
     });
 
     return () => {
-      notificationApi.fetchLatestNotifications = original;
+      notificationRepository.fetchLatestNotifications = original;
     };
   }, []);
 
   return <Story />;
 };
 
-const withMockNotificationApi: Decorator = (Story) => (
-  <MockNotificationApiDecorator Story={Story} />
+const withMockNotificationRepository: Decorator = (Story) => (
+  <MockNotificationRepositoryDecorator Story={Story} />
 );
 
 const meta: Meta<typeof NotificationComponent> = {
@@ -69,6 +70,6 @@ const meta: Meta<typeof NotificationComponent> = {
 export default meta;
 
 export const Default: StoryObj<typeof NotificationComponent> = {
-  decorators: [withMockNotificationApi],
+  decorators: [withMockNotificationRepository],
   render: () => <NotificationComponent triggerClassName="" />,
 };

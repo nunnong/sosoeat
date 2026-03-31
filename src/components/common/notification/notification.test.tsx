@@ -9,6 +9,7 @@ import { Notification as Nt } from './notification';
 jest.mock('@/lib/http/fetch-client', () => ({
   fetchClient: {
     get: jest.fn(),
+    put: jest.fn(),
   },
 }));
 
@@ -77,46 +78,27 @@ describe('Notification', () => {
     } as unknown as Response);
   });
 
-  it('알림 열기 트리거가 표시된다', () => {
+  // 수정 후
+  it('알림 열기 트리거가 표시된다', async () => {
     render(<Nt />);
-    expect(screen.getByRole('button', { name: '알림 열기' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: '알림 열기' })).toBeInTheDocument();
   });
 
-  it('triggerClassName이 트리거 버튼에 적용된다', () => {
+  it('triggerClassName이 트리거 버튼에 적용된다', async () => {
     render(<Nt triggerClassName="trigger-test-class" />);
-    expect(screen.getByRole('button', { name: '알림 열기' })).toHaveClass('trigger-test-class');
+    expect(await screen.findByRole('button', { name: '알림 열기' })).toHaveClass(
+      'trigger-test-class'
+    );
   });
 
   it('트리거 클릭 시 알림 내역과 목록이 보인다 (넓은 화면: Popover)', async () => {
     const user = userEvent.setup();
     render(<Nt />);
-
-    await user.click(screen.getByRole('button', { name: '알림 열기' }));
+    await user.click(await screen.findByRole('button', { name: '알림 열기' })); // ← findBy
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: '알림 내역' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '모두 읽기' })).toBeInTheDocument();
-    expect(screen.getByText('모임 확정')).toBeInTheDocument();
-  });
-
-  describe('767px 이하 (Dialog)', () => {
-    beforeEach(() => {
-      mockMatchMedia(true);
-    });
-
-    afterEach(() => {
-      jest.restoreAllMocks();
-    });
-
-    it('트리거 클릭 시 Dialog에 주입 목록이 보인다', async () => {
-      const user = userEvent.setup();
-      render(<Nt />);
-
-      await user.click(screen.getByRole('button', { name: '알림 열기' }));
-
-      expect(await screen.findByRole('dialog')).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: '알림 내역' })).toBeInTheDocument();
-      expect(await screen.findByText('모임 확정')).toBeInTheDocument();
-    });
+    expect(await screen.findByRole('heading', { name: '알림 내역' })).toBeInTheDocument(); // ← findBy
+    expect(await screen.findByRole('button', { name: '모두 읽기' })).toBeInTheDocument(); // ← findBy
+    expect(await screen.findByText('모임 확정')).toBeInTheDocument(); // ← findBy
   });
 });

@@ -4,7 +4,7 @@ import type { Notification, NotificationList } from '@/types/generated-client';
 
 export const notificationApi = {
   readNotification: ({ notificationId }: { notificationId: number }) => {
-    return fetchClient.get(`/notifications/${notificationId}/read`);
+    return fetchClient.put(`/notifications/${notificationId}/read`);
   },
   fetchLatestPostComment: ({ teamId, postId }: { teamId: string; postId: number }) => {
     return postsApi.teamIdPostsPostIdCommentsGet({
@@ -24,7 +24,6 @@ export const notificationApi = {
     cursor = '',
     isRead = 'null',
   }: {
-    teamId: string;
     size?: number;
     cursor?: string;
     isRead?: boolean | 'null';

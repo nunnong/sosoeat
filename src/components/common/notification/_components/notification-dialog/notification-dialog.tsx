@@ -2,7 +2,13 @@
 
 import * as React from 'react';
 
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 import { NotificationPanelBody } from '../notification-panel-body';
@@ -23,24 +29,18 @@ export const NotificationDialog = ({
   list,
   unreadCount,
 }: NotificationDialogProps) => {
-  const titleId = React.useId();
+  const panelId = React.useId();
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <NotificationTrigger className={triggerClassName} unreadCount={unreadCount ?? 0} />
       </DialogTrigger>
-      <DialogContent
-        className={mobileDialogContentClass}
-        showCloseButton={false}
-        aria-labelledby={titleId}
-        aria-describedby={undefined}
-      >
-        <DialogTitle id={titleId} className="sr-only">
-          알림
-        </DialogTitle>
+      <DialogContent className={mobileDialogContentClass} showCloseButton={false}>
+        <DialogTitle className="sr-only">알림</DialogTitle>
+        <DialogDescription className="sr-only">알림 목록</DialogDescription>
         <NotificationPanelBody
-          titleId={titleId}
+          titleId={panelId}
           listScrollClassName={scrollAreaMobileClass}
           list={list}
           unreadCount={unreadCount}
