@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { HeartRepository } from '../repository/heart.repository';
 
 const useFavoriteMeeting = (initialIsFavorited: boolean) => {
   const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
+
+  useEffect(() => {
+    setIsFavorited(initialIsFavorited);
+  }, [initialIsFavorited]);
 
   const toggleFavorite = async (meetingId: number) => {
     setIsFavorited((prev) => !prev); // Optimistic UI 업데이트
