@@ -37,6 +37,9 @@ export const notificationApi = {
       .get(`/notifications?${params.toString()}`)
       .then((res) => res.json());
 
+    if (!data || !data.data) {
+      return { data: [], unread: 0 };
+    }
     // API에서 받은 데이터의 createdAt은 string이므로 Date 객체로 변환
     data.data.map((n) => {
       n.createdAt = new Date(n.createdAt);
