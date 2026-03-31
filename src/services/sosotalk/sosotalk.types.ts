@@ -1,8 +1,10 @@
 import type { PostList, PostWithAuthor, TeamIdPostsGetRequest } from '@/types/generated-client';
+import type { PostWithComments } from '@/types/generated-client/models/PostWithComments';
 
 export type GetSosoTalkPostListParams = Omit<TeamIdPostsGetRequest, 'teamId'>;
 
 export type GetSosoTalkPostListResponse = PostList;
+export type GetSosoTalkPostDetailResponse = PostWithComments;
 
 export interface SosoTalkPostCardItem {
   id: number;
