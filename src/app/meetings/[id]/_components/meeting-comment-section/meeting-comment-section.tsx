@@ -1,0 +1,62 @@
+'use client';
+
+import { MessageSquareText } from 'lucide-react';
+
+import { CountingBadge } from '@/components/common/counting-badge/counting-badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
+
+import { buildCommentTree } from './comment-tree';
+import { MeetingCommentItem } from './meeting-comment-item';
+import type { MeetingCommentSectionProps } from './meeting-comment-section.types';
+
+// 댓글이 이 수를 초과하면 ScrollArea 적용
+const MAX_VISIBLE_COMMENTS = 5;
+
+export function MeetingCommentSection({
+  comments,
+  commentCount,
+  className,
+}: MeetingCommentSectionProps) {
+  const totalCommentCount = commentCount ?? comments.length;
+  const treeComments = buildCommentTree(comments);
+  const shouldScroll = treeComments.length > MAX_VISIBLE_COMMENTS;
+
+  const commentList = treeComments.map((comment) => (
+    <MeetingCommentItem key={comment.id} comment={comment} />
+  ));
+
+  return (
+    <section
+      className={cn(
+        'border-sosoeat-gray-200 w-full rounded-[24px] border bg-white px-6 py-4',
+        className
+      )}
+    >
+      {/* 헤더 */}
+      <div className="flex items-center gap-2">
+        <MessageSquareText className="text-sosoeat-orange-600 size-5" />
+        <h2 className="text-sosoeat-gray-900 text-xl font-bold">댓글</h2>
+        <span className="md:hidden">
+          <CountingBadge count={totalCommentCount} size="small" />
+        </span>
+        <span className="hidden md:block">
+          <CountingBadge count={totalCommentCount} size="large" />
+        </span>
+      </div>
+
+      {/* 댓글 목록 */}
+      {shouldScroll ? (
+        <ScrollArea className="mt-4 h-[994px]">
+          <div className="space-y-4 pr-4">{commentList}</div>
+        </ScrollArea>
+      ) : (
+        <div className="mt-4 space-y-4">{commentList}</div>
+      )}
+
+      {/* 댓글 입력창 */}
+      {/* TODO: CommentInput 컴포넌트 연결 */}
+      <div className="bg-sosoeat-gray-100 -mx-6 mt-4 rounded-b-[24px] px-6 py-4" />
+    </section>
+  );
+}
