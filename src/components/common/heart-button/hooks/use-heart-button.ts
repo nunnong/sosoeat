@@ -10,16 +10,18 @@ const useFavoriteMeeting = (initialIsFavorited: boolean) => {
   }, [initialIsFavorited]);
 
   const toggleFavorite = async (meetingId: number) => {
-    setIsFavorited((prev) => !prev); // Optimistic UI 업데이트
+    const prev = isFavorited;
+
+    setIsFavorited(!prev); // Optimistic UI 업데이트
     try {
-      if (isFavorited) {
+      if (prev) {
         await HeartRepository.favoriteDelete(meetingId);
       } else {
         await HeartRepository.favoritePost(meetingId);
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
-      setIsFavorited((prev) => !prev); // 롤백
+      setIsFavorited(prev); // 롤백
     }
   };
 
