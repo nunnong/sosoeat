@@ -14,8 +14,6 @@ import { buildCommentTree } from './comment-tree';
 import { MeetingCommentItem } from './meeting-comment-item';
 import type { MeetingCommentSectionProps } from './meeting-comment-section.types';
 
-const MAX_VISIBLE_COMMENTS = 5;
-
 export function MeetingCommentSection({
   comments,
   commentCount,
@@ -27,7 +25,6 @@ export function MeetingCommentSection({
 
   const totalCommentCount = commentCount ?? comments.length;
   const treeComments = buildCommentTree(comments);
-  const shouldScroll = treeComments.length > MAX_VISIBLE_COMMENTS;
 
   const commentList = treeComments.map((comment) => (
     <MeetingCommentItem key={comment.id} comment={comment} />
@@ -53,15 +50,9 @@ export function MeetingCommentSection({
       </div>
 
       {/* 댓글 목록 */}
-      {shouldScroll ? (
-        <div className="mt-4 h-[994px]">
-          <ScrollArea className="h-full">
-            <div className="space-y-4 pr-4">{commentList}</div>
-          </ScrollArea>
-        </div>
-      ) : (
-        <div className="mt-4 space-y-4">{commentList}</div>
-      )}
+      <ScrollArea className="mt-4 *:data-radix-scroll-area-viewport:h-auto! *:data-radix-scroll-area-viewport:max-h-[994px]">
+        <div className="space-y-4 pr-4">{commentList}</div>
+      </ScrollArea>
 
       {/* 댓글 입력창 */}
       <div className="mt-4 rounded-[24px] px-6 py-4">
