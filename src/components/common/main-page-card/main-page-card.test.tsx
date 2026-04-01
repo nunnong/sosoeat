@@ -48,6 +48,7 @@ function createMockMeeting(overrides: Partial<MeetingWithHost> = {}): MeetingWit
     createdBy: 1,
     createdAt: now,
     updatedAt: now,
+    isCompleted: false,
     host: {
       id: 1,
       name: '김소소',

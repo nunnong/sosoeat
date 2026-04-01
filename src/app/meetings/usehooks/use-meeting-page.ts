@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { format } from 'date-fns';
+import { startOfDay } from 'date-fns';
 
 import { MeetingWithHost, TeamIdMeetingsGetRequest } from '@/types/generated-client';
 
@@ -8,9 +8,18 @@ import { MeetingFilterBarProps } from '../_components/meeting-filter-bar';
 import { RegionSelection } from '../_components/region-select-modal';
 import { fetchMeetingByFilter } from '../repositories/api/fetch-meeting-by-filter';
 
+type DateChangeParams = {
+  valueStart: Date | null;
+  valueEnd: Date | null;
+};
+
+const toExclusiveDateEnd = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+
 const useMeetingPage = () => {
   const [regionCommitted, setRegionCommitted] = useState<RegionSelection>(null);
-  const [date, setDate] = useState<Date | null>(null);
+  const [dateStart, setDateStart] = useState<Date | null>(null);
+  const [dateEnd, setDateEnd] = useState<Date | null>(null);
   const [meetingData, setMeetingData] = useState<MeetingWithHost[]>([]);
   const [typeFilter, setTypeFilter] = useState<'all' | 'groupEat' | 'groupBuy'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -25,7 +34,8 @@ const useMeetingPage = () => {
       regionCommitted == null
         ? undefined
         : regionCommitted.district + ' ' + regionCommitted.province,
-    date: date == null ? undefined : date,
+    dateStart: dateStart == null ? undefined : dateStart,
+    dateEnd: dateEnd == null ? undefined : toExclusiveDateEnd(dateEnd),
     sortBy: sort === 'participantCount' ? undefined : sort,
     sortOrder: sortOrder,
   };
@@ -34,13 +44,25 @@ const useMeetingPage = () => {
     setTypeFilter(value);
   };
 
-  const handleDateChange = (value: Date | null) => {
-    const formattedDate = value ? format(value, 'yyyy-MM-dd') : undefined;
-    setDate(formattedDate ? new Date(formattedDate) : null);
-  };
-
   const handleRegionChange = (value: RegionSelection) => {
     setRegionCommitted(value);
+  };
+
+  const handleDateChange = ({ valueStart, valueEnd }: DateChangeParams) => {
+    if (!valueStart && !valueEnd) {
+      setDateStart(null);
+      setDateEnd(null);
+      return;
+    }
+
+    if (valueStart) {
+      setDateStart(startOfDay(valueStart));
+      setDateEnd(valueEnd ?? valueStart);
+      return;
+    }
+
+    setDateStart(startOfDay(valueEnd!));
+    setDateEnd(valueEnd);
   };
 
   const handleSortChange = (
@@ -57,13 +79,13 @@ const useMeetingPage = () => {
       setMeetingData(data.data);
     };
     fetchData();
-  }, [regionCommitted, date, typeFilter, sort, sortOrder]);
-
+  }, [regionCommitted, dateStart, dateEnd, typeFilter, sort, sortOrder]);
   return {
     meetingData,
     handleRegionChange,
     regionCommitted,
-    date,
+    dateStart,
+    dateEnd,
     handleDateChange,
     handleTypeFilterChange,
     typeFilter,

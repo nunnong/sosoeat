@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { UserPostsResponseDataInnerAuthor } from './UserPostsResponseDataInnerAuthor';
+import {
+  UserPostsResponseDataInnerAuthorFromJSON,
+  UserPostsResponseDataInnerAuthorFromJSONTyped,
+  UserPostsResponseDataInnerAuthorToJSON,
+  UserPostsResponseDataInnerAuthorToJSONTyped,
+} from './UserPostsResponseDataInnerAuthor';
 import type { UserPostsResponseDataInnerCount } from './UserPostsResponseDataInnerCount';
 import {
   UserPostsResponseDataInnerCountFromJSON,
@@ -20,93 +27,93 @@ import {
   UserPostsResponseDataInnerCountToJSON,
   UserPostsResponseDataInnerCountToJSONTyped,
 } from './UserPostsResponseDataInnerCount';
-import type { Author } from './Author';
-import { AuthorFromJSON, AuthorFromJSONTyped, AuthorToJSON, AuthorToJSONTyped } from './Author';
 
 /**
  *
  * @export
- * @interface PostWithAuthor
+ * @interface UserPostsResponseDataInner
  */
-export interface PostWithAuthor {
+export interface UserPostsResponseDataInner {
   /**
    *
    * @type {number}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   id: number;
   /**
    *
    * @type {string}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   teamId: string;
   /**
    *
    * @type {string}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   title: string;
   /**
    *
    * @type {string}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   content: string;
   /**
    *
    * @type {string}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   image: string;
   /**
    *
    * @type {number}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   authorId: number;
   /**
    *
    * @type {number}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   viewCount: number;
   /**
    *
    * @type {number}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   likeCount: number;
   /**
    *
    * @type {Date}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   createdAt: Date;
   /**
    *
    * @type {Date}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   updatedAt: Date;
   /**
    *
-   * @type {Author}
-   * @memberof PostWithAuthor
+   * @type {UserPostsResponseDataInnerAuthor}
+   * @memberof UserPostsResponseDataInner
    */
-  author: Author;
+  author: UserPostsResponseDataInnerAuthor;
   /**
    *
    * @type {UserPostsResponseDataInnerCount}
-   * @memberof PostWithAuthor
+   * @memberof UserPostsResponseDataInner
    */
   count: UserPostsResponseDataInnerCount;
 }
 
 /**
- * Check if a given object implements the PostWithAuthor interface.
+ * Check if a given object implements the UserPostsResponseDataInner interface.
  */
-export function instanceOfPostWithAuthor(value: object): value is PostWithAuthor {
+export function instanceOfUserPostsResponseDataInner(
+  value: object
+): value is UserPostsResponseDataInner {
   if (!('id' in value) || value['id'] === undefined) return false;
   if (!('teamId' in value) || value['teamId'] === undefined) return false;
   if (!('title' in value) || value['title'] === undefined) return false;
@@ -122,14 +129,14 @@ export function instanceOfPostWithAuthor(value: object): value is PostWithAuthor
   return true;
 }
 
-export function PostWithAuthorFromJSON(json: any): PostWithAuthor {
-  return PostWithAuthorFromJSONTyped(json, false);
+export function UserPostsResponseDataInnerFromJSON(json: any): UserPostsResponseDataInner {
+  return UserPostsResponseDataInnerFromJSONTyped(json, false);
 }
 
-export function PostWithAuthorFromJSONTyped(
+export function UserPostsResponseDataInnerFromJSONTyped(
   json: any,
   ignoreDiscriminator: boolean
-): PostWithAuthor {
+): UserPostsResponseDataInner {
   if (json == null) {
     return json;
   }
@@ -144,17 +151,17 @@ export function PostWithAuthorFromJSONTyped(
     likeCount: json['likeCount'],
     createdAt: new Date(json['createdAt']),
     updatedAt: new Date(json['updatedAt']),
-    author: AuthorFromJSON(json['author']),
+    author: UserPostsResponseDataInnerAuthorFromJSON(json['author']),
     count: UserPostsResponseDataInnerCountFromJSON(json['_count']),
   };
 }
 
-export function PostWithAuthorToJSON(json: any): PostWithAuthor {
-  return PostWithAuthorToJSONTyped(json, false);
+export function UserPostsResponseDataInnerToJSON(json: any): UserPostsResponseDataInner {
+  return UserPostsResponseDataInnerToJSONTyped(json, false);
 }
 
-export function PostWithAuthorToJSONTyped(
-  value?: PostWithAuthor | null,
+export function UserPostsResponseDataInnerToJSONTyped(
+  value?: UserPostsResponseDataInner | null,
   ignoreDiscriminator: boolean = false
 ): any {
   if (value == null) {
@@ -172,7 +179,7 @@ export function PostWithAuthorToJSONTyped(
     likeCount: value['likeCount'],
     createdAt: value['createdAt'].toISOString(),
     updatedAt: value['updatedAt'].toISOString(),
-    author: AuthorToJSON(value['author']),
+    author: UserPostsResponseDataInnerAuthorToJSON(value['author']),
     _count: UserPostsResponseDataInnerCountToJSON(value['count']),
   };
 }

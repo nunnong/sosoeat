@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { MainPageCard } from '@/components/common/main-page-card';
 import { MeetingCreateModal } from '@/components/common/meeting-create-modal';
 import { useModal } from '@/hooks/use-modal';
@@ -27,9 +29,10 @@ export default function MeetingsPage() {
   const {
     regionCommitted,
     handleRegionChange,
-    date,
-    handleDateChange,
+    dateStart,
+    dateEnd,
     meetingData,
+    handleDateChange,
     handleTypeFilterChange,
     typeFilter,
     handleSortChange,
@@ -60,7 +63,8 @@ export default function MeetingsPage() {
       <div className="flex flex-col gap-4 px-4 sm:px-0">
         <MeetingFilterBar
           regionCommitted={regionCommitted}
-          date={date}
+          dateStart={dateStart}
+          dateEnd={dateEnd}
           typeFilter={typeFilter}
           onTypeFilterChange={handleTypeFilterChange}
           onDateChange={handleDateChange}
