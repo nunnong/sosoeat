@@ -1,5 +1,8 @@
+import { parseISO } from 'date-fns';
+import { create } from 'domain';
+
 import { fetchClient } from '@/lib/http/fetch-client';
-import type { Notification, NotificationList } from '@/types/generated-client';
+import type { Comment, Notification, NotificationList } from '@/types/generated-client';
 
 export const notificationApi = {
   readNotification: ({ notificationId }: { notificationId: number }) => {
@@ -13,11 +16,41 @@ export const notificationApi = {
     });
 
     const response = await fetchClient.get(`/posts/${postId}/comments?${params.toString()}`);
-    return response.json();
+    const json = await response.json();
+    const data = json.data.map((comment: Comment) => ({
+      ...comment,
+      createdAt: parseISO(comment.createdAt as unknown as string), // string을 Date 객체로 변환
+      updatedAt: parseISO(comment.updatedAt as unknown as string), // string을 Date 객체로 변환
+    }));
+
+    return data;
   },
   fetchUsersUserId: async ({ userId }: { userId: number }) => {
     const response = await fetchClient.get(`/users/${userId}`);
-    return await response.json();
+    const json = await response.json();
+    const data = {
+      ...json,
+      createdAt: parseISO(json.createdAt as unknown as string), // string을 Date 객체로 변환
+      updatedAt: parseISO(json.updatedAt as unknown as string), // string을 Date 객체로 변환
+    };
+    return data;
+  },
+  fetchUsersMe: async () => {
+    const response = await fetchClient.get(`/users/me`);
+    const json = await response.json();
+    const data = {
+      ...json,
+      createdAt: parseISO(json.createdAt as unknown as string), // string을 Date 객체로 변환
+      updatedAt: parseISO(json.updatedAt as unknown as string), // string을 Date 객체로 변환
+    };
+    return data;
+  },
+  createMeetingNotification: async ({ userId, postId }: { userId: number; postId: number }) => {
+    await fetchClient.post(`/notifications/meeting`, {
+      userId,
+      postId,
+    });
+    return { userId, postId };
   },
   fetchLatestNotifications: async ({
     size = 10,
