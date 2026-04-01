@@ -24,7 +24,8 @@ import type { MeetingFilterBarProps } from './meeting-filter-bar.types';
 export const MeetingFilterBar = ({
   onTypeFilterChange = () => {},
   regionCommitted,
-  date,
+  dateStart,
+  dateEnd,
   className,
   typeFilter,
   sort: _sort,
@@ -66,8 +67,9 @@ export const MeetingFilterBar = ({
       {/* Frame 2610402 — h 32 필터 행 */}
       <div className="flex h-8 w-full items-center justify-start gap-2 sm:justify-end md:w-auto">
         <DetailDatePicker
-          value={date}
-          onChange={onDateChange}
+          valueStart={dateStart}
+          valueEnd={dateEnd}
+          onDateChange={onDateChange}
           className={cn(meetingFilterPillTriggerClass, 'min-w-24')}
         />
         <RegionSelectModal
@@ -92,7 +94,7 @@ export const MeetingFilterBar = ({
         />
         {
           <DropdownMenu>
-            <DropdownMenuTrigger className={cn(meetingFilterPillTriggerClass, 'min-w-24')}>
+            <DropdownMenuTrigger className={cn(meetingFilterPillTriggerClass, 'min-w-[45px]')}>
               <span>{checked ? checked : '정렬'}</span>
               <ChevronDown className="size-4 shrink-0" aria-hidden />
             </DropdownMenuTrigger>

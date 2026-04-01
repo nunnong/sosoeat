@@ -28,6 +28,7 @@ const MOCK_DATA: MeetingWithHost[] = [
     updatedAt: new Date('2026-03-01'),
     host: { id: 1, name: '김소소', image: '/icons/human-basic.svg' },
     isFavorited: false,
+    isCompleted: false,
   },
   {
     id: 2,
@@ -52,6 +53,7 @@ const MOCK_DATA: MeetingWithHost[] = [
     updatedAt: new Date('2026-03-01'),
     host: { id: 2, name: '이잇', image: '/icons/human-basic.svg' },
     isFavorited: false,
+    isCompleted: true,
   },
   {
     id: 3,
@@ -76,6 +78,7 @@ const MOCK_DATA: MeetingWithHost[] = [
     updatedAt: new Date('2026-03-01'),
     host: { id: 3, name: '박잇소', image: '/icons/human-basic.svg' },
     isFavorited: false,
+    isCompleted: false,
   },
   {
     id: 4,
@@ -100,6 +103,7 @@ const MOCK_DATA: MeetingWithHost[] = [
     updatedAt: new Date('2026-03-01'),
     host: { id: 4, name: '최소소', image: '/icons/human-basic.svg' },
     isFavorited: true,
+    isCompleted: true,
   },
   {
     id: 5,
@@ -124,6 +128,7 @@ const MOCK_DATA: MeetingWithHost[] = [
     updatedAt: new Date('2026-03-01'),
     host: { id: 5, name: '정잇', image: '/icons/human-basic.svg' },
     isFavorited: false,
+    isCompleted: false,
   },
   {
     id: 6,
@@ -148,6 +153,7 @@ const MOCK_DATA: MeetingWithHost[] = [
     updatedAt: new Date('2026-03-01'),
     host: { id: 6, name: '강소잇', image: '/icons/human-basic.svg' },
     isFavorited: false,
+    isCompleted: false,
   },
 ];
 

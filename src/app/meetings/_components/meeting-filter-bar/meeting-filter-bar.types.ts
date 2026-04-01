@@ -7,7 +7,7 @@ export interface MeetingFilterBarProps {
   className?: string;
   onTypeFilterChange?: (typeFilter: 'all' | 'groupEat' | 'groupBuy') => void;
   onFilterButtonClick?: (filterType: string) => void;
-  onDateChange?: (date: Date | null) => void;
+  onDateChange?: (params: { valueStart: Date | null; valueEnd: Date | null }) => void;
   onRegionChange?: (region: RegionSelection) => void;
   onSortChange?: (
     sortBy: 'participantCount' | 'dateTime' | 'registrationEnd',
@@ -16,5 +16,6 @@ export interface MeetingFilterBarProps {
   sort: 'participantCount' | 'dateTime' | 'registrationEnd';
   regionCommitted: RegionSelection;
   typeFilter: 'all' | 'groupEat' | 'groupBuy';
-  date: Date | null;
+  dateStart: Date | null;
+  dateEnd: Date | null;
 }

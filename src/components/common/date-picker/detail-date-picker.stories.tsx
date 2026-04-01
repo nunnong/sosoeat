@@ -14,24 +14,46 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   render: function Template(args) {
-    const [value, setValue] = useState<Date | null>(null);
-    return <DetailDatePicker {...args} value={value} onChange={setValue} />;
+    const [valueStart, setValueStart] = useState<Date | null>(null);
+    const [valueEnd, setValueEnd] = useState<Date | null>(null);
+    return (
+      <DetailDatePicker
+        {...args}
+        valueStart={valueStart}
+        valueEnd={valueEnd}
+        onStartDateChange={setValueStart}
+        onEndDateChange={setValueEnd}
+      />
+    );
   },
   args: {
     variant: 'groupBuy',
-    value: null,
-    onChange: () => {},
+    valueStart: null,
+    valueEnd: null,
+    onStartDateChange: () => {},
+    onEndDateChange: () => {},
   },
 };
 
 export const GroupEat: Story = {
   render: function Template(args) {
-    const [value, setValue] = useState<Date | null>(null);
-    return <DetailDatePicker {...args} value={value} onChange={setValue} />;
+    const [valueStart, setValueStart] = useState<Date | null>(null);
+    const [valueEnd, setValueEnd] = useState<Date | null>(null);
+    return (
+      <DetailDatePicker
+        {...args}
+        valueStart={valueStart}
+        valueEnd={valueEnd}
+        onStartDateChange={setValueStart}
+        onEndDateChange={setValueEnd}
+      />
+    );
   },
   args: {
     variant: 'groupEat',
-    value: null,
-    onChange: () => {},
+    valueStart: null,
+    valueEnd: null,
+    onStartDateChange: () => {},
+    onEndDateChange: () => {},
   },
 };
