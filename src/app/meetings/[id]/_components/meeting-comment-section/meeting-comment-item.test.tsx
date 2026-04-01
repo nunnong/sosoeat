@@ -9,6 +9,11 @@ jest.mock('@/services/comments', () => ({
   useLikeComment: jest.fn(() => ({ mutate: jest.fn() })),
   useUpdateComment: jest.fn(() => ({ mutate: jest.fn() })),
   useDeleteComment: jest.fn(() => ({ mutate: jest.fn() })),
+  useCreateComment: jest.fn(() => ({ mutate: jest.fn() })),
+}));
+
+jest.mock('./format-date', () => ({
+  formatCommentDate: jest.fn((date: string) => date),
 }));
 
 const mockComment: MeetingComment = {
@@ -103,7 +108,7 @@ describe('MeetingCommentItem', () => {
       expect(screen.getByText('삭제된 댓글입니다.')).toBeInTheDocument();
     });
 
-    it('isDeleted가 true이면 좋아요/수정/삭제 버튼이 표시되지 않는다', () => {
+    it('isDeleted가 true이면 좋아요/답글 버튼이 표시되지 않는다', () => {
       render(
         <MeetingCommentItem
           comment={{ ...mockComment, isDeleted: true, isMine: true }}
@@ -112,7 +117,27 @@ describe('MeetingCommentItem', () => {
         { wrapper: createWrapper() }
       );
 
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: '좋아요' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: '답글' })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('좋아요', () => {
+    it('좋아요 버튼 클릭 시 useLikeComment mutate가 호출된다', async () => {
+      const mockMutate = jest.fn();
+      const commentsModule = jest.mocked(
+        jest.requireMock('@/services/comments') as { useLikeComment: jest.Mock }
+      );
+      commentsModule.useLikeComment.mockReturnValue({ mutate: mockMutate });
+
+      const user = userEvent.setup();
+      render(<MeetingCommentItem comment={mockComment} meetingId={1} />, {
+        wrapper: createWrapper(),
+      });
+
+      await user.click(screen.getByRole('button', { name: '좋아요' }));
+
+      expect(mockMutate).toHaveBeenCalledWith({ commentId: 1, isLiked: false });
     });
   });
 
@@ -139,6 +164,23 @@ describe('MeetingCommentItem', () => {
       });
 
       expect(screen.getByText('이소소')).toBeInTheDocument();
+    });
+
+    it('isReply가 false이면 답글 버튼이 표시된다', () => {
+      render(<MeetingCommentItem comment={mockComment} meetingId={1} />, {
+        wrapper: createWrapper(),
+      });
+
+      expect(screen.getByRole('button', { name: '답글' })).toBeInTheDocument();
+    });
+
+    it('isReply가 true이면 답글 버튼이 표시되지 않는다', () => {
+      render(
+        <MeetingCommentItem comment={{ ...mockComment, parentId: 1 }} isReply meetingId={1} />,
+        { wrapper: createWrapper() }
+      );
+
+      expect(screen.queryByRole('button', { name: '답글' })).not.toBeInTheDocument();
     });
   });
 });

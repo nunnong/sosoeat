@@ -2,38 +2,83 @@
 
 import { useState } from 'react';
 
-import { Heart, UserRound } from 'lucide-react';
+import { Heart, MessageCircle, UserRound } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useModal } from '@/hooks/use-modal';
 import { cn } from '@/lib/utils';
+import {
+  useCreateComment,
+  useDeleteComment,
+  useLikeComment,
+  useUpdateComment,
+} from '@/services/comments';
 
 import { EllipsisMenu } from '../meeting-detail-card/_components/ellipsis-menu';
 
+import { CommentDeleteModal } from './comment-delete-modal';
+import { formatCommentDate } from './format-date';
 import type { MeetingComment } from './meeting-comment-section.types';
 
 interface MeetingCommentItemProps {
   comment: MeetingComment;
   isReply?: boolean;
+  meetingId: number;
 }
 
-// ─── MeetingCommentItem ───────────────────────────────────────
-
-export function MeetingCommentItem({ comment, isReply = false }: MeetingCommentItemProps) {
+export function MeetingCommentItem({
+  comment,
+  isReply = false,
+  meetingId,
+}: MeetingCommentItemProps) {
   const {
-    id: _id, // TODO: 좋아요/수정/삭제 mutation에서 사용 예정
+    id,
     author,
     content,
     isDeleted,
     createdAt,
     likeCount,
-    isLiked: initialIsLiked,
+    isLiked,
     isHostComment,
     isMine,
     replies,
   } = comment;
 
-  // TODO: API 연동 시 useState 제거하고 useQuery 데이터의 isLiked 직접 사용
-  const [isLiked, setIsLiked] = useState(initialIsLiked);
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const { isOpen: isDeleteModalOpen, open: openDeleteModal, close: closeDeleteModal } = useModal();
+
+  const { mutate: likeComment } = useLikeComment(meetingId);
+  const { mutate: updateComment } = useUpdateComment(meetingId);
+  const { mutate: deleteComment } = useDeleteComment(meetingId);
+  const { mutate: createComment } = useCreateComment(meetingId);
+
+  const handleLike = () => {
+    likeComment({ commentId: id, isLiked });
+  };
+
+  const handleEdit = (content: string) => {
+    updateComment({ commentId: id, payload: { content } });
+  };
+
+  const handleDelete = () => {
+    deleteComment(id, {
+      onSuccess: closeDeleteModal,
+    });
+  };
+
+  const handleReplySubmit = () => {
+    if (!replyText.trim()) return;
+    createComment(
+      { content: replyText, parentId: id },
+      {
+        onSuccess: () => {
+          setReplyText('');
+          setIsReplying(false);
+        },
+      }
+    );
+  };
 
   return (
     <div>
@@ -47,7 +92,7 @@ export function MeetingCommentItem({ comment, isReply = false }: MeetingCommentI
             </AvatarFallback>
           </Avatar>
 
-          {/* ── 오른쪽 영역: 이름 + 날짜 / 본문 / 하단 액션 ── */}
+          {/* ── 오른쪽 영역 ── */}
           <div className="flex flex-1 flex-col">
             {/* 이름 + 날짜 + 더보기 */}
             <div className="flex items-center justify-between">
@@ -58,12 +103,11 @@ export function MeetingCommentItem({ comment, isReply = false }: MeetingCommentI
                 )}
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-sosoeat-gray-600 text-xs">{createdAt}</span>
+                <span className="text-sosoeat-gray-600 text-xs">
+                  {formatCommentDate(createdAt)}
+                </span>
                 {isMine && !isDeleted && (
-                  <EllipsisMenu
-                    onEdit={() => {}} // TODO: useEditCommentMutation
-                    onDelete={() => {}} // TODO: useDeleteCommentMutation
-                  />
+                  <EllipsisMenu onEdit={() => handleEdit(content)} onDelete={openDeleteModal} />
                 )}
               </div>
             </div>
@@ -78,17 +122,59 @@ export function MeetingCommentItem({ comment, isReply = false }: MeetingCommentI
               {isDeleted ? '삭제된 댓글입니다.' : content}
             </p>
 
-            {/* 좋아요 */}
+            {/* 좋아요 + 답글 버튼 */}
             {!isDeleted && (
               <div className="mt-2 flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsLiked((prev) => !prev)} // TODO: useLikeCommentMutation으로 교체
-                  className="text-sosoeat-orange-600 flex items-center gap-1 text-sm transition-colors"
+                  aria-label="좋아요"
+                  onClick={handleLike}
+                  className="text-sosoeat-orange-600 flex cursor-pointer items-center gap-1 text-sm transition-colors"
                 >
                   <Heart className={cn('size-4', isLiked && 'fill-sosoeat-orange-600')} />
                   <span>{likeCount}</span>
                 </button>
+
+                {!isReply && (
+                  <button
+                    type="button"
+                    aria-label="답글"
+                    onClick={() => setIsReplying((prev) => !prev)}
+                    className="text-sosoeat-gray-500 hover:text-sosoeat-orange-600 flex cursor-pointer items-center gap-1 text-sm transition-colors"
+                  >
+                    <MessageCircle className="size-4" />
+                    <span>답글</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* 대댓글 입력창 */}
+            {isReplying && (
+              <div className="mt-2 flex gap-2">
+                <textarea
+                  className="flex-1 resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                  rows={1}
+                  placeholder="답글을 입력하세요."
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                />
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsReplying(false)}
+                    className="cursor-pointer rounded-lg px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleReplySubmit}
+                    className="bg-sosoeat-orange-600 cursor-pointer rounded-lg px-3 py-1 text-sm text-white"
+                  >
+                    저장
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -99,10 +185,17 @@ export function MeetingCommentItem({ comment, isReply = false }: MeetingCommentI
       {replies && replies.length > 0 && (
         <div className="mt-3 ml-[78px] space-y-3">
           {replies.map((reply) => (
-            <MeetingCommentItem key={reply.id} comment={reply} isReply />
+            <MeetingCommentItem key={reply.id} comment={reply} isReply meetingId={meetingId} />
           ))}
         </div>
       )}
+
+      {/* ── 삭제 확인 모달 ── */}
+      <CommentDeleteModal
+        open={isDeleteModalOpen}
+        onCancel={closeDeleteModal}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

@@ -1,7 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { Comment, commentApi, CreateCommentRequest, UpdateCommentRequest } from './comment.api';
+import {
+  Comment,
+  commentApi,
+  CreateCommentRequest,
+  SyncMeetingRequest,
+  UpdateCommentRequest,
+} from './comment.api';
 
 export const commentKeys = {
   all: ['comments'] as const,
@@ -9,24 +15,15 @@ export const commentKeys = {
   count: (meetingId: number) => ['comments', meetingId, 'count'] as const,
 };
 
-/**
- * [Hook] useComments
- * 모임의 댓글 목록을 조회합니다.
- * 서버 컴포넌트에서 fetch한 initialData를 주입받을 수 있습니다.
- */
 export const useComments = (meetingId: number, initialData?: Comment[]) => {
   return useQuery({
     queryKey: commentKeys.list(meetingId),
     queryFn: () => commentApi.getComments(meetingId),
     initialData,
+    retry: false,
   });
 };
 
-/**
- * [Hook] useCreateComment
- * 댓글/대댓글을 작성합니다.
- * 성공 시 댓글 목록을 다시 불러옵니다.
- */
 export const useCreateComment = (meetingId: number) => {
   const queryClient = useQueryClient();
 
@@ -34,6 +31,7 @@ export const useCreateComment = (meetingId: number) => {
     mutationFn: (payload: CreateCommentRequest) => commentApi.createComment(meetingId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: commentKeys.list(meetingId) });
+      queryClient.invalidateQueries({ queryKey: commentKeys.count(meetingId) });
     },
     onError: (error: Error) => {
       toast.error(error.message || '댓글 작성 중 오류가 발생했습니다.');
@@ -41,11 +39,6 @@ export const useCreateComment = (meetingId: number) => {
   });
 };
 
-/**
- * [Hook] useUpdateComment
- * 댓글을 수정합니다.
- * 성공 시 댓글 목록을 다시 불러옵니다.
- */
 export const useUpdateComment = (meetingId: number) => {
   const queryClient = useQueryClient();
 
@@ -62,11 +55,6 @@ export const useUpdateComment = (meetingId: number) => {
   });
 };
 
-/**
- * [Hook] useDeleteComment
- * 댓글을 삭제합니다.
- * 성공 시 댓글 목록을 다시 불러옵니다.
- */
 export const useDeleteComment = (meetingId: number) => {
   const queryClient = useQueryClient();
 
@@ -74,6 +62,7 @@ export const useDeleteComment = (meetingId: number) => {
     mutationFn: (commentId: number) => commentApi.deleteComment(commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: commentKeys.list(meetingId) });
+      queryClient.invalidateQueries({ queryKey: commentKeys.count(meetingId) });
       toast.success('댓글이 삭제되었습니다.');
     },
     onError: (error: Error) => {
@@ -82,23 +71,64 @@ export const useDeleteComment = (meetingId: number) => {
   });
 };
 
-/**
- * [Hook] useLikeComment
- * 댓글 좋아요/취소를 처리합니다.
- * isLiked가 true면 취소, false면 좋아요
- * 성공 시 댓글 목록을 다시 불러옵니다.
- */
 export const useLikeComment = (meetingId: number) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ commentId, isLiked }: { commentId: number; isLiked: boolean }) =>
       isLiked ? commentApi.unlikeComment(commentId) : commentApi.likeComment(commentId),
-    onSuccess: () => {
+
+    onMutate: async ({ commentId, isLiked }) => {
+      await queryClient.cancelQueries({ queryKey: commentKeys.list(meetingId) });
+      const previousComments = queryClient.getQueryData(commentKeys.list(meetingId));
+
+      queryClient.setQueryData(commentKeys.list(meetingId), (old: Comment[] | undefined) => {
+        if (!old) return old;
+        return old.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              isLiked: !isLiked,
+              likeCount: isLiked ? comment.likeCount - 1 : comment.likeCount + 1,
+            };
+          }
+          return {
+            ...comment,
+            replies: comment.replies?.map((reply) =>
+              reply.id === commentId
+                ? {
+                    ...reply,
+                    isLiked: !isLiked,
+                    likeCount: isLiked ? reply.likeCount - 1 : reply.likeCount + 1,
+                  }
+                : reply
+            ),
+          };
+        });
+      });
+
+      return { previousComments };
+    },
+
+    onError: (_, __, context) => {
+      if (context?.previousComments) {
+        queryClient.setQueryData(commentKeys.list(meetingId), context.previousComments);
+      }
+      toast.error('좋아요 처리 중 오류가 발생했습니다.');
+    },
+
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: commentKeys.list(meetingId) });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || '좋아요 처리 중 오류가 발생했습니다.');
+  });
+};
+
+export const useSyncCreateMeeting = () => {
+  return useMutation({
+    mutationFn: (payload: SyncMeetingRequest) => commentApi.syncCreateMeeting(payload),
+    retry: 3,
+    onError: () => {
+      console.error('[syncCreateMeeting] 동기화 실패');
     },
   });
 };

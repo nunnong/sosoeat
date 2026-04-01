@@ -12,5 +12,6 @@ export {
   useCreateComment,
   useDeleteComment,
   useLikeComment,
+  useSyncCreateMeeting,
   useUpdateComment,
 } from './comment.queries';

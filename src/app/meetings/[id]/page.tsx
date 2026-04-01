@@ -129,7 +129,15 @@ export default async function MeetingDetailPage({ params }: Props) {
   try {
     const res = await commentServer.get(`/meetings/${meetingId}/comments`);
     if (res.ok) {
-      initialComments = await res.json();
+      const data = await res.json();
+      // SSR에서는 isMine을 false로 설정 (Hydration mismatch 방지)
+      // isMine은 클라이언트에서 React Query 리페치 시 올바르게 설정됨
+      console.log('첫 댓글 isLiked:', data[0]?.isLiked); // 추가
+      initialComments = data.map((comment: MeetingComment) => ({
+        ...comment,
+        isMine: false,
+        replies: comment.replies?.map((reply: MeetingComment) => ({ ...reply, isMine: false })),
+      }));
     }
   } catch {
     // 댓글 fetch 실패해도 페이지는 정상 렌더링

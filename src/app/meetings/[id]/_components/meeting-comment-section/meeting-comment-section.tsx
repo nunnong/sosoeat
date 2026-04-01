@@ -10,7 +10,6 @@ import type { Comment } from '@/services/comments';
 import { useComments, useCreateComment } from '@/services/comments';
 import { useAuthStore } from '@/store/auth-store';
 
-import { buildCommentTree } from './comment-tree';
 import { MeetingCommentItem } from './meeting-comment-item';
 import type { MeetingCommentSectionProps } from './meeting-comment-section.types';
 
@@ -21,10 +20,8 @@ export function MeetingCommentSection({
 }: MeetingCommentSectionProps) {
   const [text, setText] = useState('');
   const { isAuthenticated, user } = useAuthStore();
-  const { data: flatComments } = useComments(meetingId, initialComments as Comment[]);
+  const { data: comments } = useComments(meetingId, initialComments as Comment[]);
   const { mutate: createComment } = useCreateComment(meetingId);
-
-  const comments = buildCommentTree(flatComments ?? []);
 
   const handleSubmit = () => {
     if (!text.trim()) return;
@@ -36,7 +33,7 @@ export function MeetingCommentSection({
     <section className={cn('flex flex-col gap-4', className)}>
       {/* 댓글 목록 */}
       <div className="space-y-2">
-        {comments.map((comment) => (
+        {(comments ?? []).map((comment) => (
           <MeetingCommentItem key={comment.id} comment={comment} meetingId={meetingId} />
         ))}
       </div>
