@@ -1,5 +1,4 @@
 'use client';
-
 import { MainPageCard } from '@/components/common/main-page-card';
 import { MeetingCreateModal } from '@/components/common/meeting-create-modal';
 import { useModal } from '@/hooks/use-modal';
@@ -28,13 +27,15 @@ export default function MeetingsPage() {
   const {
     regionCommitted,
     handleRegionChange,
-    date,
-    handleDateChange,
+    dateStart,
+    dateEnd,
     meetingData,
+    handleDateChange,
     handleTypeFilterChange,
     typeFilter,
     handleSortChange,
-    sort,
+    sortBy,
+    sortOrder,
   } = useMeetingPage();
 
   //sort는 dateTime, registrationEnd, participantCount를 가짐
