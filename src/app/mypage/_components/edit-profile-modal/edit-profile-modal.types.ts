@@ -1,8 +1,6 @@
 import type { ChangeEvent } from 'react';
 
 export interface EditProfileModalProps {
-  isOpen?: boolean;
-  onClose?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   initialName?: string;
