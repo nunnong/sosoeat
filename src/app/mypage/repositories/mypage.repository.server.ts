@@ -20,3 +20,10 @@ export const fetchFavoriteCountServer = async (): Promise<number> => {
   const data: FavoriteCount = await res.json();
   return data.count;
 };
+
+export const fetchPostCountServer = async (userId: number): Promise<number> => {
+  const res = await apiServer.get(`/articles?authorId=${userId}`, { cache: 'no-store' });
+  if (!res.ok) return 0;
+  const data = await res.json();
+  return data.totalCount ?? 0;
+};

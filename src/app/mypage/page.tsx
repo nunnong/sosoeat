@@ -9,13 +9,15 @@ import {
   fetchFavoriteCountServer,
   fetchMeetingCountServer,
   fetchMeServer,
+  fetchPostCountServer,
 } from './repositories/mypage.repository.server';
 
 export default async function MyPage() {
-  const [user, meetingCount, favoriteCount] = await Promise.all([
-    fetchMeServer(),
+  const user = await fetchMeServer();
+  const [meetingCount, favoriteCount, postCount] = await Promise.all([
     fetchMeetingCountServer(),
     fetchFavoriteCountServer(),
+    user ? fetchPostCountServer(user.id) : Promise.resolve(0),
   ]);
 
   return (
@@ -33,7 +35,7 @@ export default async function MyPage() {
       <div className="flex flex-row justify-center gap-5 md:p-5">
         <CountCard variant="meeting" count={meetingCount} />
         <CountCard variant="favorite" count={favoriteCount} />
-        <CountCard variant="post" count={5} />
+        <CountCard variant="post" count={postCount} />
       </div>
 
       <Suspense>
