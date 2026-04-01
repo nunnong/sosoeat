@@ -45,33 +45,35 @@ export default function MeetingsPage() {
   //근데 vlaue===sort value === options 즉 sort === options임
   //sortBy는 dateTime, registrationEnd, participantCount
   return (
-    <div className="mx-auto flex max-w-[1140px] flex-col items-center justify-center gap-4 sm:px-4">
-      <MeetingSearchBanner />
-      <div className="flex flex-col gap-4 px-4 sm:px-0">
-        <MeetingFilterBar
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          regionCommitted={regionCommitted}
-          dateStart={dateStart}
-          dateEnd={dateEnd}
-          typeFilter={typeFilter}
-          onTypeFilterChange={handleTypeFilterChange}
-          onDateChange={handleDateChange}
-          onRegionChange={handleRegionChange}
-          onSortChange={handleSortChange}
-        />
-        {!meetingData || meetingData.length === 0 ? (
-          <EmptyPage />
-        ) : (
-          <div className="grid grid-cols-1 justify-center gap-1 md:grid-cols-2 md:gap-[20px] lg:grid-cols-3 lg:gap-[27px]">
-            {meetingData.map((meeting) => (
-              <MainPageCard key={meeting.id} meeting={meeting} />
-            ))}
-          </div>
-        )}
-        <MeetingMakeButton onClick={open} />
+    <div className="bg-sosoeat-gray-100">
+      <div className="mx-auto flex max-w-[1140px] flex-col items-center justify-center gap-4 sm:px-4">
+        <MeetingSearchBanner />
+        <div className="flex flex-col gap-4 px-4 sm:px-0">
+          <MeetingFilterBar
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            regionCommitted={regionCommitted}
+            dateStart={dateStart}
+            dateEnd={dateEnd}
+            typeFilter={typeFilter}
+            onTypeFilterChange={handleTypeFilterChange}
+            onDateChange={handleDateChange}
+            onRegionChange={handleRegionChange}
+            onSortChange={handleSortChange}
+          />
+          {!meetingData || meetingData.length === 0 ? (
+            <EmptyPage />
+          ) : (
+            <div className="grid grid-cols-1 justify-center gap-1 md:grid-cols-2 md:gap-[20px] lg:grid-cols-3 lg:gap-[27px]">
+              {meetingData.map((meeting) => (
+                <MainPageCard key={meeting.id} meeting={meeting} />
+              ))}
+            </div>
+          )}
+          <MeetingMakeButton onClick={handleOpenCreateModal} />
+        </div>
+        <MeetingCreateModal open={isOpen} onClose={close} onSubmit={createMeeting} />
       </div>
-      <MeetingCreateModal open={isOpen} onClose={close} onSubmit={createMeeting} />
     </div>
   );
 }
