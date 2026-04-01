@@ -3,16 +3,26 @@ import { MainPageCard } from '@/components/common/main-page-card';
 import { MeetingCreateModal } from '@/components/common/meeting-create-modal';
 import { useModal } from '@/hooks/use-modal';
 import { useCreateMeeting } from '@/services/meetings';
+import { useAuthStore } from '@/store/auth-store';
 
 import { EmptyPage } from './_components/empty-page';
 import { MeetingFilterBar } from './_components/meeting-filter-bar';
-import { MeetingMakeButton } from './_components/meeting-make-button.tsx';
+import { MeetingMakeButton } from './_components/meeting-make-button';
 import { MeetingSearchBanner } from './_components/meeting-search-banner';
 import useMeetingPage from './usehooks/use-meeting-page';
 
 export default function MeetingsPage() {
   const { isOpen, open, close } = useModal();
   const { mutateAsync: createMeeting } = useCreateMeeting();
+  const { isAuthenticated, setLoginRequired } = useAuthStore();
+
+  const handleOpenCreateModal = () => {
+    if (!isAuthenticated) {
+      setLoginRequired(true);
+      return;
+    }
+    open();
+  };
 
   const {
     regionCommitted,
