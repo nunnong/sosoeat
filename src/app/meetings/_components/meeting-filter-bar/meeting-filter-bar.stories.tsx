@@ -23,14 +23,16 @@ export const Default: Story = {
     dateStart: null,
     regionCommitted: null,
     typeFilter: 'all',
-    sort: 'participantCount',
+    sortBy: 'participantCount',
+    sortOrder: 'desc',
   },
   render: function MeetingFilterBarStory() {
     const [dateStart, setDateStart] = useState<Date | null>(null);
     const [dateEnd, setDateEnd] = useState<Date | null>(null);
     const [regionCommitted, setRegionCommitted] = useState<RegionSelection>(null);
     const [typeFilter, setTypeFilter] = useState<'all' | 'groupEat' | 'groupBuy'>('all');
-    const [sort, setSort] = useState<MeetingFilterBarProps['sort']>('participantCount');
+    const [sortBy, setSortBy] = useState<MeetingFilterBarProps['sortBy']>('participantCount');
+    const [sortOrder, setSortOrder] = useState<MeetingFilterBarProps['sortOrder']>('desc');
 
     return (
       <div className="w-full max-w-6xl">
@@ -45,9 +47,11 @@ export const Default: Story = {
           onRegionChange={setRegionCommitted}
           typeFilter={typeFilter}
           onTypeFilterChange={setTypeFilter}
-          sort={sort}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
           onSortChange={(sortBy, sortOrder) => {
-            setSort(sortBy);
+            setSortBy(sortBy);
+            setSortOrder(sortOrder);
           }}
         />
       </div>

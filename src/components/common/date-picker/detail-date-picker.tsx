@@ -85,7 +85,7 @@ export function DetailDatePicker({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger type="button" className={cn(DETAIL_DATE_PICKER_TRIGGER_CLASS, className)}>
         <span className={DETAIL_DATE_PICKER_TRIGGER_CONTENT_CLASS}>
-          <Image src={'icons/deadline-calendar.svg'} alt="Calendar" width={20} height={20} />
+          <Image src={'/icons/deadline-calendar.svg'} alt="Calendar" width={20} height={20} />
           {triggerLabel}
           <ChevronDown className="size-4 shrink-0" aria-hidden />
         </span>

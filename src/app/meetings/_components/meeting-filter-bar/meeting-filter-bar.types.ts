@@ -13,7 +13,8 @@ export interface MeetingFilterBarProps {
     sortBy: 'participantCount' | 'dateTime' | 'registrationEnd',
     sortOrder: 'asc' | 'desc'
   ) => void;
-  sort: 'participantCount' | 'dateTime' | 'registrationEnd';
+  sortBy: 'participantCount' | 'dateTime' | 'registrationEnd';
+  sortOrder: 'asc' | 'desc';
   regionCommitted: RegionSelection;
   typeFilter: 'all' | 'groupEat' | 'groupBuy';
   dateStart: Date | null;

@@ -30,18 +30,42 @@ export const MeetingFilterBar = ({
   dateEnd,
   className,
   typeFilter,
-  sort: _sort,
+  sortOrder: _sortOrder,
+  sortBy: _sortBy,
   onSortChange = () => {},
   onDateChange = () => {},
   onRegionChange = () => {},
 }: MeetingFilterBarProps) => {
-  const [selectedSortLabel, setSelectedSortLabel] = useState<string | null>(null);
+  // const [selectedSortLabel, setSelectedSortLabel] = useState<string | null>(null);
+  // const DEFAULT_SORT = { sortBy: 'participantCount', sortOrder: 'desc' } as const;
+
+  // const handleSortItemChecked = (option: SortOption) => {
+  //   const isSelected = selectedSortLabel === option.label;
+  //   if (isSelected) {
+  //     setSelectedSortLabel(null);
+  //     onSortChange(DEFAULT_SORT.sortBy, DEFAULT_SORT.sortOrder);
+  //     return;
+  //   }
+  //   setSelectedSortLabel(option.label);
+  //   onSortChange(option.sortBy, option.sortOrder);
+  // };
+  const [selectedSortLabel, setSelectedSortLabel] = useState<string | null>(() => {
+    const selectedOption = options.find(
+      (option) => option.sortBy === _sortBy && option.sortOrder === _sortOrder
+    );
+    return selectedOption ? selectedOption.label : null;
+  });
 
   const handleSortItemChecked = (option: SortOption) => {
-    setSelectedSortLabel((prev) => (prev === option.label ? null : option.label));
+    const isSelected = selectedSortLabel === option.label;
+    if (isSelected) {
+      setSelectedSortLabel(null);
+      onSortChange('participantCount', 'desc');
+      return;
+    }
+    setSelectedSortLabel(option.label);
     onSortChange(option.sortBy, option.sortOrder);
   };
-
   return (
     <div
       className={cn(
@@ -113,16 +137,15 @@ export const MeetingFilterBar = ({
               )}
             >
               {options.map((option) => {
-                const isSelected = selectedSortLabel === option.label;
                 return (
                   <DropdownMenuCheckboxItem
                     key={option.label}
-                    checked={isSelected}
+                    checked={selectedSortLabel === option.label}
                     onCheckedChange={() => handleSortItemChecked(option)}
                     className={cn(
                       'relative flex h-10 min-h-10 w-full flex-none cursor-pointer items-center gap-[6px] rounded-none border-0 py-0 pr-3 pl-[11px] text-sm leading-5 font-medium text-[#333333] outline-none select-none',
                       'focus:text-[#333333] data-[highlighted]:text-[#333333]',
-                      isSelected
+                      selectedSortLabel === option.label
                         ? 'bg-[#E8F3FF] focus:bg-[#E8F3FF] data-[highlighted]:bg-[#E8F3FF]'
                         : 'bg-white focus:bg-white data-[highlighted]:bg-white',
                       '[&_[data-slot=dropdown-menu-checkbox-item-indicator]]:hidden'
@@ -131,7 +154,7 @@ export const MeetingFilterBar = ({
                     <span
                       className={cn(
                         'size-[6px] shrink-0 rounded-full',
-                        isSelected ? 'bg-[#3182F6]' : 'bg-[#D9D9D9]'
+                        selectedSortLabel === option.label ? 'bg-[#3182F6]' : 'bg-[#D9D9D9]'
                       )}
                       aria-hidden
                     />

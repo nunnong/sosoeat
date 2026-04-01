@@ -13,9 +13,6 @@ type DateChangeParams = {
   valueEnd: Date | null;
 };
 
-const toExclusiveDateEnd = (date: Date) =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-
 const useMeetingPage = () => {
   const [regionCommitted, setRegionCommitted] = useState<RegionSelection>(null);
   const [dateStart, setDateStart] = useState<Date | null>(null);
@@ -23,10 +20,9 @@ const useMeetingPage = () => {
   const [meetingData, setMeetingData] = useState<MeetingWithHost[]>([]);
   const [typeFilter, setTypeFilter] = useState<'all' | 'groupEat' | 'groupBuy'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [sort, setSort] = useState<MeetingFilterBarProps['sort']>('participantCount');
+  const [sortBy, setSortBy] = useState<MeetingFilterBarProps['sortBy']>('participantCount');
 
-  const options: TeamIdMeetingsGetRequest = {
-    teamId: 'sosoeattest',
+  const options: Omit<TeamIdMeetingsGetRequest, 'teamId'> = {
     size: 10,
     //type unfind이면 전체 보냄
     type: typeFilter === 'all' ? undefined : typeFilter,
@@ -35,9 +31,12 @@ const useMeetingPage = () => {
         ? undefined
         : regionCommitted.district + ' ' + regionCommitted.province,
     dateStart: dateStart == null ? undefined : dateStart,
-    dateEnd: dateEnd == null ? undefined : toExclusiveDateEnd(dateEnd),
-    sortBy: sort === 'participantCount' ? undefined : sort,
-    sortOrder: sortOrder,
+    dateEnd:
+      dateEnd == null
+        ? undefined
+        : new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate() + 1),
+    sortBy: sortBy ? undefined : sortBy,
+    sortOrder: sortOrder ? undefined : sortOrder,
   };
 
   const handleTypeFilterChange = (value: 'all' | 'groupEat' | 'groupBuy') => {
@@ -69,7 +68,7 @@ const useMeetingPage = () => {
     sortBy: 'participantCount' | 'dateTime' | 'registrationEnd',
     sortOrder: 'asc' | 'desc'
   ) => {
-    setSort(sortBy);
+    setSortBy(sortBy);
     setSortOrder(sortOrder);
   };
 
@@ -79,7 +78,7 @@ const useMeetingPage = () => {
       setMeetingData(data.data);
     };
     fetchData();
-  }, [regionCommitted, dateStart, dateEnd, typeFilter, sort, sortOrder]);
+  }, [regionCommitted, dateStart, dateEnd, typeFilter, sortBy, sortOrder]);
   return {
     meetingData,
     handleRegionChange,
@@ -90,7 +89,8 @@ const useMeetingPage = () => {
     handleTypeFilterChange,
     typeFilter,
     handleSortChange,
-    sort,
+    sortBy,
+    sortOrder,
   };
 };
 
