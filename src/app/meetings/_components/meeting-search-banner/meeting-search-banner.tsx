@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import type { MeetingSearchBannerProps } from './meeting-search-banner.type';
 
 const bannerShellClass =
-  'relative mt-11 h-48 w-full overflow-hidden rounded-xl sm:mt-16 sm:h-56 md:mt-[94px] md:h-[244px] md:max-w-[1140px] md:rounded-2xl';
+  'relative h-48 w-full overflow-hidden rounded-xlsm:h-56 md:h-[244px] md:max-w-[1140px] md:rounded-2xl';
 
 const headlineClass =
   'font-pretendard-local text-3xl leading-[1.2] font-extrabold tracking-[-0.03em] text-white sm:text-4xl md:text-[46px] md:leading-[55px] md:tracking-[-1.38px]';
