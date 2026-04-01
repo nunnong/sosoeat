@@ -6,6 +6,7 @@ import { useModal } from '@/hooks/use-modal';
 import { useCreateMeeting } from '@/services/meetings';
 import { useAuthStore } from '@/store/auth-store';
 
+import { EmptyPage } from './_components/empty-page';
 import { MeetingFilterBar } from './_components/meeting-filter-bar';
 import { MeetingMakeButton } from './_components/meeting-make-button';
 import { MeetingSearchBanner } from './_components/meeting-search-banner';
@@ -58,24 +59,28 @@ export default function MeetingsPage() {
             <p>가고 싶었던 맛집, 혼자 가기 아쉬웠죠? 모여요에서 같이 먹을 사람을 찾아보세요.</p>
           }
         />
-        <div className="flex flex-col gap-4 px-4 sm:px-0">
-          <MeetingFilterBar
-            regionCommitted={regionCommitted}
-            date={date}
-            typeFilter={typeFilter}
-            onTypeFilterChange={handleTypeFilterChange}
-            onDateChange={handleDateChange}
-            onRegionChange={handleRegionChange}
-            onSortChange={handleSortChange}
-            sort={sort}
-          />
-          <div className="grid grid-cols-1 justify-center gap-1 md:grid-cols-2 md:gap-[20px] lg:grid-cols-3 lg:gap-[27px]">
-            {meetingData.map((meeting) => (
-              <MainPageCard key={meeting.id} meeting={meeting} />
-            ))}
+        {!meetingData || meetingData.length === 0 ? (
+          <EmptyPage />
+        ) : (
+          <div className="flex flex-col gap-4 px-4 sm:px-0">
+            <MeetingFilterBar
+              regionCommitted={regionCommitted}
+              date={date}
+              typeFilter={typeFilter}
+              onTypeFilterChange={handleTypeFilterChange}
+              onDateChange={handleDateChange}
+              onRegionChange={handleRegionChange}
+              onSortChange={handleSortChange}
+              sort={sort}
+            />
+            <div className="grid grid-cols-1 justify-center gap-1 md:grid-cols-2 md:gap-[20px] lg:grid-cols-3 lg:gap-[27px]">
+              {meetingData.map((meeting) => (
+                <MainPageCard key={meeting.id} meeting={meeting} />
+              ))}
+            </div>
           </div>
-          <MeetingMakeButton onClick={handleOpenCreateModal} />
-        </div>
+        )}
+        <MeetingMakeButton onClick={handleOpenCreateModal} />
         <MeetingCreateModal open={isOpen} onClose={close} onSubmit={createMeeting} />
       </div>
     </div>
