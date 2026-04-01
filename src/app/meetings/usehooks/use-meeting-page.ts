@@ -13,9 +13,6 @@ type DateChangeParams = {
   valueEnd: Date | null;
 };
 
-const toExclusiveDateEnd = (date: Date) =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-
 const useMeetingPage = () => {
   const [regionCommitted, setRegionCommitted] = useState<RegionSelection>(null);
   const [dateStart, setDateStart] = useState<Date | null>(null);
@@ -35,7 +32,10 @@ const useMeetingPage = () => {
         ? undefined
         : regionCommitted.district + ' ' + regionCommitted.province,
     dateStart: dateStart == null ? undefined : dateStart,
-    dateEnd: dateEnd == null ? undefined : toExclusiveDateEnd(dateEnd),
+    dateEnd:
+      dateEnd == null
+        ? undefined
+        : new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate() + 1),
     sortBy: sort === 'participantCount' ? undefined : sort,
     sortOrder: sortOrder,
   };

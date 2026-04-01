@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { MainPageCard } from '@/components/common/main-page-card';
 import { MeetingCreateModal } from '@/components/common/meeting-create-modal';
 import { useModal } from '@/hooks/use-modal';
