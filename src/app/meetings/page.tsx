@@ -5,6 +5,7 @@ import { MeetingCreateModal } from '@/components/common/meeting-create-modal';
 import { useModal } from '@/hooks/use-modal';
 import { useCreateMeeting } from '@/services/meetings';
 
+import { EmptyPage } from './_components/empty-page';
 import { MeetingFilterBar } from './_components/meeting-filter-bar';
 import { MeetingMakeButton } from './_components/meeting-make-button.tsx';
 import { MeetingSearchBanner } from './_components/meeting-search-banner';
@@ -24,7 +25,8 @@ export default function MeetingsPage() {
     handleTypeFilterChange,
     typeFilter,
     handleSortChange,
-    sort,
+    sortBy,
+    sortOrder,
   } = useMeetingPage();
 
   //sort는 dateTime, registrationEnd, participantCount를 가짐
@@ -35,21 +37,11 @@ export default function MeetingsPage() {
   //sortBy는 dateTime, registrationEnd, participantCount
   return (
     <div className="mx-auto flex max-w-[1140px] flex-col justify-center gap-4 sm:px-4">
-      <MeetingSearchBanner
-        alt="모임 배너"
-        imageUrl="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&q=80"
-        titleContent={<span>함께하면</span>}
-        subtitleContent={
-          <>
-            <br />더 맛있어요
-          </>
-        }
-        subtitle={
-          <p>가고 싶었던 맛집, 혼자 가기 아쉬웠죠? 모여요에서 같이 먹을 사람을 찾아보세요.</p>
-        }
-      />
+      <MeetingSearchBanner />
       <div className="flex flex-col gap-4 px-4 sm:px-0">
         <MeetingFilterBar
+          sortBy={sortBy}
+          sortOrder={sortOrder}
           regionCommitted={regionCommitted}
           dateStart={dateStart}
           dateEnd={dateEnd}
@@ -58,13 +50,16 @@ export default function MeetingsPage() {
           onDateChange={handleDateChange}
           onRegionChange={handleRegionChange}
           onSortChange={handleSortChange}
-          sort={sort}
         />
-        <div className="grid grid-cols-1 justify-center gap-1 md:grid-cols-2 md:gap-[20px] lg:grid-cols-3 lg:gap-[27px]">
-          {meetingData.map((meeting) => (
-            <MainPageCard key={meeting.id} meeting={meeting} />
-          ))}
-        </div>
+        {!meetingData || meetingData.length === 0 ? (
+          <EmptyPage />
+        ) : (
+          <div className="grid grid-cols-1 justify-center gap-1 md:grid-cols-2 md:gap-[20px] lg:grid-cols-3 lg:gap-[27px]">
+            {meetingData.map((meeting) => (
+              <MainPageCard key={meeting.id} meeting={meeting} />
+            ))}
+          </div>
+        )}
         <MeetingMakeButton onClick={open} />
       </div>
       <MeetingCreateModal open={isOpen} onClose={close} onSubmit={createMeeting} />

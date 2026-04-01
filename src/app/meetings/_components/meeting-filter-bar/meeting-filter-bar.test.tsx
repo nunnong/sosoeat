@@ -6,13 +6,14 @@ import type { MeetingFilterBarProps } from './meeting-filter-bar.types';
 
 const defaultProps: Pick<
   MeetingFilterBarProps,
-  'dateStart' | 'dateEnd' | 'regionCommitted' | 'typeFilter' | 'sort'
+  'dateStart' | 'dateEnd' | 'regionCommitted' | 'typeFilter' | 'sortBy' | 'sortOrder'
 > = {
   dateStart: null,
   dateEnd: null,
   regionCommitted: null,
   typeFilter: 'all',
-  sort: 'participantCount',
+  sortBy: 'participantCount',
+  sortOrder: 'desc',
 };
 
 describe('MeetingFilterBar', () => {
