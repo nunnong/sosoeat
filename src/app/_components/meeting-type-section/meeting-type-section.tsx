@@ -8,7 +8,10 @@ export function MeetingTypeSection() {
       <h2 className="mb-3 text-lg font-bold md:text-xl lg:text-2xl">어떤 모임을 원하세요?</h2>
       <div className="flex gap-3 md:gap-6 lg:gap-9">
         {/* 함께먹기 */}
-        <div className="bg-sosoeat-orange-600 relative flex-1 overflow-hidden rounded-2xl p-4 md:p-5 lg:p-6">
+        <Link
+          href="/meetings?type=group-eat"
+          className="bg-sosoeat-orange-600 relative flex-1 overflow-hidden rounded-2xl p-4 md:p-5 lg:p-6"
+        >
           <div className="flex flex-col gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-white/20 lg:h-10 lg:w-10">
               <UtensilsCrossed className="h-5 w-5 text-white lg:h-6 lg:w-6" />
@@ -19,19 +22,19 @@ export function MeetingTypeSection() {
               <br />
               함께 할 사람을 모아요
             </p>
-            <Link
-              href="/meetings?type=group-eat"
-              className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white lg:px-4 lg:py-1.5 lg:text-sm"
-            >
+            <span className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white lg:px-4 lg:py-1.5 lg:text-sm">
               모임 찾기
               <ArrowRight className="size-3 lg:size-4" />
-            </Link>
+            </span>
           </div>
           <UtensilsCrossed className="absolute right-3 bottom-3 h-14 w-14 text-white/20 lg:right-4 lg:bottom-4 lg:h-20 lg:w-20" />
-        </div>
+        </Link>
 
         {/* 공동구매 */}
-        <div className="bg-sosoeat-blue-600 relative flex-1 overflow-hidden rounded-2xl p-4 md:p-5 lg:p-6">
+        <Link
+          href="/meetings?type=group-buy"
+          className="bg-sosoeat-blue-600 relative flex-1 overflow-hidden rounded-2xl p-4 md:p-5 lg:p-6"
+        >
           <div className="flex flex-col gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-white/20 lg:h-10 lg:w-10">
               <ShoppingCart className="h-5 w-5 text-white lg:h-6 lg:w-6" />
@@ -42,16 +45,13 @@ export function MeetingTypeSection() {
               <br />
               식재료를 함께 구매해요
             </p>
-            <Link
-              href="/meetings?type=group-buy"
-              className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white lg:px-4 lg:py-1.5 lg:text-sm"
-            >
+            <span className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white lg:px-4 lg:py-1.5 lg:text-sm">
               모임 찾기
               <ArrowRight className="size-3 lg:size-4" />
-            </Link>
+            </span>
           </div>
           <ShoppingCart className="absolute right-3 bottom-3 h-14 w-14 text-white/20 lg:right-4 lg:bottom-4 lg:h-20 lg:w-20" />
-        </div>
+        </Link>
       </div>
     </section>
   );
