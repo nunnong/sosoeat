@@ -36,7 +36,7 @@ export default function MeetingsPage() {
   //근데 vlaue===sort value === options 즉 sort === options임
   //sortBy는 dateTime, registrationEnd, participantCount
   return (
-    <div className="mx-auto flex max-w-[1140px] flex-col items-start justify-center gap-4 sm:px-4">
+    <div className="mx-auto flex max-w-[1140px] flex-col items-center justify-center gap-4 sm:px-4">
       <MeetingSearchBanner />
       <div className="flex flex-col gap-4 px-4 sm:px-0">
         <MeetingFilterBar
