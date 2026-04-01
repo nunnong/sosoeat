@@ -69,7 +69,7 @@ export function MeetingTabs() {
 
   return (
     <Tabs
-      className="mx-auto w-full max-w-[1140px] p-6 px-2"
+      className="mx-auto w-full max-w-285 p-6"
       value={activeTab}
       onValueChange={(v) => setActiveTab(v as TabValue)}
     >
@@ -86,7 +86,7 @@ export function MeetingTabs() {
           ) : cards.length === 0 ? (
             <MeetingTabsEmpty />
           ) : (
-            <div className="flex flex-col items-center gap-4 py-4 lg:flex-row">
+            <div className="flex flex-col items-center gap-4 py-4 lg:flex-row lg:flex-wrap lg:justify-center">
               {cards.map((card) => (
                 <MyPageCard key={card.meetingId} {...card} />
               ))}
