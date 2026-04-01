@@ -35,8 +35,8 @@ const useMeetingPage = () => {
       dateEnd == null
         ? undefined
         : new Date(dateEnd.getFullYear(), dateEnd.getMonth(), dateEnd.getDate() + 1),
-    sortBy: sortBy ? undefined : sortBy,
-    sortOrder: sortOrder ? undefined : sortOrder,
+    sortBy: sortBy,
+    sortOrder: sortOrder,
   };
 
   const handleTypeFilterChange = (value: 'all' | 'groupEat' | 'groupBuy') => {
