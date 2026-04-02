@@ -27,6 +27,8 @@ interface MeetingCommentItemProps {
   meetingId: number;
 }
 
+// ─── MeetingCommentItem ───────────────────────────────────────
+
 export function MeetingCommentItem({
   comment,
   isReply = false,
