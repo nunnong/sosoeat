@@ -11,7 +11,7 @@ export const meetingsQueryOptions = {
     queryKey: ['meetings', id],
     queryFn: async () => {
       const response = await meetingsApi.getAll();
-      const meeting = response.find((m) => m.id === id);
+      const meeting = response.data.find((m) => m.id === id);
       if (!meeting) {
         throw new Error('모임을 찾을 수 없습니다.');
       }

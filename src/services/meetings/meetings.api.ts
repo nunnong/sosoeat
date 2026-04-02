@@ -1,4 +1,5 @@
 import { fetchClient } from '@/lib/http/fetch-client';
+import { MeetingList } from '@/types/generated-client';
 import { CreateMeeting } from '@/types/generated-client/models/CreateMeeting';
 import { MeetingWithHost } from '@/types/generated-client/models/MeetingWithHost';
 import { UpdateMeeting } from '@/types/generated-client/models/UpdateMeeting';
@@ -45,7 +46,7 @@ export const meetingsApi = {
     return response.json();
   },
 
-  async getAll(): Promise<MeetingWithHost[]> {
+  async getAll(): Promise<MeetingList> {
     const response = await fetchClient.get('/meetings');
 
     if (!response.ok) {
