@@ -13,6 +13,7 @@ import {
   useLikeComment,
   useUpdateComment,
 } from '@/services/comments';
+import { useAuthStore } from '@/store/auth-store';
 
 import { EllipsisMenu } from '../meeting-detail-card/_components/ellipsis-menu';
 
@@ -44,21 +45,34 @@ export function MeetingCommentItem({
     replies,
   } = comment;
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(content);
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
   const { isOpen: isDeleteModalOpen, open: openDeleteModal, close: closeDeleteModal } = useModal();
 
+  const { user } = useAuthStore();
   const { mutate: likeComment } = useLikeComment(meetingId);
   const { mutate: updateComment } = useUpdateComment(meetingId);
   const { mutate: deleteComment } = useDeleteComment(meetingId);
-  const { mutate: createComment } = useCreateComment(meetingId);
+  const { mutate: createComment } = useCreateComment(meetingId, {
+    nickname: user?.name ?? '',
+    profileUrl: user?.image ?? null,
+  });
 
   const handleLike = () => {
     likeComment({ commentId: id, isLiked });
   };
 
-  const handleEdit = (content: string) => {
-    updateComment({ commentId: id, payload: { content } });
+  const handleEditSubmit = () => {
+    if (!editText.trim() || editText === content) {
+      setIsEditing(false);
+      return;
+    }
+    updateComment(
+      { commentId: id, payload: { content: editText.trim() } },
+      { onSuccess: () => setIsEditing(false) }
+    );
   };
 
   const handleDelete = () => {
@@ -107,20 +121,51 @@ export function MeetingCommentItem({
                   {formatCommentDate(createdAt)}
                 </span>
                 {isMine && !isDeleted && (
-                  <EllipsisMenu onEdit={() => handleEdit(content)} onDelete={openDeleteModal} />
+                  <EllipsisMenu onEdit={() => setIsEditing(true)} onDelete={openDeleteModal} />
                 )}
               </div>
             </div>
 
             {/* 본문 */}
-            <p
-              className={cn(
-                'mt-1 text-base font-medium',
-                isDeleted ? 'text-sosoeat-gray-600 italic' : 'text-sosoeat-gray-800'
-              )}
-            >
-              {isDeleted ? '삭제된 댓글입니다.' : content}
-            </p>
+            {isEditing ? (
+              <div className="mt-1 flex flex-col gap-1">
+                <textarea
+                  className="w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                  rows={2}
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  autoFocus
+                />
+                <div className="flex justify-end gap-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditText(content);
+                      setIsEditing(false);
+                    }}
+                    className="cursor-pointer rounded-lg px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleEditSubmit}
+                    className="bg-sosoeat-orange-600 cursor-pointer rounded-lg px-3 py-1 text-sm text-white"
+                  >
+                    저장
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p
+                className={cn(
+                  'mt-1 text-base font-medium',
+                  isDeleted ? 'text-sosoeat-gray-600 italic' : 'text-sosoeat-gray-800'
+                )}
+              >
+                {isDeleted ? '삭제된 댓글입니다.' : content}
+              </p>
+            )}
 
             {/* 좋아요 + 답글 버튼 */}
             {!isDeleted && (
@@ -182,11 +227,13 @@ export function MeetingCommentItem({
       </div>
 
       {/* ── 대댓글 목록 ── */}
-      {replies && replies.length > 0 && (
+      {replies && replies.filter((r) => !r.isDeleted).length > 0 && (
         <div className="mt-3 ml-[78px] space-y-3">
-          {replies.map((reply) => (
-            <MeetingCommentItem key={reply.id} comment={reply} isReply meetingId={meetingId} />
-          ))}
+          {replies
+            .filter((r) => !r.isDeleted)
+            .map((reply) => (
+              <MeetingCommentItem key={reply.id} comment={reply} isReply meetingId={meetingId} />
+            ))}
         </div>
       )}
 

@@ -45,7 +45,10 @@ describe('useCreateComment', () => {
     const { queryClient, wrapper } = createWrapper();
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
-    const { result } = renderHook(() => useCreateComment(MEETING_ID), { wrapper });
+    const { result } = renderHook(
+      () => useCreateComment(MEETING_ID, { nickname: '테스트', profileUrl: null }),
+      { wrapper }
+    );
 
     result.current.mutate({ content: '새 댓글' });
 
@@ -59,7 +62,10 @@ describe('useCreateComment', () => {
     mockCreateComment.mockRejectedValue(new Error('댓글 작성 실패'));
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useCreateComment(MEETING_ID), { wrapper });
+    const { result } = renderHook(
+      () => useCreateComment(MEETING_ID, { nickname: '테스트', profileUrl: null }),
+      { wrapper }
+    );
 
     result.current.mutate({ content: '새 댓글' });
 

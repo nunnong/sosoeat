@@ -21,7 +21,10 @@ export function MeetingCommentSection({
   const [text, setText] = useState('');
   const { isAuthenticated, user } = useAuthStore();
   const { data: comments } = useComments(meetingId, initialComments as Comment[]);
-  const { mutate: createComment } = useCreateComment(meetingId);
+  const { mutate: createComment } = useCreateComment(meetingId, {
+    nickname: user?.name ?? '',
+    profileUrl: user?.image ?? null,
+  });
 
   const handleSubmit = () => {
     if (!text.trim()) return;
@@ -33,9 +36,11 @@ export function MeetingCommentSection({
     <section className={cn('flex flex-col gap-4', className)}>
       {/* 댓글 목록 */}
       <div className="space-y-2">
-        {(comments ?? []).map((comment) => (
-          <MeetingCommentItem key={comment.id} comment={comment} meetingId={meetingId} />
-        ))}
+        {(comments ?? [])
+          .filter((comment) => !comment.isDeleted || comment.replies?.some((r) => !r.isDeleted))
+          .map((comment) => (
+            <MeetingCommentItem key={comment.id} comment={comment} meetingId={meetingId} />
+          ))}
       </div>
 
       {/* 댓글 입력 */}
