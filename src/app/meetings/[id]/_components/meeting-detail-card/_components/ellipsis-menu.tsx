@@ -1,3 +1,7 @@
+'use client';
+
+import { useSyncExternalStore } from 'react';
+
 import { EllipsisVerticalIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -13,7 +17,17 @@ interface EllipsisMenuProps {
   onDelete?: () => void;
 }
 
+const subscribe = () => () => {};
+
 export function EllipsisMenu({ onEdit, onDelete }: EllipsisMenuProps) {
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true, // 클라이언트: true
+    () => false // 서버: false
+  );
+
+  if (!mounted) return null;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
