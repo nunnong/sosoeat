@@ -83,15 +83,10 @@ export function MeetingCommentItem({
 
   const handleReplySubmit = () => {
     if (!replyText.trim()) return;
-    createComment(
-      { content: replyText, parentId: id },
-      {
-        onSuccess: () => {
-          setReplyText('');
-          setIsReplying(false);
-        },
-      }
-    );
+    const text = replyText.trim();
+    setReplyText('');
+    setIsReplying(false);
+    createComment({ content: text, parentId: id });
   };
 
   return (
@@ -180,7 +175,7 @@ export function MeetingCommentItem({
                   <span>{likeCount}</span>
                 </button>
 
-                {!isReply && (
+                {!isReply && id > 0 && (
                   <button
                     type="button"
                     aria-label="답글"
