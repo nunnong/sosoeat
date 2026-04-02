@@ -4,6 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown/index';
+import { cn } from '@/lib/utils';
 
 import type { DropdownSimpleProp } from './dropdown-simple.type';
 
@@ -14,18 +15,18 @@ export function DropdownSimple({
   onChange,
   triggerClassName = ' ',
   itemClassName = ' ',
+  contentClassName = ' ',
 }: DropdownSimpleProp) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={triggerClassName}>{placeholder}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className={cn(contentClassName)}>
         {options.map((option) => (
           <DropdownMenuCheckboxItem
             key={option}
             checked={value === option}
-            onSelect={(e) => e.preventDefault()}
-            onCheckedChange={(checked) => {
-              onChange(checked ? option : null);
+            onCheckedChange={() => {
+              onChange(option);
             }}
             className={itemClassName}
           >

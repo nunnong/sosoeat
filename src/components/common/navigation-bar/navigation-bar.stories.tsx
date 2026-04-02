@@ -25,8 +25,6 @@ const withAuthState =
 
 const MOCK_USER = { id: '1', name: '홍길동' };
 
-// ── 비로그인 ──────────────────────────────────────────
-
 export const NotLoggedIn: Story = {
   name: '비로그인',
   decorators: [withAuthState({ user: null })],
@@ -40,7 +38,13 @@ export const NotLoggedInActiveMenu: Story = {
   },
 };
 
-// ── 로그인 ────────────────────────────────────────────
+export const NotLoggedInWishList: Story = {
+  name: '비로그인 / 찜한 모임 클릭 → 로그인 이동',
+  decorators: [withAuthState({ user: null })],
+  parameters: {
+    nextjs: { navigation: { pathname: '/mypage?tab=liked' } },
+  },
+};
 
 export const LoggedIn: Story = {
   name: '로그인',
@@ -63,7 +67,3 @@ export const LoggedInWithProfileImage: Story = {
     }),
   ],
 };
-
-// TODO: 아래 스토리는 React Query 연결 후 추가 예정
-// - 알림 읽음/읽지 않음 (unreadCount)
-// - 찜한 모임 배지 표시 (wishlistCount)
