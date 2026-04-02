@@ -1,5 +1,3 @@
-import { get } from 'http';
-
 import { fetchClient } from '@/lib/http/fetch-client';
 import { CreateMeeting } from '@/types/generated-client/models/CreateMeeting';
 import { MeetingWithHost } from '@/types/generated-client/models/MeetingWithHost';
