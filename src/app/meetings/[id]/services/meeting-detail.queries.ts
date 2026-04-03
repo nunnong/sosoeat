@@ -2,26 +2,60 @@
 
 import { useRouter } from 'next/navigation';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { meetingsApi } from '@/services/meetings/meetings.api';
+import type { Meeting } from '@/types/meeting';
 
-export const useConfirmMeeting = (id: number, onSuccess?: () => void) =>
-  useMutation({
+export const meetingDetailKeys = {
+  detail: (id: number) => ['meetings', 'detail', id] as const,
+};
+
+export function useMeetingDetail(meetingId: number, initialData: Meeting) {
+  return useQuery({
+    queryKey: meetingDetailKeys.detail(meetingId),
+    queryFn: () => meetingsApi.getById(meetingId),
+    initialData,
+    staleTime: 60_000,
+  });
+}
+
+export const useConfirmMeeting = (id: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: () => meetingsApi.updateStatus(id, { status: 'CONFIRMED' }),
     retry: false,
-    onSuccess: () => {
-      toast.success('모임이 확정되었습니다.');
-      onSuccess?.();
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: meetingDetailKeys.detail(id) });
+      const previous = queryClient.getQueryData<Meeting>(meetingDetailKeys.detail(id));
+      if (previous) {
+        queryClient.setQueryData<Meeting>(meetingDetailKeys.detail(id), {
+          ...previous,
+          confirmedAt: new Date().toISOString(),
+        });
+      }
+      return { previous };
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(meetingDetailKeys.detail(id), context.previous);
+      }
       toast.error(error.message || '모임 확정 중 오류가 발생했습니다.');
     },
+    onSuccess: () => {
+      toast.success('모임이 확정되었습니다.');
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+    },
   });
+};
 
 export const useDeleteMeeting = (id: number) => {
   const router = useRouter();
+
   return useMutation({
     mutationFn: () => meetingsApi.deleteMeeting(id),
     onSuccess: () => {
@@ -34,28 +68,68 @@ export const useDeleteMeeting = (id: number) => {
   });
 };
 
-export const useJoinMeeting = (id: number, onSuccess?: () => void) =>
-  useMutation({
+export const useJoinMeeting = (id: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: () => meetingsApi.join(id),
     retry: false,
-    onSuccess: () => {
-      toast.success('모임에 참여했습니다.');
-      onSuccess?.();
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: meetingDetailKeys.detail(id) });
+      const previous = queryClient.getQueryData<Meeting>(meetingDetailKeys.detail(id));
+      if (previous) {
+        queryClient.setQueryData<Meeting>(meetingDetailKeys.detail(id), {
+          ...previous,
+          isJoined: true,
+          participantCount: Math.min(previous.capacity, previous.participantCount + 1),
+        });
+      }
+      return { previous };
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(meetingDetailKeys.detail(id), context.previous);
+      }
       toast.error(error.message || '모임 참여 중 오류가 발생했습니다.');
     },
+    onSuccess: () => {
+      toast.success('모임에 참여했습니다.');
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+    },
   });
+};
 
-export const useLeaveMeeting = (id: number, onSuccess?: () => void) =>
-  useMutation({
+export const useLeaveMeeting = (id: number) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
     mutationFn: () => meetingsApi.leave(id),
     retry: false,
-    onSuccess: () => {
-      toast.success('모임 참여를 취소했습니다.');
-      onSuccess?.();
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: meetingDetailKeys.detail(id) });
+      const previous = queryClient.getQueryData<Meeting>(meetingDetailKeys.detail(id));
+      if (previous) {
+        queryClient.setQueryData<Meeting>(meetingDetailKeys.detail(id), {
+          ...previous,
+          isJoined: false,
+          participantCount: Math.max(0, previous.participantCount - 1),
+        });
+      }
+      return { previous };
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(meetingDetailKeys.detail(id), context.previous);
+      }
       toast.error(error.message || '모임 참여 취소 중 오류가 발생했습니다.');
     },
+    onSuccess: () => {
+      toast.success('모임 참여를 취소했습니다.');
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+    },
   });
+};
