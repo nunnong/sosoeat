@@ -39,16 +39,20 @@ export const useConfirmMeeting = (id: number) => {
       return { previous };
     },
     onError: (error: Error, _, context) => {
-      if (context?.previous) {
+      if (context?.previous !== undefined) {
         queryClient.setQueryData(meetingDetailKeys.detail(id), context.previous);
+      } else {
+        void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
       }
       toast.error(error.message || '모임 확정 중 오류가 발생했습니다.');
     },
     onSuccess: () => {
       toast.success('모임이 확정되었습니다.');
     },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+    onSettled: (_data, error) => {
+      if (error == null) {
+        void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+      }
     },
   });
 };
@@ -87,16 +91,20 @@ export const useJoinMeeting = (id: number) => {
       return { previous };
     },
     onError: (error: Error, _, context) => {
-      if (context?.previous) {
+      if (context?.previous !== undefined) {
         queryClient.setQueryData(meetingDetailKeys.detail(id), context.previous);
+      } else {
+        void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
       }
       toast.error(error.message || '모임 참여 중 오류가 발생했습니다.');
     },
     onSuccess: () => {
       toast.success('모임에 참여했습니다.');
     },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+    onSettled: (_data, error) => {
+      if (error == null) {
+        void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+      }
     },
   });
 };
@@ -120,16 +128,20 @@ export const useLeaveMeeting = (id: number) => {
       return { previous };
     },
     onError: (error: Error, _, context) => {
-      if (context?.previous) {
+      if (context?.previous !== undefined) {
         queryClient.setQueryData(meetingDetailKeys.detail(id), context.previous);
+      } else {
+        void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
       }
       toast.error(error.message || '모임 참여 취소 중 오류가 발생했습니다.');
     },
     onSuccess: () => {
       toast.success('모임 참여를 취소했습니다.');
     },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+    onSettled: (_data, error) => {
+      if (error == null) {
+        void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(id) });
+      }
     },
   });
 };
