@@ -24,7 +24,6 @@ const useMeetingPage = () => {
 
   const region =
     regionCommitted == null ? undefined : `${regionCommitted.district} ${regionCommitted.province}`;
-  const dateStartIso = dateStart?.toISOString();
   const dateEndExclusiveIso =
     dateEnd == null
       ? undefined
