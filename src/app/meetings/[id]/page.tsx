@@ -48,7 +48,11 @@ export default async function MeetingDetailPage({ params }: Props) {
         </div>
       </section>
 
-      <MeetingLocationSection address={meetingData.address} />
+      <MeetingLocationSection
+        address={meetingData.address}
+        latitude={meetingData.latitude}
+        longitude={meetingData.longitude}
+      />
       <MeetingCommentSection meetingId={meetingId} initialComments={initialComments} />
       <MeetingRecommendedSection meetings={recommendedMeetings} />
     </main>
