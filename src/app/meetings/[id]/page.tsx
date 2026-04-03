@@ -37,7 +37,10 @@ export default async function MeetingDetailPage({ params }: Props) {
 
   return (
     <main className="space-y-[30px] py-10">
-      <MeetingHeroSection meeting={meetingData} />
+      <MeetingHeroSection
+        key={`${meetingData.id}-${meetingData.updatedAt}`}
+        meeting={meetingData}
+      />
 
       <section>
         <h2 className="text-sosoeat-gray-900 mb-3 text-2xl font-semibold">모임 설명</h2>

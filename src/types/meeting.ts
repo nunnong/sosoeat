@@ -6,8 +6,9 @@ export type Meeting = {
   type: MeetingCategory;
   region: string;
   address: string;
-  latitude: number;
-  longitude: number;
+  /** 백엔드에서 좌표 미입력 시 null */
+  latitude: number | null;
+  longitude: number | null;
   dateTime: string;
   registrationEnd: string;
   capacity: number;

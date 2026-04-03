@@ -3,15 +3,19 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import { MeetingEditModal, toMeetingEditFormData } from '@/components/common/meeting-edit-modal';
 import { useModal } from '@/hooks/use-modal';
 import type { Meeting } from '@/types/meeting';
 
 import {
+  meetingDetailKeys,
   useConfirmMeeting,
   useDeleteMeeting,
   useJoinMeeting,
   useLeaveMeeting,
+  useMeetingDetail,
 } from '../../services/meeting-detail.queries';
 import { MeetingDetailCard } from '../meeting-detail-card';
 
@@ -21,16 +25,23 @@ interface MeetingHeroSectionProps {
   meeting: Meeting;
 }
 
-export function MeetingHeroSection({ meeting }: MeetingHeroSectionProps) {
+export function MeetingHeroSection({ meeting: initialMeeting }: MeetingHeroSectionProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: meetingData } = useMeetingDetail(initialMeeting.id, initialMeeting);
+  const meeting = meetingData ?? initialMeeting;
+
   const { role, status } = useMeetingRole(meeting);
   const { isOpen: isEditOpen, open: openEdit, close: closeEdit } = useModal();
 
-  const refresh = () => router.refresh();
+  const refreshPageAndMeetingCache = () => {
+    void queryClient.invalidateQueries({ queryKey: meetingDetailKeys.detail(meeting.id) });
+    router.refresh();
+  };
 
-  const joinMutation = useJoinMeeting(meeting.id, refresh);
-  const leaveMutation = useLeaveMeeting(meeting.id, refresh);
-  const confirmMutation = useConfirmMeeting(meeting.id, refresh);
+  const joinMutation = useJoinMeeting(meeting.id);
+  const leaveMutation = useLeaveMeeting(meeting.id);
+  const confirmMutation = useConfirmMeeting(meeting.id);
   const deleteMutation = useDeleteMeeting(meeting.id);
 
   const isActionPending =
@@ -81,7 +92,7 @@ export function MeetingHeroSection({ meeting }: MeetingHeroSectionProps) {
           onClose={closeEdit}
           meetingId={meeting.id}
           defaultValues={toMeetingEditFormData(meeting)}
-          onSuccess={refresh}
+          onSuccess={refreshPageAndMeetingCache}
         />
       )}
     </>
